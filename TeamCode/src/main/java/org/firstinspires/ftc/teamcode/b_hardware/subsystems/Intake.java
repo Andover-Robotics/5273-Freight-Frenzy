@@ -6,21 +6,67 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+
 public class Intake extends SubsystemBase {
-    public static final double SPEED = 0.5;
-    public MotorEx motor;
+    public static final double SPEED = 1;
+    public MotorEx leftIntake;
+    public MotorEx rightIntake;
+
+    public enum state {
+        ON,
+        OFF,
+        REVERSE,
+        LEFT,
+        RIGHT
+    }
+
+    public state toggleState = state.OFF;
 
     public Intake(OpMode opMode){
-        motor = new MotorEx(opMode.hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
-        motor.setRunMode(Motor.RunMode.RawPower);
-        motor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_435);
+        leftIntake.setRunMode(Motor.RunMode.RawPower);
+        rightIntake = new MotorEx(opMode.hardwareMap, "rightIntake", Motor.GoBILDA.RPM_435);
+        rightIntake.setRunMode(Motor.RunMode.RawPower);
+        rightIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    public void toggle() {
+        if(toggleState == state.ON) {
+            stop();
+        }
+        else {
+            run();
+        }
+    }
+
+    public void switchIntake(){
+        if (toggleState == state.LEFT) {
+            leftIntake.set(0.0);
+            rightIntake.set(SPEED);
+            toggleState = state.LEFT;
+        }
+        else {
+            rightIntake.set(0.0);
+            leftIntake.set(SPEED);
+            toggleState = state.RIGHT;
+        }
     }
 
     public void run(){
-        motor.set(SPEED);
+        leftIntake.set(SPEED);
+        rightIntake.set(SPEED);
+        toggleState = state.ON;
+    }
+
+    public void outtake(){
+        leftIntake.set(- SPEED);
+        rightIntake.set(- SPEED);
+        toggleState = state.REVERSE;
     }
 
     public void stop(){
-        motor.set(0.0);
+        leftIntake.set(0.0);
+        rightIntake.set(0.0);
+        toggleState = state.OFF;
     }
 }

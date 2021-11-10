@@ -51,14 +51,19 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   //If there is a module-specific var, put it in the module class ie slideStage goes in the slides module
 
 
-  private MotorEx carousel;
+  private MotorEx leftIntake;
+  private MotorEx rightIntake;
 
   void subInit() {
     //TODO: initialize subsystems not initialized in bot constructor
     timingScheduler = new TimingScheduler(this);
-    carousel = new MotorEx(hardwareMap, "carousel");
-    carousel.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-    carousel.set(0);
+    leftIntake = new MotorEx(hardwareMap, "leftIntake");
+    leftIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    leftIntake.set(0);
+
+    rightIntake = new MotorEx(hardwareMap, "rightIntake");
+    rightIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    rightIntake.set(0);
   }
 
   @Override
@@ -69,7 +74,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     timingScheduler.run();
 
     //Movement =================================================================================================
-    //TODO: change depending on mode :)
+    //TODO: change depending on mode
     driveSpeed = 1 - 0.35 * (triggerSignal(Trigger.LEFT_TRIGGER) + triggerSignal(Trigger.RIGHT_TRIGGER));
 
     if(justPressed(Button.BACK)){
@@ -92,10 +97,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.carousel.stop();
     }
 
-    if(buttonSignal(Button.B)){
-      bot.intake.run();
-    }else{
-      bot.intake.stop();
+
+    if(gamepadEx1.wasJustReleased(Button.B)) {
+      bot.intake.toggle();
     }
 
 
@@ -168,7 +172,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
             gyroAngle);
       else
         bot.drive.driveRobotCentric(
-            driveVector.getY() * driveSpeed,
+            -driveVector.getY() * driveSpeed,
             -driveVector.getX() * driveSpeed,
             turnVector.getX() * driveSpeed
         );
