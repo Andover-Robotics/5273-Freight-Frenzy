@@ -29,6 +29,7 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
   @Override
   public void runOpMode() throws InterruptedException {
     Bot.instance = null;
+
     bot = Bot.getInstance(this);
     gamepad = new GamepadEx(gamepad1);
 
