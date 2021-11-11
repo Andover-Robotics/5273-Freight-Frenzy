@@ -91,10 +91,13 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
 
     //TODO: insert actual teleop stuff here
+
+    //Carousel stuff
     if(gamepadEx1.wasJustReleased(Button.Y)){
       bot.carousel.run();
     }
 
+    //Intake stuff
     if(gamepadEx1.isDown(Button.RIGHT_STICK_BUTTON)) {
       bot.intake.reverse();
     }
