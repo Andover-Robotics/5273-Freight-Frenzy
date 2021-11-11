@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.R;
 
 
 public class Intake extends SubsystemBase {
-    public static final double SPEED = 1;
+    public static final double SPEED = 0.8;
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 
