@@ -91,16 +91,17 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
 
     //TODO: insert actual teleop stuff here
-    if(buttonSignal(Button.DPAD_UP)){
+    if(gamepadEx1.wasJustReleased(Button.Y)){
       bot.carousel.run();
-    }else{
-      bot.carousel.stop();
     }
 
-
-    if(gamepadEx1.wasJustReleased(Button.B)) {
-      bot.intake.toggle();
+    if(gamepadEx1.isDown(Button.RIGHT_STICK_BUTTON)) {
+      bot.intake.reverse();
     }
+    else if(gamepadEx1.wasJustReleased(Button.B)) {
+      bot.intake.runToggle();
+    }
+
 
 
     /*//TODO: make control scheme
