@@ -74,7 +74,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-    driveSpeed = 1 - 0.35 * (triggerSignal(Trigger.LEFT_TRIGGER) + triggerSignal(Trigger.RIGHT_TRIGGER));
+    driveSpeed = 1 - 0.35 * (triggerSignal(Trigger.LEFT_TRIGGER));
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -104,18 +104,18 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if(gamepadEx1.isDown(Button.RIGHT_STICK_BUTTON)) {
       bot.intake.reverse();
     }
-    else if(gamepadEx1.wasJustReleased(Button.B)) {
+    if(gamepadEx1.wasJustReleased(Button.B)) {
       bot.intake.runToggle();
     }
 
-    if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outake.openLeftFlap();
-      bot.outake.closeRightFlap();
-    }
-    else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outake.openRightFlap();
-      bot.outake.closeLeftFlap();
-    }
+//    if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
+//      bot.outake.openLeftFlap();
+//      bot.outake.closeRightFlap();
+//    }
+//    else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
+//      bot.outake.openRightFlap();
+//      bot.outake.closeLeftFlap();
+//    }
 
     if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
       bot.outake.flipBucket();
@@ -125,7 +125,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
-      bot.outakeBucket.runSlides();
+      bot.outake.runSlides();
+    }
+
+    if(bot.outake.freightInBucket()) {
+      bot.outake.closeLeftFlap();
+      bot.outake.closeRightFlap();
+    }
+    else {
+      bot.outake.openLeftFlap();
+      bot.outake.openRightFlap();
     }
 
 
