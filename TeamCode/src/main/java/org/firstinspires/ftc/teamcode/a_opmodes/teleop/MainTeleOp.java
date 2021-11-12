@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import android.hardware.TriggerEvent;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
@@ -25,6 +27,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private boolean centricity = false;
   private boolean isManual = true;
   private int percent = 1, part = 0;
+  private double triggerConstant = 0.05;
 
 
 
@@ -102,11 +105,18 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     //Intake stuff
+
     if(gamepadEx1.isDown(Button.RIGHT_STICK_BUTTON)) {
+      bot.intake.runToggle();
+    }
+    else if (gamepadEx1.isDown(Button.LEFT_STICK_BUTTON)){
       bot.intake.reverse();
     }
-    else if(gamepadEx1.wasJustReleased(Button.B)) {
-      bot.intake.runToggle();
+    else if(gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
+      bot.intake.runRight();
+    }
+    else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
+      bot.intake.runLeft();
     }
 
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
@@ -125,7 +135,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outakeBucket.unFlipBucket();
     }
 
-    if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
+    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
       bot.outakeBucket.runSlides();
     }
 
