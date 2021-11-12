@@ -23,7 +23,7 @@ public class Bot {
   //example
   public final Carousel carousel;
   public final Intake intake;
-  public final Outake outakeBucket;
+  public final Outake outake;
 //  public final TemplateSubsystem templateSubsystem;
 
 
@@ -71,7 +71,7 @@ public class Bot {
 //    this.templateSubsystem = new TemplateSubsystem(opMode);
     this.carousel = new Carousel(opMode);
     this.intake = new Intake(opMode);
-    this.outakeBucket = new Outake(opMode);
+    this.outake = new Outake(opMode);
 
 
 
