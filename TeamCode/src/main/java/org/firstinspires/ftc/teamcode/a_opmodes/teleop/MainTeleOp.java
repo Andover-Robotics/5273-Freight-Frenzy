@@ -124,6 +124,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outake.unFlipBucket();
     }
 
+    if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
+      bot.outakeBucket.runSlides();
+    }
+
 
 
     /*//TODO: make control scheme
