@@ -10,9 +10,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Outake extends SubsystemBase {
 
-    private static final double OPEN = 90/360;
+    private static final double OPEN = 0.27;
     private static final double CLOSED = 0;
-    private static final double FLIPPED = 145/360;
+    private static final double FLIPPED = 0.49;
     private static final double UNFLIPPED = 0;
 
     private Servo leftFlap, rightFlap, bucket;

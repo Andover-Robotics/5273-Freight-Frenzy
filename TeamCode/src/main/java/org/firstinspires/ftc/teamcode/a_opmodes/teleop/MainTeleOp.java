@@ -81,9 +81,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       isManual = !isManual;
     }
 
-    if(isManual) {
+    if (isManual) {
       drive();
-    }else{
+    }
+    else {
       followPath();
     }
 
@@ -93,8 +94,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     //TODO: insert actual teleop stuff here
 
     //Carousel stuff
-    if(gamepadEx1.wasJustReleased(Button.Y)){
+    if (gamepadEx1.wasJustReleased(Button.Y)){
       bot.carousel.run();
+    }
+    else if (gamepadEx1.wasJustReleased(Button.A)){
+      bot.carousel.stop();
     }
 
     //Intake stuff
@@ -103,6 +107,22 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx1.wasJustReleased(Button.B)) {
       bot.intake.runToggle();
+    }
+
+    if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
+      bot.outakeBucket.openLeftFlap();
+      bot.outakeBucket.closeRightFlap();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
+      bot.outakeBucket.openRightFlap();
+      bot.outakeBucket.closeLeftFlap();
+    }
+
+    if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
+      bot.outakeBucket.flipBucket();
+    }
+    else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
+      bot.outakeBucket.unFlipBucket();
     }
 
 
@@ -124,16 +144,18 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     Controller 2
     A:      B:      X:      Y:
     DPAD
-    L:      D:     U:      R:
+    L:      D: Unflip Bucket    U: Flip Bucket     R:
     Joystick
     L:movement/reset field centric or progress automation
     R:movement/switch robotfield centric or none
     Trigger L/R: slow driving
     Bumper
-    L:none/switch to previous path      R:none/switch to next path
+    L: Open Left Flap, Close Right Flap      R: Open Right Flap, Close Left Flap
     Other
     Start:  Back:switch between automation and driving
      */
+
+    
 
 
     /*

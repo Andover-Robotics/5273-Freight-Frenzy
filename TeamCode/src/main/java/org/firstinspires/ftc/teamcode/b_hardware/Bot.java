@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Carousel;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.b_hardware.subsystems.OutakeBucket;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
 
 public class Bot {
@@ -22,6 +23,7 @@ public class Bot {
   //example
   public final Carousel carousel;
   public final Intake intake;
+  public final OutakeBucket outakeBucket;
 //  public final TemplateSubsystem templateSubsystem;
 
 
@@ -69,6 +71,7 @@ public class Bot {
 //    this.templateSubsystem = new TemplateSubsystem(opMode);
     this.carousel = new Carousel(opMode);
     this.intake = new Intake(opMode);
+    this.outakeBucket = new OutakeBucket(opMode);
 
 
 
