@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -110,19 +109,19 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outakeBucket.openLeftFlap();
-      bot.outakeBucket.closeRightFlap();
+      bot.outake.openLeftFlap();
+      bot.outake.closeRightFlap();
     }
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outakeBucket.openRightFlap();
-      bot.outakeBucket.closeLeftFlap();
+      bot.outake.openRightFlap();
+      bot.outake.closeLeftFlap();
     }
 
     if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
-      bot.outakeBucket.flipBucket();
+      bot.outake.flipBucket();
     }
     else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
-      bot.outakeBucket.unFlipBucket();
+      bot.outake.unFlipBucket();
     }
 
 
