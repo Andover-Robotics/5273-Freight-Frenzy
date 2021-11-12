@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Outake extends SubsystemBase {
@@ -14,6 +15,11 @@ public class Outake extends SubsystemBase {
     private static final double CLOSED = 0;
     private static final double FLIPPED = 0.49;
     private static final double UNFLIPPED = 0;
+
+    private static final double DIAMETER = 38.0;
+    private static final double SPOOL = 185.0;
+    private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
+    private static final double SLIDE_SPEED = 0.05;
 
     private Servo leftFlap, rightFlap, bucket;
     private MotorEx slideMotor;
@@ -76,6 +82,15 @@ public class Outake extends SubsystemBase {
     }
     public void closeRightFlap() {
         rightFlap.setPosition(CLOSED);
+    }
+
+    public void runSlides(){
+        //TODO: Code this method
+        slideMotor.resetEncoder();
+        while (slideMotor.encoder.getRevolutions() < ROTATIONS) {
+            slideMotor.set(SLIDE_SPEED);
+        }
+        slideMotor.set(0.0);
     }
 
 }
