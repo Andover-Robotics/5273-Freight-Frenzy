@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outake;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
 
+import java.util.concurrent.Executors;
+
 public class Bot {
   // in TeleOp and Autonomous we should be able to call "new Bot(this)"
   // bot.intake.run(), bot.shooter.spinUp
@@ -71,7 +73,7 @@ public class Bot {
 //    this.templateSubsystem = new TemplateSubsystem(opMode);
     this.carousel = new Carousel(opMode);
     this.intake = new Intake(opMode);
-    this.outake = new Outake(opMode);
+    this.outake = new Outake(opMode, Executors.newSingleThreadExecutor());
 
 
 

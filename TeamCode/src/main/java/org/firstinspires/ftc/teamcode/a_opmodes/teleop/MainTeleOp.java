@@ -120,23 +120,28 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outakeBucket.openLeftFlap();
-      bot.outakeBucket.closeRightFlap();
+      bot.outake.openLeftFlap();
+      bot.outake.closeRightFlap();
     }
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outakeBucket.openRightFlap();
-      bot.outakeBucket.closeLeftFlap();
+      bot.outake.openRightFlap();
+      bot.outake.closeLeftFlap();
     }
 
     if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
-      bot.outakeBucket.flipBucket();
+      bot.outake.flipBucket();
     }
     else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
-      bot.outakeBucket.unFlipBucket();
+      bot.outake.unFlipBucket();
     }
 
     if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
-      bot.outakeBucket.runSlides();
+      bot.outake.runSlides();
+    }
+
+    if (bot.outake.freightInBucket()){
+      bot.outake.closeLeftFlap();
+      bot.outake.closeRightFlap();
     }
 
 
