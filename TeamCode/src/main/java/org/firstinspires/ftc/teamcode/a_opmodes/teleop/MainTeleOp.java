@@ -78,7 +78,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-    driveSpeed = 1 - 0.35 * (triggerSignal(Trigger.LEFT_TRIGGER) + triggerSignal(Trigger.RIGHT_TRIGGER));
+    driveSpeed = 1 - 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -106,17 +106,20 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Intake stuff
 
-    if(gamepadEx1.isDown(Button.RIGHT_STICK_BUTTON)) {
+    if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
       bot.intake.runToggle();
     }
-    else if (gamepadEx1.isDown(Button.LEFT_STICK_BUTTON)){
+    else if (gamepadEx2.isDown(Button.LEFT_STICK_BUTTON)){
       bot.intake.reverse();
     }
-    else if(gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
+    else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();
     }
-    else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
+    else if (gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
       bot.intake.runLeft();
+    }
+    else {
+      bot.intake.stop();
     }
 
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
@@ -135,7 +138,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outake.unFlipBucket();
     }
 
-    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
+    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
       bot.outake.runSlides();
     }
 
@@ -226,9 +229,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       fieldCentricOffset = bot.imu.getAngularOrientation()
           .toAngleUnit(AngleUnit.DEGREES).firstAngle;
     }
-    if(justPressed(Button.RIGHT_STICK_BUTTON)){
+    if (justPressed(Button.RIGHT_STICK_BUTTON)){
       centricity = !centricity;
     }
+
   }
 
   private void followPath(){//Path following ===================================================================================

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 public class Intake extends SubsystemBase {
-    public static final double SPEED = - 1.0;
+    public static final double SPEED = 1.0;
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 
@@ -25,6 +25,7 @@ public class Intake extends SubsystemBase {
     public Intake(OpMode opMode){
         leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_312);
         leftIntake.setRunMode(Motor.RunMode.RawPower);
+        rightIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightIntake = new MotorEx(opMode.hardwareMap, "rightIntake", Motor.GoBILDA.RPM_312);
         rightIntake.setRunMode(Motor.RunMode.RawPower);
         rightIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);

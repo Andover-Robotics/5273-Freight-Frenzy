@@ -12,7 +12,7 @@ import java.lang.Math.toRadians
 import kotlin.math.PI
 import kotlin.math.roundToInt
 
-class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths functionality to this
+class AutoPaths(val opMode: LinearOpMode, val pipelineResult: TemplateDetector.PipelineResult) {//TODO: possibly add the TeleOpPaths functionality to this
 
     //TODO: reverse this
 
@@ -71,6 +71,9 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     //TODO: Insert pose/vector vals here
 
+    val startPose = Pose2d(-36.0, -66.0, 0.0)
+    // val elementY = (pipelineResult == TemplateDetector.PipelineResult.LEFT ? )
+
     //                                                                  ===================================================
 
     //example
@@ -80,21 +83,24 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //            4 to Pose2d(48 - 5.1, -48.0 - 3.0556 - 3f, (-90.0 + 30.268).toRadians)
     //    )
 
-    val startPose = Pose2d(0.0, 0.0, 0.0)
-
     //TODO: Make Trajectories in trajectorySets
 
     //                                                                              ====================================================
     private val trajectorySets: Map<TemplateDetector.PipelineResult, List<AutoPathElement>> = mapOf(
             //use !! when accessing maps ie: dropSecondWobble[0]!!
             //example
-            TemplateDetector.PipelineResult.LEFT to run{
+            TemplateDetector.PipelineResult.LEFT to run {
                 listOf(
-                makePath("forward 4",
-                    drive.trajectoryBuilder(startPose)
-                        .lineToConstantHeading(Vector2d(0.0, 12.0))
-                        .build())
-                )
+                    makePath("Strafe Left to Carousel",
+                        drive.trajectoryBuilder(startPose)
+                            .strafeLeft(16.75)
+                            .build()))
+                    /* makePath("Pick Up Team Shipping Element",
+                        drive.trajectoryBuilder(startPose.plus(Pose2d(-16.75, 0.0, 0.0)))
+                            .splineToLinearHeading(elementPose, 100.0)
+                            .build()))
+
+                     */
             },
             TemplateDetector.PipelineResult.RIGHT to run{
                 listOf(
