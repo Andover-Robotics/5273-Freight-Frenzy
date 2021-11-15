@@ -139,13 +139,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
-      bot.outake.runSlides();
+      //bot.outake.runSlides();
     }
 
+    /*
     if (bot.outake.freightInBucket()){
       bot.outake.closeLeftFlap();
       bot.outake.closeRightFlap();
     }
+     */
 
 
 

@@ -69,14 +69,17 @@ public class Outake extends SubsystemBase {
         bucket.setDirection(Servo.Direction.FORWARD);
         bucket.setPosition(UNFLIPPED);
 
+        /*
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.VelocityControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
-        rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
+         */
 
-        closeBucket();
+        //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
+        //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
+
+        //closeBucket();
     }
 
     public void toggleBucket() {
@@ -99,7 +102,7 @@ public class Outake extends SubsystemBase {
 
     //TODO: add sensors to auto detect when minerals enter the bucket - auto close the flaps then
     // can start coding now - sensors will be REV color sensors
-
+     /*
     public void closeBucket() {
         Future<?> closeFlaps = executorService.submit(() -> {
             while (true) {
@@ -131,6 +134,8 @@ public class Outake extends SubsystemBase {
         }
         return false;
     }
+     */
+
 
     public void openLeftFlap() {
         leftFlap.setPosition(OPEN);
@@ -145,6 +150,7 @@ public class Outake extends SubsystemBase {
         rightFlap.setPosition(CLOSED);
     }
 
+    /*
     public void runSlides(){
         //TODO: Code this method
         slideMotor.resetEncoder();
@@ -155,5 +161,7 @@ public class Outake extends SubsystemBase {
         slideMotor.set(SLIDE_STOPPED);
         eState = extensionState.RETRACTED;
     }
+
+     */
 
 }

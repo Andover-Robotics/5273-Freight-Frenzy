@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
     public Intake(OpMode opMode){
         leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_312);
         leftIntake.setRunMode(Motor.RunMode.RawPower);
-        rightIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightIntake = new MotorEx(opMode.hardwareMap, "rightIntake", Motor.GoBILDA.RPM_312);
         rightIntake.setRunMode(Motor.RunMode.RawPower);
         rightIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
