@@ -1,21 +1,16 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 
-import android.graphics.Color;
-
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.I2cAddr;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public class Outake extends SubsystemBase {
 
@@ -24,14 +19,30 @@ public class Outake extends SubsystemBase {
     private static final double FLIPPED = 0.49;
     private static final double UNFLIPPED = 0;
 
-    private static final double DIAMETER = 38.0; // in millimeters
-    private static final double SPOOL = 185.0; // in millimeters
+    private static final double DIAMETER = 38.0;
+    private static final double SPOOL = 185.0;
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
     private static final double SLIDE_SPEED = 0.05;
+    private static final double SLIDE_STOPPED = 0.0;
+
+    private static final int RED_WHITE = 255;
+    private static final int GREEN_WHITE = 255;
+    private static final int BLUE_WHITE = 255;
+    private static int[] white = new int[] {RED_WHITE, GREEN_WHITE, BLUE_WHITE};
+
+    private static final int RED_YELLOW = 0;
+    private static final int GREEN_YELLOW = 255;
+    private static final int BLUE_YELLOW = 255;
+    private static int[] yellow = new int[] {RED_YELLOW, GREEN_YELLOW, BLUE_YELLOW};
+
+    private static int[][] colors = new int[][] {white, yellow};
+
+    private static final double MARGIN = 0.15;
 
     private Servo leftFlap, rightFlap, bucket;
     private MotorEx slideMotor;
     private ColorSensor leftSensor, rightSensor;
+    private ExecutorService executorService;
 
     private enum bucketState {
         FLIPPED,
@@ -44,8 +55,9 @@ public class Outake extends SubsystemBase {
     private extensionState eState = extensionState.RETRACTED;
     private bucketState bState = bucketState.UNFLIPPED;
 
-    public Outake(OpMode opMode) {
+    public Outake(OpMode opMode, ExecutorService executorService) {
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
+        this.executorService = executorService;
         leftFlap.setDirection(Servo.Direction.FORWARD);
         leftFlap.setPosition(OPEN);
 
@@ -57,13 +69,17 @@ public class Outake extends SubsystemBase {
         bucket.setDirection(Servo.Direction.FORWARD);
         bucket.setPosition(UNFLIPPED);
 
+        /*
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.VelocityControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
-        rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
+         */
 
+        //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
+        //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
+
+        //closeBucket();
     }
 
     public void toggleBucket() {
@@ -86,13 +102,40 @@ public class Outake extends SubsystemBase {
 
     //TODO: add sensors to auto detect when minerals enter the bucket - auto close the flaps then
     // can start coding now - sensors will be REV color sensors
+     /*
+    public void closeBucket() {
+        Future<?> closeFlaps = executorService.submit(() -> {
+            while (true) {
+                for (int[] color : colors) {
 
+                    int red = color[0];
+                    int green = color[1];
+                    int blue = color[2];
+
+                    double redVal = (double) (rightSensor.red());
+                    double greenVal = (double) (rightSensor.green());
+                    double blueVal = (double) (rightSensor.blue());
+
+                    boolean isRed = red * (1 - MARGIN) <= redVal && redVal <= red * (1 + MARGIN);
+                    boolean isGreen = green * (1 - MARGIN) <= greenVal && greenVal <= green * (1 + MARGIN);
+                    boolean isBlue = blue * (1 - MARGIN) <= blueVal && blueVal <= blue * (1 + MARGIN);
+
+                    if (isRed && isGreen && isBlue) {
+                        closeLeftFlap();
+                        closeRightFlap();
+                    }
+                }
+            }
+        });
+    }
     public boolean freightInBucket() {
         if((leftSensor.alpha() < 50 || rightSensor.alpha() < 50)) {
             return true;
         }
         return false;
     }
+     */
+
 
     public void openLeftFlap() {
         leftFlap.setPosition(OPEN);
@@ -106,15 +149,8 @@ public class Outake extends SubsystemBase {
     public void closeRightFlap() {
         rightFlap.setPosition(CLOSED);
     }
-    public void closeFlaps() {
-        closeLeftFlap();
-        closeRightFlap();
-    }
-    public void openFlaps() {
-        openLeftFlap();
-        openRightFlap();
-    }
 
+    /*
     public void runSlides(){
         //TODO: Code this method
         slideMotor.resetEncoder();
@@ -122,8 +158,10 @@ public class Outake extends SubsystemBase {
             slideMotor.set(SLIDE_SPEED);
             eState = extensionState.EXTENDED;
         }
-        slideMotor.set(0.0);
+        slideMotor.set(SLIDE_STOPPED);
         eState = extensionState.RETRACTED;
     }
+
+     */
 
 }

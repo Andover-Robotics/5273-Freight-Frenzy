@@ -71,6 +71,8 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
 //    if (detected == null)
 //      detected = PipelineResult.LEFT;
 
+    waitForStart();
+
     detected = PipelineResult.RIGHT;
     List<AutoPathElement> trajectories = paths.getTrajectories(detected);
 //    pipeline.close();
@@ -78,7 +80,13 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
 
     //Roadrunner stuff
 
-    bot.roadRunner.setPoseEstimate(paths.getStartPose());
+    if (detected == PipelineResult.RIGHT){
+      bot.roadRunner.setPoseEstimate(paths.getRightStartPose());
+    }
+    else {
+      bot.roadRunner.setPoseEstimate(paths.getLeftStartPose());
+    }
+
 
     if (isStopRequested())
       return;

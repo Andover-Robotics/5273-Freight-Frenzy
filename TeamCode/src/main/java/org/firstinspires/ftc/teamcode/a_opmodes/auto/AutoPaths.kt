@@ -23,6 +23,14 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         //AutoPathElement.Action(name) {actions to take(include sleeps)}
     }
 
+    public val rightStartPose = Pose2d(- 12.0, - 66.5, 0.0)
+    public val leftStartPose = Pose2d(- 12.0, 67.5, 0.0)
+
+
+    private fun Pose2d(x: Double, result: Map<TemplateDetector.PipelineResult, Double>, heading: Double): Pose2d {
+        return Pose2d(x, mapOf(TemplateDetector.PipelineResult.LEFT to - 67.5, TemplateDetector.PipelineResult.RIGHT to 67.5), 180.0)
+    }
+
     val bot: Bot = Bot.getInstance()
     val drive: RRMecanumDrive = bot.roadRunner
     val Double.toRadians get() = (toRadians(this))
@@ -57,6 +65,10 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     //TODO: insert action vals here
 
+    private val runCarousel = AutoPathElement.Action("Run carousel motor") {
+              Thread.sleep(2000)
+              bot.carousel.stop()
+    }
     //                                                                  =======================================================
 
     //example
@@ -71,6 +83,10 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     //TODO: Insert pose/vector vals here
 
+    private val strafe_distance = 28.0;
+
+    // val elementY = (pipelineResult == TemplateDetector.PipelineResult.LEFT ? )
+
     //                                                                  ===================================================
 
     //example
@@ -80,71 +96,65 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //            4 to Pose2d(48 - 5.1, -48.0 - 3.0556 - 3f, (-90.0 + 30.268).toRadians)
     //    )
 
-    val startPose = Pose2d(0.0, 0.0, 0.0)
-
     //TODO: Make Trajectories in trajectorySets
 
-    //                                                                              ====================================================
+    //TODO: Separate alliance-specific and position-specific paths                                                                            ====================================================
     private val trajectorySets: Map<TemplateDetector.PipelineResult, List<AutoPathElement>> = mapOf(
             //use !! when accessing maps ie: dropSecondWobble[0]!!
             //example
-            TemplateDetector.PipelineResult.LEFT to run{
+            TemplateDetector.PipelineResult.LEFT to run {
                 listOf(
-                makePath("forward 4",
-                    drive.trajectoryBuilder(startPose)
-                        .lineToConstantHeading(Vector2d(0.0, 12.0))
-                        .build())
-                )
+                    makePath("Strafe Right to Shipping Hub",
+                        drive.trajectoryBuilder(leftStartPose)
+                            .strafeRight(strafe_distance)
+                            .build()),
+                    makePath("Strafe Left to Wall",
+                        drive.trajectoryBuilder(lastPosition)
+                            .strafeLeft(strafe_distance - 2.0)
+                            .build()),
+                    makePath("Drive Backwards to Carousel",
+                        drive.trajectoryBuilder(lastPosition)
+                            .back(50.5)
+                            .addSpatialMarker(Vector2d(-48.0, -66.5)){
+                                bot.carousel.run()
+                            }
+                            .build()),
+                    runCarousel,
+                    makePath("Drive Forward to Park",
+                        drive.trajectoryBuilder(lastPosition)
+                            .forward(102.0)
+                            .build())
+                    )
+                    /* makePath("Pick Up Team Shipping Element",
+                        drive.trajectoryBuilder(startPose.plus(Pose2d(-16.75, 0.0, 0.0)))
+                            .splineToLinearHeading(elementPose, 100.0)
+                            .build()))
+
+                     */
             },
+
             TemplateDetector.PipelineResult.RIGHT to run{
                 listOf(
-                    makePath("forward 8",
-                        drive.trajectoryBuilder(startPose)
-                            .lineToConstantHeading(Vector2d(0.0, 24.0))
+                    makePath("Strafe Right to Shipping Hub",
+                        drive.trajectoryBuilder(rightStartPose)
+                            .strafeRight(strafe_distance)
                             .build()),
-                    makePath("left 8",
+                    makePath("Strafe Left to Wall",
                         drive.trajectoryBuilder(lastPosition)
-                            .lineToConstantHeading(Vector2d(24.0, 24.0))
+                            .strafeLeft(strafe_distance - 2.0)
                             .build()),
-                    makePath("back 8",
+                    makePath("Drive Backwards to Carousel",
                         drive.trajectoryBuilder(lastPosition)
-                            .lineToConstantHeading(Vector2d(24.0, 0.0))
+                            .forward( 50.5)
+                            .addSpatialMarker(Vector2d(-48.0, -66.5)){
+                                bot.carousel.run()
+                            }
                             .build()),
-                    makePath("right 8",
+                    runCarousel,
+                    makePath("Drive Forward to Park",
                         drive.trajectoryBuilder(lastPosition)
-                            .lineToConstantHeading(startPose.vec())
-                            .build()),
-                    makeAction("wait for 3 seconds"){
-                        Thread.sleep(3000)
-                    },
-                    makePath("spline forward",
-                        drive.trajectoryBuilder(lastPosition)
-                            .splineTo(Vector2d(24.0, 24.0), 0.0)
-                            .build()),
-                    makePath("spline backward",
-                        drive.trajectoryBuilder(lastPosition, 180.0)
-                            .splineTo(startPose.vec(), 180.0)
-                            .build()),
-                    makeAction("wait for 3 seconds"){
-                        Thread.sleep(3000)
-                    },
-                    makePath("forward 8",
-                        drive.trajectoryBuilder(startPose)
-                            .lineToLinearHeading(Pose2d(0.0, 24.0, 90.toRadians))
-                            .build()),
-                    makePath("left 8",
-                        drive.trajectoryBuilder(lastPosition)
-                            .lineToLinearHeading(Pose2d(24.0, 24.0, PI))
-                            .build()),
-                    makePath("back 8",
-                        drive.trajectoryBuilder(lastPosition)
-                            .lineToLinearHeading(Pose2d(24.0, 0.0, -90.toRadians))
-                            .build()),
-                    makePath("right 8",
-                        drive.trajectoryBuilder(lastPosition)
-                            .lineToLinearHeading(startPose)
+                            .back(96.0)
                             .build())
-
                 )
             }
 //
