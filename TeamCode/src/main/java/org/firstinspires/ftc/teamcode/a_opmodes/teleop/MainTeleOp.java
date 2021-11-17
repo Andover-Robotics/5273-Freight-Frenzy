@@ -143,12 +143,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     Controller 1
     A:      B:      X:      Y:
     DPAD
-    L:      D:     U:      R:
+    L: Unflip BucketD:     U: Flip Bucket R:
     Joystick
     L:Field centric movement
     R:Set orientation / Rotation (Determine through practice)
-    Trigger L/R: slow driving (maybe)
-    Bumper
+    Trigger L/R: left intake -- right intake
+    Bumper:
     L:none/switch to previous path      R:none/switch to next path
     Other
     Start:  Back:switch between automation and driving
