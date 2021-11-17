@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import android.hardware.TriggerEvent;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -24,6 +27,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private boolean centricity = false;
   private boolean isManual = true;
   private int percent = 1, part = 0;
+  private double triggerConstant = 0.05;
 
 
 
@@ -74,7 +78,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-    driveSpeed = 1 - 0.35 * (triggerSignal(Trigger.LEFT_TRIGGER));
+    driveSpeed = 1 - 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -101,21 +105,31 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     //Intake stuff
-    if(gamepadEx1.isDown(Button.RIGHT_STICK_BUTTON)) {
-      bot.intake.reverse();
-    }
-    if(gamepadEx1.wasJustReleased(Button.B)) {
+
+    if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
       bot.intake.runToggle();
     }
+    else if (gamepadEx2.isDown(Button.LEFT_STICK_BUTTON)){
+      bot.intake.reverse();
+    }
+    else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
+      bot.intake.runRight();
+    }
+    else if (gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
+      bot.intake.runLeft();
+    }
+    else {
+      bot.intake.stop();
+    }
 
-//    if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-//      bot.outake.openLeftFlap();
-//      bot.outake.closeRightFlap();
-//    }
-//    else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-//      bot.outake.openRightFlap();
-//      bot.outake.closeLeftFlap();
-//    }
+    if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
+      bot.outake.openLeftFlap();
+      bot.outake.closeRightFlap();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
+      bot.outake.openRightFlap();
+      bot.outake.closeLeftFlap();
+    }
 
     if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
       bot.outake.flipBucket();
@@ -124,18 +138,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outake.unFlipBucket();
     }
 
-    if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > 0.05){
-      bot.outake.runSlides();
+    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
+      //bot.outake.runSlides();
     }
 
-    if(bot.outake.freightInBucket()) {
+    /*
+    if (bot.outake.freightInBucket()){
       bot.outake.closeLeftFlap();
       bot.outake.closeRightFlap();
     }
-    else {
-      bot.outake.openLeftFlap();
-      bot.outake.openRightFlap();
-    }
+     */
 
 
 
@@ -219,9 +231,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       fieldCentricOffset = bot.imu.getAngularOrientation()
           .toAngleUnit(AngleUnit.DEGREES).firstAngle;
     }
-    if(justPressed(Button.RIGHT_STICK_BUTTON)){
+    if (justPressed(Button.RIGHT_STICK_BUTTON)){
       centricity = !centricity;
     }
+
   }
 
   private void followPath(){//Path following ===================================================================================
