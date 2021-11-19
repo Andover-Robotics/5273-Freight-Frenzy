@@ -68,10 +68,10 @@ public class TemplateDetector {//TODO: Change this to control hub
 
   class TemplatePipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(0, 50, 220);
-    final Scalar upperRange = new Scalar(20, 200, 255);
+    final Scalar lowerRange = new Scalar(0, 225, 225 );
+    final Scalar upperRange = new Scalar(30, 255, 255);
 
-    static final double DUCK_AREA = 9950;
+    static final double DUCK_AREA = 5550;
     //static final double ST_DEV = 10;
     //NormalDistribution one_nd = new NormalDistribution(ONE_RING_AREA, ST_DEV);
     //NormalDistribution four_nd = new NormalDistribution(FOUR_RING_AREA, ST_DEV);
