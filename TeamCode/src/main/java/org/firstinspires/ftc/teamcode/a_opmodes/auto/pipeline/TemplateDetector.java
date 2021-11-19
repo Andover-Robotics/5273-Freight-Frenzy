@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
 import android.annotation.SuppressLint;
+import android.graphics.Path;
 import android.util.Log;
 import android.util.Pair;
 
@@ -22,6 +23,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera2Impl;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,10 +71,10 @@ public class TemplateDetector {//TODO: Change this to control hub
     final Scalar lowerRange = new Scalar(0, 50, 220);
     final Scalar upperRange = new Scalar(20, 200, 255);
 
-    static final double ONE_RING_AREA = 9950, FOUR_RING_AREA = 19840;
-    static final double ST_DEV = 10;
-    NormalDistribution one_nd = new NormalDistribution(ONE_RING_AREA, ST_DEV);
-    NormalDistribution four_nd = new NormalDistribution(FOUR_RING_AREA, ST_DEV);
+    static final double DUCK_AREA = 9950;
+    //static final double ST_DEV = 10;
+    //NormalDistribution one_nd = new NormalDistribution(ONE_RING_AREA, ST_DEV);
+    //NormalDistribution four_nd = new NormalDistribution(FOUR_RING_AREA, ST_DEV);
 
     final Mat test = new Mat(),
         edgeDetector = new Mat(),
@@ -80,6 +82,9 @@ public class TemplateDetector {//TODO: Change this to control hub
         contourDetector = new Mat();
     final MatOfPoint2f polyDpResult = new MatOfPoint2f();
     final List<Rect> bounds = new ArrayList<>();
+    final double width = 960;
+    final double middle_left_x = width / 3;
+    final double middle_right_x = 2 * width / 3;
     final Size gaussianKernelSize = new Size(9, 9);
 
     @SuppressLint("SdCardPath")
@@ -118,7 +123,27 @@ public class TemplateDetector {//TODO: Change this to control hub
 
     // returns a pair containing verdict and confidence from 0 to 1
     private Optional<Pair<PipelineResult, Double>> identifyStackFromBounds() {
-      return Optional.of(Pair.create(PipelineResult.LEFT, 1.0));
+
+      double minError = bounds.stream().map(Rect::area).min(Comparator.naturalOrder()).get();
+      Rect boundingBox = null;
+
+      for (Rect t: bounds) {
+        if (Math.abs(DUCK_AREA - t.area()) <= minError){
+          boundingBox = t;
+        }
+      }
+
+      if (boundingBox.x + boundingBox.width <= middle_left_x) {
+        return Optional.of(Pair.create(PipelineResult.LEFT, 0.8));
+      }
+      else if (boundingBox.x + boundingBox.width <= middle_right_x){
+        return Optional.of(Pair.create(PipelineResult.MIDDLE, 0.8));
+      }
+      else {
+        return Optional.of(Pair.create(PipelineResult.RIGHT, 0.8));
+      }
+
+
     }
 
 
@@ -130,7 +155,7 @@ public class TemplateDetector {//TODO: Change this to control hub
         // if polydp fails, switch to a local new MatOfPoint2f();
         Imgproc.approxPolyDP(new MatOfPoint2f(contour.toArray()), polyDpResult, 3, true);
         Rect r = Imgproc.boundingRect(new MatOfPoint(polyDpResult.toArray()));
-        if (r.y > 350 && r.area() > ONE_RING_AREA / 2) addCombineRectangle(bounds, r, bounds.size() - 1);
+        if (r.y > 350 && r.area() > DUCK_AREA / 2 && r.area() < 2 * DUCK_AREA) addCombineRectangle(bounds, r, bounds.size() - 1);
       }
     }
 
