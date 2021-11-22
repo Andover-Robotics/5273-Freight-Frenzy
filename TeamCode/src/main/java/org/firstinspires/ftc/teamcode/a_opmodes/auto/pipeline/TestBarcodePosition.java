@@ -1,12 +1,24 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import android.util.Pair;
 
-public class TestBarcodePosition extends LinearOpMode {
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+public class TestBarcodePosition extends OpMode {
+    private DuckDetector duckDetector;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void init() {
+        duckDetector = new DuckDetector(this, telemetry);
+    }
 
+    @Override
+    public void loop() {
+        duckDetector.currentlyDetected()
+                .ifPresent((pipelineResultDoublePair -> {
+                    telemetry.addData("Status", "Looking for a duck");
+                    telemetry.addData("Detected", pipelineResultDoublePair.first);
+                    telemetry.addData("Confidence", pipelineResultDoublePair.second);
+                }));
     }
 }

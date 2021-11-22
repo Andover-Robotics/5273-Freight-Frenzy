@@ -5,7 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.MarkerCallback
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.TemplateDetector
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
 import java.lang.Math.toRadians
@@ -27,8 +27,8 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     public val leftStartPose = Pose2d(- 12.0, 67.5, 0.0)
 
 
-    private fun Pose2d(x: Double, result: Map<TemplateDetector.PipelineResult, Double>, heading: Double): Pose2d {
-        return Pose2d(x, mapOf(TemplateDetector.PipelineResult.LEFT to - 67.5, TemplateDetector.PipelineResult.RIGHT to 67.5), 180.0)
+    private fun Pose2d(x: Double, result: Map<DuckDetector.PipelineResult, Double>, heading: Double): Pose2d {
+        return Pose2d(x, mapOf(DuckDetector.PipelineResult.LEFT to - 67.5, DuckDetector.PipelineResult.RIGHT to 67.5), 180.0)
     }
 
     val bot: Bot = Bot.getInstance()
@@ -99,10 +99,10 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //TODO: Make Trajectories in trajectorySets
 
     //TODO: Separate alliance-specific and position-specific paths                                                                            ====================================================
-    private val trajectorySets: Map<TemplateDetector.PipelineResult, List<AutoPathElement>> = mapOf(
+    private val trajectorySets: Map<DuckDetector.PipelineResult, List<AutoPathElement>> = mapOf(
             //use !! when accessing maps ie: dropSecondWobble[0]!!
             //example
-            TemplateDetector.PipelineResult.LEFT to run {
+            DuckDetector.PipelineResult.LEFT to run {
                 listOf(
                     makePath("Strafe Right to Shipping Hub",
                         drive.trajectoryBuilder(leftStartPose)
@@ -133,7 +133,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
                      */
             },
 
-            TemplateDetector.PipelineResult.RIGHT to run{
+            DuckDetector.PipelineResult.RIGHT to run{
                 listOf(
                     makePath("Strafe Right to Shipping Hub",
                         drive.trajectoryBuilder(rightStartPose)
@@ -161,7 +161,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     )
 
 
-    fun getTrajectories(a: TemplateDetector.PipelineResult): List<AutoPathElement>{
+    fun getTrajectories(a: DuckDetector.PipelineResult): List<AutoPathElement>{
         return trajectorySets[a]!!
     }
 

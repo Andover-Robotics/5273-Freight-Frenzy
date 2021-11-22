@@ -48,7 +48,7 @@ import java.util.ArrayList;
 public class TestRingStackRecognition extends LinearOpMode {
 
   private OpenCvCamera phoneCam;
-  final int ONE_RING_AREA = 100, FOUR_RING_AREA = 400;
+  final int DUCK_AREA = 150;
   final ArrayList<Rect> finalBounds = new ArrayList<>();
 
   @Override
@@ -122,11 +122,10 @@ public class TestRingStackRecognition extends LinearOpMode {
           int area = r.height * r.width;
 
           telemetry.addData("Area: ", area);
-          if (area > FOUR_RING_AREA) {
-            telemetry.addData("# of rings in stack: ", 4);
-          } else if (area > ONE_RING_AREA) {
-            telemetry.addData("# of rings in stack: ", 1);
-          } else {
+          if (area < DUCK_AREA * 1.5 || area > DUCK_AREA * 0.75) {
+            telemetry.addData("Duck Detected", 4);
+          }
+          else {
             telemetry.addData("No rings in stack", 0);
           }
         }

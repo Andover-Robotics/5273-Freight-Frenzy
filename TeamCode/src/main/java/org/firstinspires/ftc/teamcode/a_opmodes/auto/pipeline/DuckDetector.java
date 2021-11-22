@@ -8,6 +8,7 @@ import android.util.Pair;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -27,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class TemplateDetector {//TODO: Change this to control hub
+public class DuckDetector {//TODO: Change this to control hub
 
   public enum PipelineResult {
     LEFT(0),
@@ -43,7 +44,7 @@ public class TemplateDetector {//TODO: Change this to control hub
   private volatile Pair<PipelineResult, Double> result = null;
   private volatile boolean saveImageNext = true;
 
-  public TemplateDetector(OpMode opMode) {
+  public DuckDetector(OpMode opMode, Telemetry telemetry) {
     int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources()
         .getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
     camera = new OpenCvInternalCamera2Impl(OpenCvInternalCamera2Impl.CameraDirection.BACK,
@@ -68,7 +69,7 @@ public class TemplateDetector {//TODO: Change this to control hub
 
   class TemplatePipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(0, 225, 225 );
+    final Scalar lowerRange = new Scalar(0, 225, 225);
     final Scalar upperRange = new Scalar(30, 255, 255);
 
     static final double DUCK_AREA = 5550;
@@ -132,6 +133,8 @@ public class TemplateDetector {//TODO: Change this to control hub
           boundingBox = t;
         }
       }
+
+      assert boundingBox != null;
 
       if (boundingBox.x + boundingBox.width <= middle_left_x) {
         return Optional.of(Pair.create(PipelineResult.LEFT, 0.8));

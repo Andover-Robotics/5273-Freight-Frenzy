@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement.Action;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement.Path;
-import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.TemplateDetector;
-import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.TemplateDetector.PipelineResult;
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector;
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector.PipelineResult;
 import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
 
   PipelineResult detected;
   double confidence;
-  TemplateDetector pipeline;
+  DuckDetector pipeline;
   boolean performActions = true;
   GamepadEx gamepad;
 
