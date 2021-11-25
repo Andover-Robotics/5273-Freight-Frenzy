@@ -109,8 +109,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
       bot.intake.runToggle();
     }
-    else if (gamepadEx2.isDown(Button.LEFT_BUMPER) || gamepadEx2.isDown(Button.RIGHT_BUMPER)){
-      bot.intake.reverse();
+    else if (gamepadEx2.isDown(Button.LEFT_BUMPER)){
+      bot.intake.reverseLeft();
+    }
+    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+      bot.intake.reverseRight();
     }
     else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();

@@ -46,9 +46,18 @@ public class Intake extends SubsystemBase {
         runState = state.ON;
     }
 
-    public void reverse() {
-        runState = state.REVERSE;
-        leftIntake.set(-SPEED);
+//    public void reverse() {
+//        runState = state.REVERSE;
+//        leftIntake.set(-SPEED);
+//        rightIntake.set(-SPEED);
+//    }
+//    deprecated
+
+    public void reverseLeft() {
+        leftIntake.set(SPEED);
+    }
+
+    public void reverseRight() {
         rightIntake.set(-SPEED);
     }
 
