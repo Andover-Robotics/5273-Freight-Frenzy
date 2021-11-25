@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
 import android.util.Pair;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+@Autonomous(name = "Barcode Tester", group = "Competition")
 public class TestBarcodePosition extends OpMode {
     private DuckDetector duckDetector;
 

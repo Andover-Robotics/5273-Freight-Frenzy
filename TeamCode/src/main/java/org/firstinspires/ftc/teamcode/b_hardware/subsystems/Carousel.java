@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.GlobalConfig;
 @Config
 public class Carousel extends SubsystemBase {
     public static final double MAX_SPEED = (int) 1150 / 60 * 145.1;
-    public static final double SPEED_PERCENT = 1150 / 750;
+    public static final double SPEED_PERCENT = 0.5;
     public double targetSpeed = 0.0;
     private MotorEx motor;
 

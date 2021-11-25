@@ -19,7 +19,10 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.easyopencv.OpenCvInternalCamera2Impl;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -45,11 +48,25 @@ public class DuckDetector {//TODO: Change this to control hub
   private volatile boolean saveImageNext = true;
 
   public DuckDetector(OpMode opMode, Telemetry telemetry) {
+    /*
     int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources()
         .getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
     camera = new OpenCvInternalCamera2Impl(OpenCvInternalCamera2Impl.CameraDirection.BACK,
         cameraMonitorViewId);
-    camera.openCameraDevice();
+     */
+    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
+    camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+      @Override
+      public void onOpened() {
+
+      }
+
+      @Override
+      public void onError(int errorCode) {
+
+      }
+    });
+    //camera.openCameraDevice();
     camera.setPipeline(pipeline);
     camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
   }
