@@ -109,7 +109,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
       bot.intake.runToggle();
     }
-    else if (gamepadEx2.isDown(Button.LEFT_STICK_BUTTON)){
+    else if (gamepadEx2.isDown(Button.LEFT_BUMPER) || gamepadEx2.isDown(Button.RIGHT_BUMPER)){
       bot.intake.reverse();
     }
     else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
@@ -223,7 +223,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       else
         bot.drive.driveRobotCentric(
             -driveVector.getY() * driveSpeed,
-            -driveVector.getX() * driveSpeed,
+            driveVector.getX() * driveSpeed,
             turnVector.getX() * driveSpeed
         );
     }

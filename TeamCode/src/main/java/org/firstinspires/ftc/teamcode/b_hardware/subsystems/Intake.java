@@ -54,7 +54,7 @@ public class Intake extends SubsystemBase {
 
     public void runLeft(){
         rightIntake.set(0.0);
-        leftIntake.set(SPEED);
+        leftIntake.set(-SPEED);
         runState = state.LEFT;
     }
 
