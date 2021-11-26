@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import android.hardware.TriggerEvent;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -10,7 +13,6 @@ import com.arcrobotics.ftclib.util.Direction;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive.Mode;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
@@ -76,8 +78,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-//    driveSpeed = 1 - 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
-//    triggers now being used for intaking
+    driveSpeed = 1 - 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -105,60 +106,59 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Intake stuff
 
-    if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
-      bot.intake.runToggle();
-    }
-    else if (gamepadEx2.isDown(Button.LEFT_BUMPER)){
+    if (gamepadEx1.isDown(Button.LEFT_BUMPER)){
       bot.intake.reverseLeft();
     }
-    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+    else if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
       bot.intake.reverseRight();
     }
-    else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
+    else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();
     }
-
-    else if (gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
+    else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
       bot.intake.runLeft();
     }
     else {
       bot.intake.stop();
     }
 
-    if(gamepadEx1.wasJustPressed(Button.X)) {
-      bot.outtake.goToPosition(-500);
-//      bot.outtake.getMotor().setTargetPosition(-400);
-    }
-    if(gamepadEx1.wasJustPressed(Button.B)) {
-      bot.outtake.goToPosition(5);
-    }
-
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outtake.openLeftFlap();
-      bot.outtake.closeRightFlap();
+      bot.outake.openLeftFlap();
+      bot.outake.closeRightFlap();
     }
+
+    /*
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
+      bot.outake.
+    }
+     */
+
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {}
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {}
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {}
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outtake.openRightFlap();
-      bot.outtake.closeLeftFlap();
+      bot.outake.openRightFlap();
+      bot.outake.closeLeftFlap();
     }
 
-    if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
-      bot.outtake.fullyRetract();
+    if (gamepadEx2.wasJustReleased(Button.Y)){
+      bot.outake.flipBucket();
     }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
-      bot.outtake.goToLowGoal();
-    }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {
-      bot.outtake.goToMidGoal();
-    }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
-      bot.outtake.goToTopGoal();
-    }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
-      bot.outtake.goToCapstone();
+    else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
+      bot.outake.unFlipBucket();
     }
 
-    bot.outtake.updateSlidePos();
+    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
+      //bot.outake.runSlides();
+    }
+
+    /*
+    if (bot.outake.freightInBucket()){
+      bot.outake.closeLeftFlap();
+      bot.outake.closeRightFlap();
+    }
+     */
+
 
 
     /*//TODO: make control scheme
@@ -226,14 +226,14 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if (bot.roadRunner.mode == Mode.IDLE) {
       if (centricity)//epic java syntax
         bot.drive.driveFieldCentric(
-            driveVector.getX() * driveSpeed,
-            driveVector.getY() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                driveVector.getX()* driveSpeed,
             turnVector.getX() * driveSpeed,
             gyroAngle);
       else
         bot.drive.driveRobotCentric(
-            -driveVector.getY() * driveSpeed,
-            driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                -driveVector.getX() * driveSpeed,
             turnVector.getX() * driveSpeed
         );
     }
