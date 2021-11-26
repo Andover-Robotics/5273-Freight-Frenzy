@@ -117,6 +117,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();
     }
+
     else if (gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
       bot.intake.runLeft();
     }
