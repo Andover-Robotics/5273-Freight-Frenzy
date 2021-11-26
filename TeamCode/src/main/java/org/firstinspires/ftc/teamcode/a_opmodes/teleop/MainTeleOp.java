@@ -124,6 +124,14 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.intake.stop();
     }
 
+    if(gamepadEx1.wasJustPressed(Button.X)) {
+      bot.outtake.goToPosition(-500);
+//      bot.outtake.getMotor().setTargetPosition(-400);
+    }
+    if(gamepadEx1.wasJustPressed(Button.B)) {
+      bot.outtake.goToPosition(5);
+    }
+
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
       bot.outtake.openLeftFlap();
       bot.outtake.closeRightFlap();

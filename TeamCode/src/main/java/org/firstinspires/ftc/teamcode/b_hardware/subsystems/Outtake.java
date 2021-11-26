@@ -45,11 +45,11 @@ public class Outtake extends SubsystemBase {
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
     private static final double SLIDE_SPEED = 0.05;
 //    private static final double SLIDE_STOPPED = 0.0;
-    private static final double RETRACTED    =    5.0;  // 5 all are in ticks
-    private static final double LOW_GOAL_POS = -226.0;  // -226 ticks
-    private static final double MID_GOAL_POS = -377.0;  // -377
-    private static final double TOP_GOAL_POS = -690.0;  // -690
-    private static final double CAPSTONE_POS = -800.0;  // -800 TODO: tune these values
+    private static final int RETRACTED    =    5;  // 5 all are in ticks
+    private static final int LOW_GOAL_POS = -226;  // -226 ticks
+    private static final int MID_GOAL_POS = -377;  // -377
+    private static final int TOP_GOAL_POS = -690;  // -690
+    private static final int CAPSTONE_POS = -800;  // -800 TODO: tune these values
 
     private enum SlideState {
         RETRACTED,
@@ -101,6 +101,7 @@ public class Outtake extends SubsystemBase {
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        slideMotor.motor.setTargetPosition(RETRACTED);
 
 
 
@@ -111,24 +112,33 @@ public class Outtake extends SubsystemBase {
     }
 
     public void updateSlidePos() {
-        slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+//        slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         if(slideState == SlideState.RETRACTED) {
-            slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-            slideMotor.set(RETRACTED);
+//            slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+            goToPosition(RETRACTED);
         }
         else if(slideState == SlideState.AT_LOW_GOAL) {
-            slideMotor.set(LOW_GOAL_POS);
+            goToPosition(LOW_GOAL_POS);
         }
         else if(slideState == SlideState.AT_MID_GOAL) {
-            slideMotor.set(MID_GOAL_POS);
+            goToPosition(MID_GOAL_POS);
         }
         else if(slideState == SlideState.AT_TOP_GOAL) {
-            slideMotor.set(TOP_GOAL_POS);
+            goToPosition(TOP_GOAL_POS);
         }
         else if(slideState == SlideState.AT_CAPSTONE) {
-            slideMotor.set(CAPSTONE_POS);
+            goToPosition(CAPSTONE_POS);
         }
     }
+
+    public void goToPosition(int ticks) {
+        slideMotor.setTargetPosition(ticks);
+    }
+
+
+//    public MotorEx getMotor() {
+//        return slideMotor;
+//    }
 
     public void fullyRetract() {
         slideState = SlideState.RETRACTED;
