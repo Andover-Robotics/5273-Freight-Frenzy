@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Carousel;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outake;
+import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
 
 import java.util.concurrent.Executors;
@@ -25,7 +25,7 @@ public class Bot {
   //example
   public final Carousel carousel;
   public final Intake intake;
-  public final Outake outake;
+  public final Outtake outtake;
 //  public final TemplateSubsystem templateSubsystem;
 
 
@@ -73,7 +73,7 @@ public class Bot {
 //    this.templateSubsystem = new TemplateSubsystem(opMode);
     this.carousel = new Carousel(opMode);
     this.intake = new Intake(opMode);
-    this.outake = new Outake(opMode, Executors.newSingleThreadExecutor());
+    this.outtake = new Outtake(opMode, Executors.newSingleThreadExecutor());
 
 
 

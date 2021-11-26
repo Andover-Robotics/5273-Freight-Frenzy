@@ -6,30 +6,66 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public class Outake extends SubsystemBase {
+//TODO: use revextensions2 to make load sensing with current draw on motor possibly
+// test after scrimmage
 
+public class Outtake extends SubsystemBase {
+
+    // Servo positions for the arms and the bucket
     private static final double OPEN = 0.27;
     private static final double CLOSED = 0;
     private static final double FLIPPED = 0.49;
     private static final double UNFLIPPED = 0;
 
+    private enum BucketState {
+        FLIPPED,
+        UNFLIPPED
+    }
+    private BucketState bucketState = BucketState.UNFLIPPED;
+    private enum FlapState {
+        OPEN,
+        CLOSED
+    }
+    private FlapState flapState = FlapState.OPEN;
+
+    // Slide motor speeds + positions
     private static final double DIAMETER = 38.0;
     private static final double SPOOL = 185.0;
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
     private static final double SLIDE_SPEED = 0.05;
     private static final double SLIDE_STOPPED = 0.0;
+//    private static final double RETRACTED    = 537.7 * 0;
+//    private static final double LOW_GOAL_POS = 537.7 * 0.5;  // 0.5  rotation of spool
+//    private static final double MID_GOAL_POS = 537.7 * 2.0;  // 2.0  rotations
+//    private static final double TOP_GOAL_POS = 537.7 * 2.75;  // 2.75 rotations
+//    private static final double CAPSTONE_POS = 537.7 * 2.75;  // 2.75 rotations
 
+    private enum SlideState {
+        RETRACTED,
+        AT_LOW_GOAL,
+        AT_MID_GOAL,
+        AT_TOP_GOAL,
+        AT_CAPSTONE
+    }
+    private SlideState slideState = SlideState.RETRACTED;
+
+    // TODO: more optimized way to do color sense stuff, because this is really jank
+    // Color sensing vars for balls
     private static final int RED_WHITE = 255;
     private static final int GREEN_WHITE = 255;
     private static final int BLUE_WHITE = 255;
     private static int[] white = new int[] {RED_WHITE, GREEN_WHITE, BLUE_WHITE};
 
+    //color sensing vars for cubes
     private static final int RED_YELLOW = 0;
     private static final int GREEN_YELLOW = 255;
     private static final int BLUE_YELLOW = 255;
@@ -44,18 +80,8 @@ public class Outake extends SubsystemBase {
     private ColorSensor leftSensor, rightSensor;
     private ExecutorService executorService;
 
-    private enum bucketState {
-        FLIPPED,
-        UNFLIPPED
-    }
-    private enum extensionState {
-        EXTENDED,
-        RETRACTED
-    }
-    private extensionState eState = extensionState.RETRACTED;
-    private bucketState bState = bucketState.UNFLIPPED;
 
-    public Outake(OpMode opMode, ExecutorService executorService) {
+    public Outtake(OpMode opMode, ExecutorService executorService) {
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
         this.executorService = executorService;
         leftFlap.setDirection(Servo.Direction.FORWARD);
@@ -83,21 +109,21 @@ public class Outake extends SubsystemBase {
     }
 
     public void toggleBucket() {
-        if(bState == bucketState.UNFLIPPED) {
+        if(bucketState == BucketState.UNFLIPPED) {
             flipBucket();
         }
-        else if(bState == bucketState.FLIPPED) {
+        else if(bucketState == BucketState.FLIPPED) {
             unFlipBucket();
         }
     }
 
     public void flipBucket() {
         bucket.setPosition(FLIPPED);
-        bState = bucketState.FLIPPED;
+        bucketState = BucketState.FLIPPED;
     }
     public void unFlipBucket() {
         bucket.setPosition(UNFLIPPED);
-        bState = bucketState.UNFLIPPED;
+        bucketState = BucketState.UNFLIPPED;
     }
 
     //TODO: add sensors to auto detect when minerals enter the bucket - auto close the flaps then
@@ -135,6 +161,7 @@ public class Outake extends SubsystemBase {
         return false;
     }
      */
+
 
 
     public void openLeftFlap() {
