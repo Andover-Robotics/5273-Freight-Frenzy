@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -31,7 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class DuckDetector {//TODO: Change this to control hub
+public class DuckDetector {
 
   public enum PipelineResult {
     LEFT(0),
@@ -54,7 +55,13 @@ public class DuckDetector {//TODO: Change this to control hub
     camera = new OpenCvInternalCamera2Impl(OpenCvInternalCamera2Impl.CameraDirection.BACK,
         cameraMonitorViewId);
      */
-    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
+
+    //TODO: Change this to control hub
+    // Done, but not tested --> keep in branch till tested
+//    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
+
+    WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Duck Detector");
+    camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
     camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
       @Override
       public void onOpened() {
