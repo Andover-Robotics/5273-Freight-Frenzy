@@ -106,19 +106,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Intake stuff
 
-    if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
-      bot.intake.runToggle();
-    }
-    else if (gamepadEx2.isDown(Button.LEFT_BUMPER)){
+    if (gamepadEx1.isDown(Button.LEFT_BUMPER)){
       bot.intake.reverseLeft();
     }
-    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+    else if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
       bot.intake.reverseRight();
     }
-    else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
+    else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();
     }
-    else if (gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
+    else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
       bot.intake.runLeft();
     }
     else {
@@ -129,12 +126,22 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outake.openLeftFlap();
       bot.outake.closeRightFlap();
     }
+
+    /*
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
+      bot.outake.
+    }
+     */
+
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {}
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {}
+    else if (gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {}
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
       bot.outake.openRightFlap();
       bot.outake.closeLeftFlap();
     }
 
-    if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
+    if (gamepadEx2.wasJustReleased(Button.Y)){
       bot.outake.flipBucket();
     }
     else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
@@ -219,14 +226,14 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if (bot.roadRunner.mode == Mode.IDLE) {
       if (centricity)//epic java syntax
         bot.drive.driveFieldCentric(
-            driveVector.getX() * driveSpeed,
-            driveVector.getY() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                driveVector.getX()* driveSpeed,
             turnVector.getX() * driveSpeed,
             gyroAngle);
       else
         bot.drive.driveRobotCentric(
-            -driveVector.getY() * driveSpeed,
-            driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                -driveVector.getX() * driveSpeed,
             turnVector.getX() * driveSpeed
         );
     }
