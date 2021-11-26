@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.util.Direction;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive.Mode;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
@@ -132,24 +133,23 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.closeLeftFlap();
     }
 
-    if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
-      bot.outtake.flipBucket();
+    if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
+      bot.outtake.fullyRetract();
     }
-    else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
-      bot.outtake.unFlipBucket();
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
+      bot.outtake.goToLowGoal();
+    }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {
+      bot.outtake.goToMidGoal();
+    }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
+      bot.outtake.goToTopGoal();
+    }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
+      bot.outtake.goToCapstone();
     }
 
-    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
-      //bot.outake.runSlides();
-    }
-
-    /*
-    if (bot.outake.freightInBucket()){
-      bot.outake.closeLeftFlap();
-      bot.outake.closeRightFlap();
-    }
-     */
-
+    bot.outtake.updateSlidePos();
 
 
     /*//TODO: make control scheme

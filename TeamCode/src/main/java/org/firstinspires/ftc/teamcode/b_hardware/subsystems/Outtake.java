@@ -21,9 +21,11 @@ import java.util.concurrent.Future;
 public class Outtake extends SubsystemBase {
 
     // Servo positions for the arms and the bucket
-    private static final double OPEN = 0.27;
-    private static final double CLOSED = 0;
-    private static final double FLIPPED = 0.49;
+    private static final double RIGHT_OPEN = 0.0;
+    private static final double RIGHT_CLOSED = 0.25;
+    private static final double LEFT_OPEN = 0.25;
+    private static final double LEFT_CLOSED = 0.0;
+    private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0;
 
     private enum BucketState {
@@ -42,12 +44,12 @@ public class Outtake extends SubsystemBase {
     private static final double SPOOL = 185.0;
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
     private static final double SLIDE_SPEED = 0.05;
-    private static final double SLIDE_STOPPED = 0.0;
-//    private static final double RETRACTED    = 537.7 * 0;
-//    private static final double LOW_GOAL_POS = 537.7 * 0.5;  // 0.5  rotation of spool
-//    private static final double MID_GOAL_POS = 537.7 * 2.0;  // 2.0  rotations
-//    private static final double TOP_GOAL_POS = 537.7 * 2.75;  // 2.75 rotations
-//    private static final double CAPSTONE_POS = 537.7 * 2.75;  // 2.75 rotations
+//    private static final double SLIDE_STOPPED = 0.0;
+    private static final double RETRACTED    =    5.0;  // 5 all are in ticks
+    private static final double LOW_GOAL_POS = -226.0;  // -226 ticks
+    private static final double MID_GOAL_POS = -377.0;  // -377
+    private static final double TOP_GOAL_POS = -690.0;  // -690
+    private static final double CAPSTONE_POS = -800.0;  // -800 TODO: tune these values
 
     private enum SlideState {
         RETRACTED,
@@ -81,32 +83,75 @@ public class Outtake extends SubsystemBase {
     private ExecutorService executorService;
 
 
-    public Outtake(OpMode opMode, ExecutorService executorService) {
+    public Outtake(OpMode opMode) {
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
-        this.executorService = executorService;
+//        this.executorService = executorService;
         leftFlap.setDirection(Servo.Direction.FORWARD);
-        leftFlap.setPosition(OPEN);
+        leftFlap.setPosition(LEFT_OPEN);
 
         rightFlap = opMode.hardwareMap.servo.get("rightFlap");
         rightFlap.setDirection(Servo.Direction.FORWARD);
-        rightFlap.setPosition(OPEN);
+        rightFlap.setPosition(RIGHT_OPEN);
 
         bucket = opMode.hardwareMap.servo.get("bucketServo");
         bucket.setDirection(Servo.Direction.FORWARD);
         bucket.setPosition(UNFLIPPED);
 
-        /*
+
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
-        slideMotor.setRunMode(Motor.RunMode.VelocityControl);
+        slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-         */
+
 
         //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
         //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
 
         //closeBucket();
     }
+
+    public void updateSlidePos() {
+        slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        if(slideState == SlideState.RETRACTED) {
+            slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+            slideMotor.set(RETRACTED);
+        }
+        else if(slideState == SlideState.AT_LOW_GOAL) {
+            slideMotor.set(LOW_GOAL_POS);
+        }
+        else if(slideState == SlideState.AT_MID_GOAL) {
+            slideMotor.set(MID_GOAL_POS);
+        }
+        else if(slideState == SlideState.AT_TOP_GOAL) {
+            slideMotor.set(TOP_GOAL_POS);
+        }
+        else if(slideState == SlideState.AT_CAPSTONE) {
+            slideMotor.set(CAPSTONE_POS);
+        }
+    }
+
+    public void fullyRetract() {
+        slideState = SlideState.RETRACTED;
+        return;
+    }
+    public void goToLowGoal() {
+        slideState = SlideState.AT_LOW_GOAL;
+        return;
+    }
+    public void goToMidGoal() {
+        slideState = SlideState.AT_MID_GOAL;
+        return;
+    }
+    public void goToTopGoal() {
+        slideState = SlideState.AT_TOP_GOAL;
+        return;
+    }
+    public void goToCapstone() {
+        slideState = SlideState.AT_CAPSTONE;
+        return;
+    }
+
+
 
     public void toggleBucket() {
         if(bucketState == BucketState.UNFLIPPED) {
@@ -165,21 +210,21 @@ public class Outtake extends SubsystemBase {
 
 
     public void openLeftFlap() {
-        leftFlap.setPosition(OPEN);
+        leftFlap.setPosition(LEFT_OPEN);
     }
     public void closeLeftFlap() {
-        leftFlap.setPosition(CLOSED);
+        leftFlap.setPosition(LEFT_CLOSED);
     }
     public void openRightFlap() {
-        rightFlap.setPosition(OPEN);
+        rightFlap.setPosition(RIGHT_OPEN);
     }
     public void closeRightFlap() {
-        rightFlap.setPosition(CLOSED);
+        rightFlap.setPosition(RIGHT_CLOSED);
     }
 
-    /*
+    /* DEPRECATED
     public void runSlides(){
-        //TODO: Code this method
+        //
         slideMotor.resetEncoder();
         while (slideMotor.encoder.getRevolutions() < ROTATIONS) {
             slideMotor.set(SLIDE_SPEED);

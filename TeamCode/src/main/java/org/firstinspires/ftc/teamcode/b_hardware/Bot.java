@@ -73,7 +73,7 @@ public class Bot {
 //    this.templateSubsystem = new TemplateSubsystem(opMode);
     this.carousel = new Carousel(opMode);
     this.intake = new Intake(opMode);
-    this.outtake = new Outtake(opMode, Executors.newSingleThreadExecutor());
+    this.outtake = new Outtake(opMode);
 
 
 
