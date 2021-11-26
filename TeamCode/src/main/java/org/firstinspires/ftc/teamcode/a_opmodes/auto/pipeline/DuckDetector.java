@@ -149,7 +149,7 @@ public class DuckDetector {
     // returns a pair containing verdict and confidence from 0 to 1
     private Optional<Pair<PipelineResult, Double>> identifyStackFromBounds() {
 
-      double minError = bounds.stream().map(Rect::area).min(Comparator.naturalOrder()).get();
+      double minError = bounds.stream().map(Rect::area).max(Comparator.naturalOrder()).get();
       Rect boundingBox = null;
 
       for (Rect t: bounds) {

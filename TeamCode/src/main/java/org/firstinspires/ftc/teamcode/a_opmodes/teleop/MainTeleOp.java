@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import android.hardware.TriggerEvent;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -76,8 +79,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-//    driveSpeed = 1 - 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
-//    triggers now being used for intaking
+    driveSpeed = 1; //- 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -149,6 +151,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.goToCapstone();
     }
 
+
     bot.outtake.updateSlidePos();
 
 
@@ -205,27 +208,25 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
 
   private void drive(){//Driving ===================================================================================
-    updateState();
-
     final double gyroAngle =
-        bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).secondAngle//TODO: make sure that the orientation is correct
-            - fieldCentricOffset;
+            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).secondAngle//TODO: make sure that the orientation is correct
+                    - fieldCentricOffset;
     Vector2d driveVector = stickSignal(Direction.LEFT),
-        turnVector = new Vector2d(
-            stickSignal(Direction.RIGHT).getX() * Math.abs(stickSignal(Direction.RIGHT).getX()),
-            0);
+            turnVector = new Vector2d(
+                    stickSignal(Direction.RIGHT).getX() * Math.abs(stickSignal(Direction.RIGHT).getX()),
+                    0);
     if (bot.roadRunner.mode == Mode.IDLE) {
       if (centricity)//epic java syntax
         bot.drive.driveFieldCentric(
-            driveVector.getX() * driveSpeed,
-            driveVector.getY() * driveSpeed,
-            turnVector.getX() * driveSpeed,
-            gyroAngle);
+                driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                turnVector.getX() * driveSpeed,
+                gyroAngle);
       else
         bot.drive.driveRobotCentric(
-            -driveVector.getY() * driveSpeed,
-            driveVector.getX() * driveSpeed,
-            turnVector.getX() * driveSpeed
+                driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                turnVector.getX() * driveSpeed
         );
     }
     if (justPressed(Button.LEFT_STICK_BUTTON)) {
