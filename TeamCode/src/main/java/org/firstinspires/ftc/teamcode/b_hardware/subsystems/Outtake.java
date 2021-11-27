@@ -48,6 +48,7 @@ public class Outtake extends SubsystemBase {
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;
     // private static final int RETRACTED =  5;
+    private int targetPostion = 0;
     private static final int LOW_GOAL_POS = -226; // ticks
     private static final int MID_GOAL_POS = -377;
     private static final int TOP_GOAL_POS = -690;
@@ -124,21 +125,25 @@ public class Outtake extends SubsystemBase {
     public void goToLowGoal() {
         slideState = SlideState.AT_LOW_GOAL;
         slideMotor.setTargetPosition(LOW_GOAL_POS);
+        targetPostion = LOW_GOAL_POS;
         slideRun = SlideRun.RUNNING;
     }
     public void goToMidGoal() {
         slideState = SlideState.AT_MID_GOAL;
         slideMotor.setTargetPosition(MID_GOAL_POS);
+        targetPostion = MID_GOAL_POS;
         slideRun = SlideRun.RUNNING;
     }
     public void goToTopGoal() {
         slideState = SlideState.AT_TOP_GOAL;
         slideMotor.setTargetPosition(TOP_GOAL_POS);
+        targetPostion = TOP_GOAL_POS;
         slideRun = SlideRun.RUNNING;
     }
     public void goToCapstone() {
         slideState = SlideState.AT_CAPSTONE;
         slideMotor.setTargetPosition(CAPSTONE_POS);
+        targetPostion = CAPSTONE_POS;
         slideRun = SlideRun.RUNNING;
     }
 
@@ -146,7 +151,7 @@ public class Outtake extends SubsystemBase {
     public void periodic(){
         //this.updateSlidePos();
         if (slideRun == SlideRun.RUNNING)
-            if (slideMotor.atTargetPosition()) {
+            if (Math.abs(slideMotor.getCurrentPosition() - targetPostion) < TOLERANCE) {
                 slideRun = SlideRun.HOLDING;
             }
             else {

@@ -47,6 +47,7 @@ public class DuckDetector {
   private final TemplatePipeline pipeline = new TemplatePipeline();
   private volatile Pair<PipelineResult, Double> result = null;
   private volatile boolean saveImageNext = true;
+  private volatile boolean opened = false;
 
   public DuckDetector(OpMode opMode, Telemetry telemetry) {
     /*
@@ -65,7 +66,7 @@ public class DuckDetector {
     camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
       @Override
       public void onOpened() {
-
+        opened = true;
       }
 
       @Override
@@ -74,8 +75,10 @@ public class DuckDetector {
       }
     });
     //camera.openCameraDevice();
-    camera.setPipeline(pipeline);
-    camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+    if (opened) {
+      camera.setPipeline(pipeline);
+      camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+    }
   }
 
   public void saveImage() {
