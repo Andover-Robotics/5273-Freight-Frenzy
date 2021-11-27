@@ -28,17 +28,6 @@ public class Outtake extends SubsystemBase {
     private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0;
 
-    private enum BucketState {
-        FLIPPED,
-        UNFLIPPED
-    }
-    private BucketState bucketState = BucketState.UNFLIPPED;
-    private enum FlapState {
-        OPEN,
-        CLOSED
-    }
-    private FlapState flapState = FlapState.OPEN;
-
     // Slide motor speeds + positions
     private static final double DIAMETER = 38.0;
     private static final double SPOOL = 185.0;
@@ -46,13 +35,13 @@ public class Outtake extends SubsystemBase {
     private static final double SLIDE_SPEED = 0.3;
     private static final double SLIDE_STOPPED = 0.03;
     private static final double ZERO_SPEED = 0.0;
-    private static final double TOLERANCE = 44;
+    private static final double TOLERANCE = 20;
     // private static final int RETRACTED =  5;
     private int targetPostion = 0;
     private static final int LOW_GOAL_POS = -226; // ticks
     private static final int MID_GOAL_POS = -377;
-    private static final int TOP_GOAL_POS = -690;
-    private static final int CAPSTONE_POS = -800; //TODO: tune these values
+    private static final int TOP_GOAL_POS = -670;
+    private static final int CAPSTONE_POS = -670; //TODO: tune these values
 
     private enum SlideState {
         RETRACTED,
@@ -67,6 +56,18 @@ public class Outtake extends SubsystemBase {
         HOLDING
     }
 
+    private enum FlapState {
+        OPEN,
+        CLOSED
+    }
+
+    private enum BucketState {
+        FLIPPED,
+        UNFLIPPED
+    }
+
+    private BucketState bucketState = BucketState.UNFLIPPED;
+    private FlapState flapState = FlapState.OPEN;
     private SlideState slideState = SlideState.AT_LOW_GOAL;
     private SlideRun slideRun = SlideRun.HOLDING;
 
@@ -163,8 +164,7 @@ public class Outtake extends SubsystemBase {
                 slideMotor.set(ZERO_SPEED);
             }
             else {
-                slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-                slideMotor.set(ZERO_SPEED);
+                slideMotor.set(SLIDE_STOPPED);
             }
 
     }

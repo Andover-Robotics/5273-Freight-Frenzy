@@ -148,12 +148,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
       bot.outtake.goToCapstone();
     }
+    else if (gamepadEx2.wasJustReleased(Button.B)){
+      bot.outtake.toggleBucket();
+    }
     else if (gamepadEx2.wasJustReleased(Button.X)){
       bot.carousel.stop();
     }
     else if (gamepadEx2.wasJustReleased(Button.A)){
       bot.carousel.run();
     }
+
 
 
     /*//TODO: make control scheme
