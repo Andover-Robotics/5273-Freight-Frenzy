@@ -4,6 +4,7 @@ import android.hardware.TriggerEvent;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -123,8 +124,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outake.openLeftFlap();
-      bot.outake.closeRightFlap();
+      bot.outtake.openLeftFlap();
+      bot.outtake.closeRightFlap();
     }
 
     /*
@@ -133,24 +134,45 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
      */
 
-    else if (gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {}
-    else if (gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {}
-    else if (gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {}
+
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outake.openRightFlap();
-      bot.outake.closeLeftFlap();
+      bot.outtake.openRightFlap();
+      bot.outtake.closeLeftFlap();
     }
 
     if (gamepadEx2.wasJustReleased(Button.Y)){
-      bot.outake.flipBucket();
+      bot.outtake.flipBucket();
     }
     else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
-      bot.outake.unFlipBucket();
+      bot.outtake.unFlipBucket();
     }
 
-    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
-      //bot.outake.runSlides();
+//    if (gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) { bot.outtake.fullyRetract(); }
+//    else if (gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) { bot.outtake.goToLowGoal(); }
+//    else if (gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) { bot.outtake.goToMidGoal(); }
+//    else if (gamepadEx2.wasJustReleased(Button.DPAD_UP)) { bot.outtake.goToTopGoal(); }
+//    else if (gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) { bot.outtake.goToCapstone(); }
+//    TODO: make this outtake use the new outtake class
+//      AND!!! make it so that it does not use this jank solution
+
+    int slideTargetTicks = 5;
+
+    if(gamepadEx2.getLeftY() > triggerConstant || gamepadEx2.getLeftY() < -triggerConstant) {
+      if(slideTargetTicks >= 800 && gamepadEx2.getLeftY() < -triggerConstant) {
+        slideTargetTicks += gamepadEx2.getLeftY()*3;
+      }
+      else if(slideTargetTicks <= 0 && gamepadEx2.getLeftY() > triggerConstant) {
+        slideTargetTicks += gamepadEx2.getLeftY()*3;
+      }
+      else if(slideTargetTicks > 0 && slideTargetTicks < 800) {
+        slideTargetTicks += gamepadEx2.getLeftY()*2;
+      }
     }
+
+    bot.outtake.goToPosition(slideTargetTicks);
+
+//    bot.outtake.goToPosition();
+
 
     /*
     if (bot.outake.freightInBucket()){

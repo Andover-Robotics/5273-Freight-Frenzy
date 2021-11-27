@@ -28,6 +28,7 @@ public class Outtake extends SubsystemBase {
     private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0;
 
+
     private enum BucketState {
         FLIPPED,
         UNFLIPPED
@@ -43,13 +44,16 @@ public class Outtake extends SubsystemBase {
     private static final double DIAMETER = 38.0;
     private static final double SPOOL = 185.0;
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
-    private static final double SLIDE_SPEED = 0.05;
+    private static final double SLIDE_SPEED = 0.5;
+    private static final double TOLERANCE = 15;
 //    private static final double SLIDE_STOPPED = 0.0;
     private static final int RETRACTED    =    5;  // 5 all are in ticks
     private static final int LOW_GOAL_POS = -226;  // -226 ticks
     private static final int MID_GOAL_POS = -377;  // -377
     private static final int TOP_GOAL_POS = -690;  // -690
     private static final int CAPSTONE_POS = -800;  // -800 TODO: tune these values
+    private static int targetPosition = RETRACTED;
+
 
     private enum SlideState {
         RETRACTED,
@@ -102,7 +106,7 @@ public class Outtake extends SubsystemBase {
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
         slideMotor.motor.setTargetPosition(RETRACTED);
-
+        slideMotor.set(0.5);
 
 
         //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
@@ -131,6 +135,17 @@ public class Outtake extends SubsystemBase {
         }
     }
 
+    @Override
+    public void periodic() {
+        goToPosition(-500);
+        if(slideMotor.getCurrentPosition() < targetPosition + TOLERANCE || slideMotor.getCurrentPosition() > targetPosition - TOLERANCE) {
+            slideMotor.stopMotor();
+        }else{
+            slideMotor.set(SLIDE_SPEED);
+        }
+//        updateSlidePos();
+    }
+
     public void goToPosition(int ticks) {
         slideMotor.setTargetPosition(ticks);
     }
@@ -142,22 +157,27 @@ public class Outtake extends SubsystemBase {
 
     public void fullyRetract() {
         slideState = SlideState.RETRACTED;
+        targetPosition = RETRACTED;
         return;
     }
     public void goToLowGoal() {
         slideState = SlideState.AT_LOW_GOAL;
+        targetPosition = LOW_GOAL_POS;
         return;
     }
     public void goToMidGoal() {
         slideState = SlideState.AT_MID_GOAL;
+        targetPosition = MID_GOAL_POS;
         return;
     }
     public void goToTopGoal() {
         slideState = SlideState.AT_TOP_GOAL;
+        targetPosition = TOP_GOAL_POS;
         return;
     }
     public void goToCapstone() {
         slideState = SlideState.AT_CAPSTONE;
+        targetPosition = CAPSTONE_POS;
         return;
     }
 
@@ -238,12 +258,12 @@ public class Outtake extends SubsystemBase {
         slideMotor.resetEncoder();
         while (slideMotor.encoder.getRevolutions() < ROTATIONS) {
             slideMotor.set(SLIDE_SPEED);
-            eState = extensionState.EXTENDED;
+            //eState = extensionState.EXTENDED;
         }
         slideMotor.set(SLIDE_STOPPED);
         eState = extensionState.RETRACTED;
     }
+*/
 
-     */
 
 }
