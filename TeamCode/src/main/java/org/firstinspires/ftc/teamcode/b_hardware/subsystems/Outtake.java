@@ -28,28 +28,20 @@ public class Outtake extends SubsystemBase {
     private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0;
 
-    private enum BucketState {
-        FLIPPED,
-        UNFLIPPED
-    }
-    private BucketState bucketState = BucketState.UNFLIPPED;
-    private enum FlapState {
-        OPEN,
-        CLOSED
-    }
-    private FlapState flapState = FlapState.OPEN;
-
     // Slide motor speeds + positions
     private static final double DIAMETER = 38.0;
     private static final double SPOOL = 185.0;
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
-    private static final double SLIDE_SPEED = 0.05;
-//    private static final double SLIDE_STOPPED = 0.0;
-    private static final int RETRACTED    =    5;  // 5 all are in ticks
-    private static final int LOW_GOAL_POS = -226;  // -226 ticks
-    private static final int MID_GOAL_POS = -377;  // -377
-    private static final int TOP_GOAL_POS = -690;  // -690
-    private static final int CAPSTONE_POS = -800;  // -800 TODO: tune these values
+    private static final double SLIDE_SPEED = 0.3;
+    private static final double SLIDE_STOPPED = 0.03;
+    private static final double ZERO_SPEED = 0.0;
+    private static final double TOLERANCE = 20;
+    // private static final int RETRACTED =  5;
+    private int targetPostion = 0;
+    private static final int LOW_GOAL_POS = -226; // ticks
+    private static final int MID_GOAL_POS = -377;
+    private static final int TOP_GOAL_POS = -670;
+    private static final int CAPSTONE_POS = -670; //TODO: tune these values
 
     private enum SlideState {
         RETRACTED,
@@ -58,7 +50,26 @@ public class Outtake extends SubsystemBase {
         AT_TOP_GOAL,
         AT_CAPSTONE
     }
-    private SlideState slideState = SlideState.RETRACTED;
+
+    private enum SlideRun {
+        RUNNING,
+        HOLDING
+    }
+
+    private enum FlapState {
+        OPEN,
+        CLOSED
+    }
+
+    private enum BucketState {
+        FLIPPED,
+        UNFLIPPED
+    }
+
+    private BucketState bucketState = BucketState.UNFLIPPED;
+    private FlapState flapState = FlapState.OPEN;
+    private SlideState slideState = SlideState.AT_LOW_GOAL;
+    private SlideRun slideRun = SlideRun.HOLDING;
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
     // Color sensing vars for balls
@@ -101,9 +112,7 @@ public class Outtake extends SubsystemBase {
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        slideMotor.motor.setTargetPosition(RETRACTED);
-
-
+        slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
         //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
@@ -111,57 +120,54 @@ public class Outtake extends SubsystemBase {
         //closeBucket();
     }
 
-    public void updateSlidePos() {
-//        slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        if(slideState == SlideState.RETRACTED) {
-//            slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-            goToPosition(RETRACTED);
-        }
-        else if(slideState == SlideState.AT_LOW_GOAL) {
-            goToPosition(LOW_GOAL_POS);
-        }
-        else if(slideState == SlideState.AT_MID_GOAL) {
-            goToPosition(MID_GOAL_POS);
-        }
-        else if(slideState == SlideState.AT_TOP_GOAL) {
-            goToPosition(TOP_GOAL_POS);
-        }
-        else if(slideState == SlideState.AT_CAPSTONE) {
-            goToPosition(CAPSTONE_POS);
-        }
-    }
-
-    public void goToPosition(int ticks) {
-        slideMotor.setTargetPosition(ticks);
-    }
-
-
-//    public MotorEx getMotor() {
-//        return slideMotor;
-//    }
-
     public void fullyRetract() {
         slideState = SlideState.RETRACTED;
-        return;
     }
     public void goToLowGoal() {
         slideState = SlideState.AT_LOW_GOAL;
-        return;
+        slideMotor.setTargetPosition(LOW_GOAL_POS);
+        targetPostion = LOW_GOAL_POS;
+        slideRun = SlideRun.RUNNING;
     }
     public void goToMidGoal() {
         slideState = SlideState.AT_MID_GOAL;
-        return;
+        slideMotor.setTargetPosition(MID_GOAL_POS);
+        targetPostion = MID_GOAL_POS;
+        slideRun = SlideRun.RUNNING;
     }
     public void goToTopGoal() {
         slideState = SlideState.AT_TOP_GOAL;
-        return;
+        slideMotor.setTargetPosition(TOP_GOAL_POS);
+        targetPostion = TOP_GOAL_POS;
+        slideRun = SlideRun.RUNNING;
     }
     public void goToCapstone() {
         slideState = SlideState.AT_CAPSTONE;
-        return;
+        slideMotor.setTargetPosition(CAPSTONE_POS);
+        targetPostion = CAPSTONE_POS;
+        slideRun = SlideRun.RUNNING;
     }
 
+    @Override
+    public void periodic(){
+        //this.updateSlidePos();
+        if (slideRun == SlideRun.RUNNING)
+            if (Math.abs(slideMotor.getCurrentPosition() - targetPostion) < TOLERANCE) {
+                slideRun = SlideRun.HOLDING;
+            }
+            else {
+                slideMotor.set(SLIDE_SPEED);
+            }
+        else
+            if (slideState == SlideState.RETRACTED){
+                slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+                slideMotor.set(ZERO_SPEED);
+            }
+            else {
+                slideMotor.set(SLIDE_STOPPED);
+            }
 
+    }
 
     public void toggleBucket() {
         if(bucketState == BucketState.UNFLIPPED) {
