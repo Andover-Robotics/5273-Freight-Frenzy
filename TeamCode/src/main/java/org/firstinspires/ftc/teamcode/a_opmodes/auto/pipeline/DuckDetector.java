@@ -60,7 +60,7 @@ public class DuckDetector {
     // Done, but not tested --> keep in branch till tested
 //    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
 
-    WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Duck Detector");
+    WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
     camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
     camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
       @Override
