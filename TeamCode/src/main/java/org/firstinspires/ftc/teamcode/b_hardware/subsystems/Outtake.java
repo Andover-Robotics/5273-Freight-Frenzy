@@ -46,7 +46,7 @@ public class Outtake extends SubsystemBase {
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
     */
     private static final double SLIDE_SPEED = 0.075;
-    private static final double SLIDE_STOPPED = 0.03;
+    private static final double SLIDE_STOPPED = 0.0;
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;
     // private static final int RETRACTED =  5;
