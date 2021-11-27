@@ -47,6 +47,7 @@ public class DuckDetector {
   private final TemplatePipeline pipeline = new TemplatePipeline();
   private volatile Pair<PipelineResult, Double> result = null;
   private volatile boolean saveImageNext = true;
+  private volatile boolean opened = false;
 
   public DuckDetector(OpMode opMode, Telemetry telemetry) {
     /*
@@ -60,12 +61,12 @@ public class DuckDetector {
     // Done, but not tested --> keep in branch till tested
 //    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
 
-    WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Duck Detector");
+    WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
     camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
     camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
       @Override
       public void onOpened() {
-
+        opened = true;
       }
 
       @Override
@@ -74,8 +75,10 @@ public class DuckDetector {
       }
     });
     //camera.openCameraDevice();
-    camera.setPipeline(pipeline);
-    camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+    if (opened) {
+      camera.setPipeline(pipeline);
+      camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+    }
   }
 
   public void saveImage() {
@@ -149,7 +152,7 @@ public class DuckDetector {
     // returns a pair containing verdict and confidence from 0 to 1
     private Optional<Pair<PipelineResult, Double>> identifyStackFromBounds() {
 
-      double minError = bounds.stream().map(Rect::area).min(Comparator.naturalOrder()).get();
+      double minError = bounds.stream().map(Rect::area).max(Comparator.naturalOrder()).get();
       Rect boundingBox = null;
 
       for (Rect t: bounds) {
