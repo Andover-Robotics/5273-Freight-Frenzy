@@ -28,6 +28,7 @@ public class Outtake extends SubsystemBase {
     private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0;
 
+
     // Slide motor speeds + positions
     private static final double DIAMETER = 38.0;
     private static final double SPOOL = 185.0;
@@ -42,6 +43,7 @@ public class Outtake extends SubsystemBase {
     private static final int MID_GOAL_POS = -377;
     private static final int TOP_GOAL_POS = -670;
     private static final int CAPSTONE_POS = -670; //TODO: tune these values
+
 
     private enum SlideState {
         RETRACTED,
@@ -112,13 +114,16 @@ public class Outtake extends SubsystemBase {
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
 
         //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
         //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
 
         //closeBucket();
     }
+
 
     public void fullyRetract() {
         slideState = SlideState.RETRACTED;
@@ -146,7 +151,8 @@ public class Outtake extends SubsystemBase {
         slideMotor.setTargetPosition(CAPSTONE_POS);
         targetPostion = CAPSTONE_POS;
         slideRun = SlideRun.RUNNING;
-    }
+
+    
 
     @Override
     public void periodic(){
@@ -244,12 +250,12 @@ public class Outtake extends SubsystemBase {
         slideMotor.resetEncoder();
         while (slideMotor.encoder.getRevolutions() < ROTATIONS) {
             slideMotor.set(SLIDE_SPEED);
-            eState = extensionState.EXTENDED;
+            //eState = extensionState.EXTENDED;
         }
         slideMotor.set(SLIDE_STOPPED);
         eState = extensionState.RETRACTED;
     }
+*/
 
-     */
 
 }

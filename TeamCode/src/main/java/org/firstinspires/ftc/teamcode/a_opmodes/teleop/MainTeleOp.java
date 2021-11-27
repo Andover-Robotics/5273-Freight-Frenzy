@@ -4,6 +4,7 @@ import android.hardware.TriggerEvent;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -128,10 +129,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.openLeftFlap();
       bot.outtake.closeRightFlap();
     }
+
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
       bot.outtake.openRightFlap();
       bot.outtake.closeLeftFlap();
     }
+
 
     if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.fullyRetract();
@@ -156,7 +159,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx2.wasJustReleased(Button.A)){
       bot.carousel.run();
-    }
+
 
 
 
