@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
 import android.annotation.SuppressLint;
-import android.graphics.Path;
 import android.util.Log;
 import android.util.Pair;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -22,8 +20,6 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
-import org.openftc.easyopencv.OpenCvInternalCamera2Impl;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -86,10 +82,10 @@ public class DuckDetector {//TODO: Change this to control hub
 
   class TemplatePipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(0, 225, 225);
-    final Scalar upperRange = new Scalar(30, 255, 255);
+    final Scalar lowerRange = new Scalar(200, 140, 0);
+    final Scalar upperRange = new Scalar(255, 255, 150);
 
-    static final double DUCK_AREA = 5550;
+    static final double DUCK_AREA = 1400;
     //static final double ST_DEV = 10;
     //NormalDistribution one_nd = new NormalDistribution(ONE_RING_AREA, ST_DEV);
     //NormalDistribution four_nd = new NormalDistribution(FOUR_RING_AREA, ST_DEV);
@@ -100,9 +96,8 @@ public class DuckDetector {//TODO: Change this to control hub
         contourDetector = new Mat();
     final MatOfPoint2f polyDpResult = new MatOfPoint2f();
     final List<Rect> bounds = new ArrayList<>();
-    final double width = 960;
-    final double middle_left_x = width / 3;
-    final double middle_right_x = 2 * width / 3;
+    final double MIDDLE_LEFT_X = 330;
+    final double MIDDLE_RIGHT_X = 550;
     final Size gaussianKernelSize = new Size(9, 9);
 
     @SuppressLint("SdCardPath")
@@ -153,10 +148,10 @@ public class DuckDetector {//TODO: Change this to control hub
 
       assert boundingBox != null;
 
-      if (boundingBox.x + boundingBox.width <= middle_left_x) {
+      if (boundingBox.x + boundingBox.width <= MIDDLE_LEFT_X) {
         return Optional.of(Pair.create(PipelineResult.LEFT, 0.8));
       }
-      else if (boundingBox.x + boundingBox.width <= middle_right_x){
+      else if (boundingBox.x + boundingBox.width <= MIDDLE_RIGHT_X){
         return Optional.of(Pair.create(PipelineResult.MIDDLE, 0.8));
       }
       else {
