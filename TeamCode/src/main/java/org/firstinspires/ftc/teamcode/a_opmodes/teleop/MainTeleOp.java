@@ -4,6 +4,7 @@ import android.hardware.TriggerEvent;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -13,6 +14,7 @@ import com.arcrobotics.ftclib.util.Direction;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive.Mode;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
@@ -28,6 +30,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private boolean isManual = true;
   private int percent = 1, part = 0;
   private double triggerConstant = 0.05;
+  double slowModeSpeed = 0.4;
 
 
 
@@ -78,7 +81,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-    driveSpeed = 1 - 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
+    driveSpeed = 1;//- 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -106,10 +109,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Intake stuff
 
-    if(gamepadEx2.isDown(Button.RIGHT_STICK_BUTTON)) {
-      bot.intake.runToggle();
-    }
-    else if (gamepadEx2.isDown(Button.LEFT_BUMPER)){
+    if (gamepadEx2.isDown(Button.LEFT_BUMPER)){
       bot.intake.reverseLeft();
     }
     else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
@@ -126,31 +126,40 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outake.openLeftFlap();
-      bot.outake.closeRightFlap();
+      bot.outtake.openLeftFlap();
+      bot.outtake.closeRightFlap();
     }
+
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outake.openRightFlap();
-      bot.outake.closeLeftFlap();
+      bot.outtake.openRightFlap();
+      bot.outtake.closeLeftFlap();
     }
 
-    if (gamepadEx2.wasJustReleased(Button.DPAD_UP)){
-      bot.outake.flipBucket();
-    }
-    else if (gamepadEx2.wasJustReleased((Button.DPAD_DOWN))){
-      bot.outake.unFlipBucket();
-    }
 
-    if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > 0.01){
-      //bot.outake.runSlides();
+    if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
+      bot.outtake.fullyRetract();
     }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
+      bot.outtake.goToLowGoal();
+    }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {
+      bot.outtake.goToMidGoal();
+    }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
+      bot.outtake.goToTopGoal();
+    }
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
+      bot.outtake.goToCapstone();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.B)){
+      bot.outtake.toggleBucket();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.X)){
+      bot.carousel.stop();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.A)){
+      bot.carousel.run();
 
-    /*
-    if (bot.outake.freightInBucket()){
-      bot.outake.closeLeftFlap();
-      bot.outake.closeRightFlap();
-    }
-     */
 
 
 
@@ -207,28 +216,43 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
 
   private void drive(){//Driving ===================================================================================
-    updateState();
-
     final double gyroAngle =
-        bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).secondAngle//TODO: make sure that the orientation is correct
-            - fieldCentricOffset;
+            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).secondAngle//TODO: make sure that the orientation is correct
+                    - fieldCentricOffset;
     Vector2d driveVector = stickSignal(Direction.LEFT),
-        turnVector = new Vector2d(
-            stickSignal(Direction.RIGHT).getX() * Math.abs(stickSignal(Direction.RIGHT).getX()),
-            0);
+            turnVector = new Vector2d(
+                    stickSignal(Direction.RIGHT).getX() * Math.abs(stickSignal(Direction.RIGHT).getX()),
+                    0);
     if (bot.roadRunner.mode == Mode.IDLE) {
-      if (centricity)//epic java syntax
+
+      boolean dpadPressed = (gamepadEx1.getButton(Button.DPAD_DOWN) || gamepadEx1.getButton(Button.DPAD_UP)
+              || gamepadEx1.getButton(Button.DPAD_LEFT) || gamepadEx1.getButton(Button.DPAD_RIGHT));
+      boolean buttonPressed = (gamepadEx1.getButton(Button.X) || gamepadEx1.getButton(Button.B));
+      double forwardSpeed = (gamepadEx1.getButton(Button.DPAD_LEFT) || gamepadEx1.getButton(Button.DPAD_RIGHT)) ? (gamepadEx1.getButton(Button.DPAD_RIGHT) ? 1 : -1) : 0;
+      double strafeSpeed = (gamepadEx1.getButton(Button.DPAD_DOWN) || gamepadEx1.getButton(Button.DPAD_UP)) ? (gamepadEx1.getButton(Button.DPAD_UP) ? 1 : -1) : 0;
+      double turnSpeed = (gamepadEx1.getButton(Button.X) || gamepadEx1.getButton(Button.B)) ? (gamepadEx1.getButton(Button.B) ? 1 : -1) : 0;
+
+      if (centricity) //epic java syntax
         bot.drive.driveFieldCentric(
-            driveVector.getX() * driveSpeed,
-            driveVector.getY() * driveSpeed,
-            turnVector.getX() * driveSpeed,
-            gyroAngle);
+                driveVector.getY() * driveSpeed,
+                driveVector.getX() * driveSpeed,
+                turnVector.getX() * driveSpeed,
+                gyroAngle);
+
+      else if (dpadPressed || buttonPressed)
+        bot.drive.driveRobotCentric(
+                - strafeSpeed * slowModeSpeed,
+                - forwardSpeed * slowModeSpeed,
+                turnSpeed * slowModeSpeed
+        );
+
       else
         bot.drive.driveRobotCentric(
-            -driveVector.getY() * driveSpeed,
-            driveVector.getX() * driveSpeed,
-            turnVector.getX() * driveSpeed
+                driveVector.getY() * driveSpeed,
+                driveVector.getX() * driveSpeed,
+                turnVector.getX() * driveSpeed
         );
+
     }
     if (justPressed(Button.LEFT_STICK_BUTTON)) {
       fieldCentricOffset = bot.imu.getAngularOrientation()

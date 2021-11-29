@@ -7,6 +7,7 @@ import android.util.Pair;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -27,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class DuckDetector {//TODO: Change this to control hub
+public class DuckDetector {
 
   public enum PipelineResult {
     LEFT(0),
@@ -42,6 +43,7 @@ public class DuckDetector {//TODO: Change this to control hub
   private final TemplatePipeline pipeline = new TemplatePipeline();
   private volatile Pair<PipelineResult, Double> result = null;
   private volatile boolean saveImageNext = true;
+  private volatile boolean opened = false;
 
   public DuckDetector(OpMode opMode, Telemetry telemetry) {
     /*
@@ -50,11 +52,17 @@ public class DuckDetector {//TODO: Change this to control hub
     camera = new OpenCvInternalCamera2Impl(OpenCvInternalCamera2Impl.CameraDirection.BACK,
         cameraMonitorViewId);
      */
-    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
+
+    //TODO: Change this to control hub
+    // Done, but not tested --> keep in branch till tested
+//    camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
+
+    WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
+    camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
     camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
       @Override
       public void onOpened() {
-
+        opened = true;
       }
 
       @Override
@@ -63,8 +71,10 @@ public class DuckDetector {//TODO: Change this to control hub
       }
     });
     //camera.openCameraDevice();
-    camera.setPipeline(pipeline);
-    camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+    if (opened) {
+      camera.setPipeline(pipeline);
+      camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+    }
   }
 
   public void saveImage() {
@@ -137,7 +147,7 @@ public class DuckDetector {//TODO: Change this to control hub
     // returns a pair containing verdict and confidence from 0 to 1
     private Optional<Pair<PipelineResult, Double>> identifyStackFromBounds() {
 
-      double minError = bounds.stream().map(Rect::area).min(Comparator.naturalOrder()).get();
+      double minError = bounds.stream().map(Rect::area).max(Comparator.naturalOrder()).get();
       Rect boundingBox = null;
 
       for (Rect t: bounds) {

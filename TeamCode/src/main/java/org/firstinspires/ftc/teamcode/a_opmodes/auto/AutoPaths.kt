@@ -69,6 +69,16 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
               Thread.sleep(2000)
               bot.carousel.stop()
     }
+
+    private val runSlides = AutoPathElement.Action("Run slides to shipping hubs"){
+              bot.outtake.goToTopGoal()
+              Thread.sleep(1500)
+              bot.outtake.flipBucket()
+              Thread.sleep(1000)
+              bot.outtake.unFlipBucket()
+              Thread.sleep(500)
+              bot.outtake.fullyRetract()
+    }
     //                                                                  =======================================================
 
     //example
@@ -108,6 +118,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
                         drive.trajectoryBuilder(leftStartPose)
                             .strafeRight(strafe_distance)
                             .build()),
+                    runSlides,
                     makePath("Strafe Left to Wall",
                         drive.trajectoryBuilder(lastPosition)
                             .strafeLeft(strafe_distance - 2.0)
@@ -139,6 +150,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
                         drive.trajectoryBuilder(rightStartPose)
                             .strafeRight(strafe_distance)
                             .build()),
+                    runSlides,
                     makePath("Strafe Left to Wall",
                         drive.trajectoryBuilder(lastPosition)
                             .strafeLeft(strafe_distance - 2.0)
