@@ -72,12 +72,8 @@ public class Outtake extends SubsystemBase {
 
 
 
-    private enum BucketState {
-        FLIPPED,
-        UNFLIPPED
-    }
 
-    private BucketState bucketState = BucketState.UNFLIPPED;
+
 
     private SlideState slideState = SlideState.AT_LOW_GOAL;
     private SlideRun slideRun = SlideRun.HOLDING;
