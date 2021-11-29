@@ -21,6 +21,7 @@ public class OuttakeWIP extends SubsystemBase {
 
 
     // Motor constants
+
     private static final int RETRACTED    =    5;  // 5 all are in ticks
     private static final int LOW_GOAL_POS = -226, MID_GOAL_POS = -377, TOP_GOAL_POS = -690, CAPSTONE_POS = -800;  // units in ticks
     // TODO: tune these values with the flipped bucket
@@ -43,6 +44,7 @@ public class OuttakeWIP extends SubsystemBase {
     private static boolean leftFlapOpen  = true;
     private static final double FLIPPED = 0.45, UNFLIPPED = 0;
     private static boolean bucketFlipped = false;
+
 
     public OuttakeWIP(OpMode opMode) {
 
@@ -69,7 +71,9 @@ public class OuttakeWIP extends SubsystemBase {
 
     @Override
     public void periodic() {
+
         //TODO: make this method better to make it smoothly go to the next slide position and better tolerances
+
         if(slideMotor.getCurrentPosition() > targetPosition - TOLERANCE || slideMotor.getCurrentPosition() < targetPosition + TOLERANCE) {
             slideMotor.set(0);
         }
@@ -77,6 +81,7 @@ public class OuttakeWIP extends SubsystemBase {
             slideMotor.set(SLIDE_SPEED);
         }
         checkNewPos();
+
         // end of slide code -- beginning of freight detection
 
         if(checkLeftCS() || checkRightCS()) {
@@ -109,6 +114,7 @@ public class OuttakeWIP extends SubsystemBase {
             targetPosition = CAPSTONE_POS;
         }
     }
+
 
     public void openLeftFlap() {
         leftFlap.setPosition(LEFT_OPEN);
