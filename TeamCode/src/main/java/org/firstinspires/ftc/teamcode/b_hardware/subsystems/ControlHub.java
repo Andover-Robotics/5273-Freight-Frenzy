@@ -4,11 +4,14 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.openftc.revextensions2.ExpansionHubEx;
+import org.openftc.revextensions2.ExpansionHubMotor;
 
 class Hubs extends SubsystemBase {
 
     private static ExpansionHubEx controlHub;
     private static ExpansionHubEx expansionHub;
+
+
 
     private static boolean partyMode = false;
     private static int[] rgb = {0, 0, 0};
@@ -19,16 +22,20 @@ class Hubs extends SubsystemBase {
     }
 
 
+
     @Override
     public void periodic() {
         if(partyMode) {
             controlHub.setLedColor(rgb[0], rgb[1], rgb[2]);
             expansionHub.setLedColor(rgb[0], rgb[1], rgb[2]);
-            if(Math.random() * 100 < 20) {
-                rgb[0] = (int) Math.random()*255 +1;
-                rgb[1] = (int) Math.random()*255 +1;
-                rgb[2] = (int) Math.random()*255 +1;
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            rgb[0] = (int) Math.random()*255 +1;
+            rgb[1] = (int) Math.random()*255 +1;
+            rgb[2] = (int) Math.random()*255 +1;
         }
         else if (!partyMode){
             controlHub.setLedColor(0, 255, 0);
@@ -50,6 +57,16 @@ class Hubs extends SubsystemBase {
         else if(!partyMode) {
             turnOnPartyMode();
         }
+    }
+
+    public double slideCurrentDraw() {
+        return controlHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS, 4);
+    }
+    public double leftIntakeCurrentDraw() {
+        return controlHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS, 1);
+    }
+    public double rightIntakeCurrentDraw() {
+        return controlHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS, 2);
     }
 
 
