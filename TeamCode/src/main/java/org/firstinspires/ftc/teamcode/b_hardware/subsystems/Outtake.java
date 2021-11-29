@@ -44,6 +44,7 @@ public class Outtake extends SubsystemBase {
     private static final double DIAMETER = 38.0;
     private static final double SPOOL = 185.0;
     private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
+
     */
     private static final double SLIDE_SPEED = 0.075;
     private static final double SLIDE_STOPPED = 0.0;
@@ -68,8 +69,21 @@ public class Outtake extends SubsystemBase {
         HOLDING
     }
 
+
+
+
+    private enum BucketState {
+        FLIPPED,
+        UNFLIPPED
+    }
+
+    private BucketState bucketState = BucketState.UNFLIPPED;
+
     private SlideState slideState = SlideState.AT_LOW_GOAL;
     private SlideRun slideRun = SlideRun.HOLDING;
+
+    private static boolean leftFlapOpen = true;
+    private static boolean rightFlapOpen = true;
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
     // Color sensing vars for balls
@@ -245,6 +259,24 @@ public class Outtake extends SubsystemBase {
     }
     public void closeRightFlap() {
         rightFlap.setPosition(RIGHT_CLOSED);
+    }
+
+    public void toggleLeftFlap() {
+        if(leftFlapOpen) {
+            closeLeftFlap();
+        }
+        else if(!leftFlapOpen) {
+            openLeftFlap();
+        }
+    }
+
+    public void toggleRightFlap() {
+        if(rightFlapOpen) {
+            closeRightFlap();
+        }
+        else if(!rightFlapOpen) {
+            openRightFlap();
+        }
     }
 
     /* DEPRECATED
