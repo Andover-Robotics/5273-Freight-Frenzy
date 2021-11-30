@@ -4,6 +4,7 @@ import android.hardware.TriggerEvent;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -98,40 +99,54 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //TODO: insert actual teleop stuff here
 
-    //Carousel stuff
-    if (gamepadEx1.wasJustReleased(Button.Y)){
-      bot.carousel.run();
+
+    if(gamepadEx1.isDown(Button.X)) {
+      bot.drive.driveRobotCentric(0, 0, -0.2);
     }
-    else if (gamepadEx1.wasJustReleased(Button.A)){
-      bot.carousel.stop();
+    else if (gamepadEx1.isDown(Button.B)) {
+      bot.drive.driveRobotCentric(0, 0, 0.2);
     }
 
-    //Intake stuff
+    if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
+      bot.drive.driveRobotCentric(-0.2, 0, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
+      bot.drive.driveRobotCentric(0.2, 0, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
+      bot.drive.driveRobotCentric(0, 0.2, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
+      bot.drive.driveRobotCentric(0, -0.2, 0);
+    }
 
-    if (gamepadEx2.isDown(Button.LEFT_BUMPER)){
+
+    if (gamepadEx1.isDown(Button.LEFT_BUMPER)){
       bot.intake.reverseLeft();
     }
-    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+    else if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
       bot.intake.reverseRight();
     }
-    else if (gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
+    else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();
     }
-    else if (gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
+    else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
       bot.intake.runLeft();
     }
     else {
       bot.intake.stop();
     }
 
+    // driver 2
+
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outtake.openLeftFlap();
-      bot.outtake.closeRightFlap();
+      bot.outtake.toggleLeftFlap();
     }
+
     else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outtake.openRightFlap();
-      bot.outtake.closeLeftFlap();
+      bot.outtake.toggleRightFlap();
     }
+
 
     if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.fullyRetract();
@@ -139,7 +154,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
       bot.outtake.goToLowGoal();
     }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
       bot.outtake.goToMidGoal();
     }
     else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
@@ -147,16 +162,21 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
       bot.outtake.fullyRetract();
+
     }
-    else if (gamepadEx2.wasJustReleased(Button.B)){
+    else if (gamepadEx2.wasJustReleased(Button.Y)){
       bot.outtake.toggleBucket();
     }
-    else if (gamepadEx2.wasJustReleased(Button.X)){
-      bot.carousel.stop();
-    }
+
+
     else if (gamepadEx2.wasJustReleased(Button.A)){
-      bot.carousel.run();
+      bot.carousel.toggleBlue();
     }
+    else if (gamepadEx2.wasJustReleased(Button.B)) {
+      bot.carousel.toggleRed();
+    }
+
+
 
 
 
@@ -236,16 +256,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                 turnVector.getX() * driveSpeed,
                 gyroAngle);
 
-      else if (dpadPressed || buttonPressed)
-        bot.drive.driveRobotCentric(
-                - strafeSpeed * slowModeSpeed,
-                - forwardSpeed * slowModeSpeed,
-                turnSpeed * slowModeSpeed
-        );
+//      else if (dpadPressed || buttonPressed)
+//        bot.drive.driveRobotCentric(
+//                - strafeSpeed * slowModeSpeed,
+//                - forwardSpeed * slowModeSpeed,
+//                turnSpeed * slowModeSpeed
+//        );
 
       else
         bot.drive.driveRobotCentric(
-                driveVector.getY() * driveSpeed,
+                driveVector.getY() * -driveSpeed,
                 driveVector.getX() * driveSpeed,
                 turnVector.getX() * driveSpeed
         );

@@ -39,22 +39,17 @@ public class Outtake extends SubsystemBase {
     }
     private FlapState flapState = FlapState.OPEN;
 
-    // Slide motor speeds + positions
-    /*
-    private static final double DIAMETER = 38.0;
-    private static final double SPOOL = 185.0;
-    private static final double ROTATIONS = SPOOL / (DIAMETER * Math.PI);
-    */
     private static final double SLIDE_SPEED = 0.3;
     private static final double SLIDE_STOPPED = 0.03;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;
-     private static final int RETRACTED =  0;
+    private static final int RETRACTED =  0;
     private static final int LOW_GOAL_POS = -226; // ticks
     private static final int MID_GOAL_POS = -377;
     private static final int TOP_GOAL_POS = -650;
     private static final int CAPSTONE_POS = -650; //TODO: tune these values
+
     private static int targetPosition;
     private enum SlideState {
         RETRACTED,
@@ -71,6 +66,9 @@ public class Outtake extends SubsystemBase {
 
     private SlideState slideState = SlideState.AT_LOW_GOAL;
     private SlideRun slideRun = SlideRun.HOLDING;
+
+    private static boolean leftFlapOpen = true;
+    private static boolean rightFlapOpen = true;
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
     // Color sensing vars for balls
@@ -156,40 +154,13 @@ public class Outtake extends SubsystemBase {
 
     @Override
     public void periodic(){
-        //this.updateSlidePos();
-        /*
-        if (slideMotor.getCurrentPosition() >= 0)
-        {
-            slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-            slideMotor.set(ZERO_SPEED);
-        }*/
-        //        if (slideRun == SlideRun.RUNNING)
-//            if (slideMotor.getCurrentPosition() > targetPosition - TOLERANCE && slideMotor.getCurrentPosition() < targetPosition + TOLERANCE ) {
-//                slideRun = SlideRun.HOLDING;
-//            }
-//            else {
-//                //slideMotor.set(SLIDE_SPEED);
-//                slideMotor.set(SLIDE_STOPPED + SLIDE_SPEED * Math.sqrt((Math.abs(slideMotor.getCurrentPosition()) - Math.abs(targetPosition)) / (double)targetPosition));
-//            }
-//        else
-//            if (slideState == SlideState.RETRACTED){
-//                slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-//                slideMotor.set(ZERO_SPEED);
-//            }
-//            else {
-//                /*
-//                slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-//                slideMotor.set(ZERO_SPEED);
-//                */
-//                slideMotor.set(SLIDE_STOPPED);
-//            }
         if(!slideMotor.atTargetPosition()){
             if (Math.abs(targetPosition) > Math.abs(slideMotor.getCurrentPosition()))
             {
                 slideMotor.set(RETRACT_SPEED);
             }
             else{
-                slideMotor.setPositionCoefficient(.05);
+                slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(SLIDE_SPEED);
                 //slideMotor.set((SLIDE_SPEED) * (((Math.abs(slideMotor.getCurrentPosition() - targetPosition)) / (double)Math.abs(targetPosition))));
             }
@@ -266,6 +237,24 @@ public class Outtake extends SubsystemBase {
     }
     public void closeRightFlap() {
         rightFlap.setPosition(RIGHT_CLOSED);
+    }
+
+    public void toggleLeftFlap() {
+        if(leftFlapOpen) {
+            closeLeftFlap();
+        }
+        else if(!leftFlapOpen) {
+            openLeftFlap();
+        }
+    }
+
+    public void toggleRightFlap() {
+        if(rightFlapOpen) {
+            closeRightFlap();
+        }
+        else if(!rightFlapOpen) {
+            openRightFlap();
+        }
     }
 
     /* DEPRECATED
