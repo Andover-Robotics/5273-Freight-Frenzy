@@ -23,9 +23,11 @@ public class Intake extends SubsystemBase {
     public state runState = state.OFF;
 
     public Intake(OpMode opMode){
+        // TODO: make a mojor change and run the intake to a specific velocity, so cube weight detection will work after calibration
+        //      for example, calibrate to a set velocity, and run the intakes at that set velocity during the duration of the match
         leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_312);
         leftIntake.setRunMode(Motor.RunMode.RawPower);
-        leftIntake.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightIntake = new MotorEx(opMode.hardwareMap, "rightIntake", Motor.GoBILDA.RPM_312);
         rightIntake.setRunMode(Motor.RunMode.RawPower);
         rightIntake.motor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -54,7 +56,7 @@ public class Intake extends SubsystemBase {
 //    deprecated
 
     public void reverseLeft() {
-        leftIntake.set(SPEED);
+        leftIntake.set(-SPEED);
     }
 
     public void reverseRight() {
@@ -63,7 +65,7 @@ public class Intake extends SubsystemBase {
 
     public void runLeft(){
         rightIntake.set(0.0);
-        leftIntake.set(-SPEED);
+        leftIntake.set(SPEED);
         runState = state.LEFT;
     }
 
