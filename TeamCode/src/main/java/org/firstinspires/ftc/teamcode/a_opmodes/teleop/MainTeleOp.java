@@ -146,7 +146,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.goToTopGoal();
     }
     else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
-      bot.outtake.goToCapstone();
+      bot.outtake.fullyRetract();
     }
     else if (gamepadEx2.wasJustReleased(Button.B)){
       bot.outtake.toggleBucket();
