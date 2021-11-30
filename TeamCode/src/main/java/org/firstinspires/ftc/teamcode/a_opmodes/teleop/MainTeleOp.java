@@ -99,7 +99,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //TODO: insert actual teleop stuff here
 
-
+    //slow driving controls
     if(gamepadEx1.isDown(Button.X)) {
       bot.drive.driveRobotCentric(0, 0, -0.2);
     }
@@ -120,7 +120,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.drive.driveRobotCentric(0, -0.2, 0);
     }
 
-
+    // intake controls
     if (gamepadEx1.isDown(Button.LEFT_BUMPER)){
       bot.intake.reverseLeft();
     }
@@ -139,6 +139,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     // driver 2
 
+    // toggling flaps to hold freight in bucket
     if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
       bot.outtake.toggleLeftFlap();
     }
@@ -147,7 +148,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.toggleRightFlap();
     }
 
-
+    // all slides controls
     if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.fullyRetract();
     }
@@ -167,7 +168,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.toggleBucket();
     }
 
-
+    // carousel controls
     else if (gamepadEx2.wasJustReleased(Button.A)){
       bot.carousel.toggleBlue();
     }
