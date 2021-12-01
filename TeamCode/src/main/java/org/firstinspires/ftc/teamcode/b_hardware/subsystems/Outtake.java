@@ -39,7 +39,7 @@ public class Outtake extends SubsystemBase {
     }
     private FlapState flapState = FlapState.OPEN;
 
-    private static final double SLIDE_SPEED = 0.3;
+    private static final double SLIDE_SPEED = 0.7;
     private static final double SLIDE_STOPPED = 0.03;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
@@ -115,6 +115,7 @@ public class Outtake extends SubsystemBase {
         slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
         slideMotor.setPositionTolerance(40);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
 
         //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
         //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
