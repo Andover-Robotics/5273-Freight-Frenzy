@@ -15,6 +15,6 @@ public class StartCarousel extends CommandBase {
 
     @Override
     public void initialize(){
-        carousel.run();
+        carousel.runRed();
     }
 }
