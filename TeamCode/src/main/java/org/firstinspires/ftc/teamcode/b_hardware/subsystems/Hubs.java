@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -29,12 +31,11 @@ class Hubs extends SubsystemBase {
     private static boolean partyMode = false;
     private static int[] rgb = {0, 0, 0};
 
-    public Hubs(OpMode opMode) {
+    public Hubs(@NonNull OpMode opMode) {
         controlHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Control Hub");
         expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
         calibrateIntakeAvgAmperage(opMode);
     }
-
 
 
     @Override
@@ -83,7 +84,7 @@ class Hubs extends SubsystemBase {
         return controlHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS, 2);
     }
 
-// TODO: possible calipration thing durinig init to run the motor and get the current it currently draws and average
+// TODO: possible calibration thing durinig init to run the motor and get the current it currently draws and average
 //    for more accurate measurements during auto & teleOp also find a way to display it on the driver hub or something
 //    BUT -- in the future use the data from the lsat 5 seconds to keep a floating average for better accuracy in cube weight detection
 
@@ -115,6 +116,8 @@ class Hubs extends SubsystemBase {
 
 
     }
+
+
 
 
 

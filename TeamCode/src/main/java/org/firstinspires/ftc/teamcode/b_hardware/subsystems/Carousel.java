@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -27,7 +29,7 @@ public class Carousel extends SubsystemBase {
     private State runState = State.OFF;
 
 
-    public Carousel(OpMode opMode){
+    public Carousel(@NonNull OpMode opMode){
         motor = new MotorEx(opMode.hardwareMap, "carousel", Motor.GoBILDA.RPM_1150);
         motor.setRunMode(Motor.RunMode.VelocityControl);
         motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

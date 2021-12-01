@@ -127,7 +127,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
                         drive.trajectoryBuilder(lastPosition)
                             .back(50.5)
                             .addSpatialMarker(Vector2d(-48.0, -66.5)){
-                                bot.carousel.run()
+//                                bot.carousel.run()
                             }
                             .build()),
                     runCarousel,
@@ -159,7 +159,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
                         drive.trajectoryBuilder(lastPosition)
                             .forward( 50.5)
                             .addSpatialMarker(Vector2d(-48.0, -66.5)){
-                                bot.carousel.run()
+                                bot.carousel.runRed()
                             }
                             .build()),
                     runCarousel,

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -46,7 +48,7 @@ public class OuttakeWIP extends SubsystemBase {
     private static boolean bucketFlipped = false;
 
 
-    public OuttakeWIP(OpMode opMode) {
+    public OuttakeWIP(@NonNull OpMode opMode) {
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
