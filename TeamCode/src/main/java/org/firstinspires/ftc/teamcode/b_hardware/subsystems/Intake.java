@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -22,7 +24,7 @@ public class Intake extends SubsystemBase {
 
     public state runState = state.OFF;
 
-    public Intake(OpMode opMode){
+    public Intake(@NonNull OpMode opMode){
         // TODO: make a mojor change and run the intake to a specific velocity, so cube weight detection will work after calibration
         //      for example, calibrate to a set velocity, and run the intakes at that set velocity during the duration of the match
         leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_312);

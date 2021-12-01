@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 
+import androidx.annotation.NonNull;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -15,8 +17,6 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-//TODO: use revextensions2 to make load sensing with current draw on motor possibly
-// test after scrimmage
 
 public class Outtake extends SubsystemBase {
 
@@ -94,7 +94,7 @@ public class Outtake extends SubsystemBase {
     private OpMode opMode;
 
 
-    public Outtake(OpMode opMode) {
+    public Outtake(@NonNull OpMode opMode) {
         this.opMode = opMode;
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
 //        this.executorService = executorService;
