@@ -57,19 +57,19 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   //If there is a module-specific var, put it in the module class ie slideStage goes in the slides module
 
 
-  private MotorEx leftIntake;
-  private MotorEx rightIntake;
+//  private MotorEx leftIntake;
+//  private MotorEx rightIntake;
 
   void subInit() {
     //TODO: initialize subsystems not initialized in bot constructor
-    timingScheduler = new TimingScheduler(this);
-    leftIntake = new MotorEx(hardwareMap, "leftIntake");
-    leftIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-    leftIntake.set(0);
-
-    rightIntake = new MotorEx(hardwareMap, "rightIntake");
-    rightIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-    rightIntake.set(0);
+//    timingScheduler = new TimingScheduler(this);
+//    leftIntake = new MotorEx(hardwareMap, "leftIntake");
+//    leftIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+//    leftIntake.set(0);
+//
+//    rightIntake = new MotorEx(hardwareMap, "rightIntake");
+//    rightIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+//    rightIntake.set(0);
   }
 
   @Override
@@ -108,16 +108,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
-      bot.drive.driveRobotCentric(-0.2, 0, 0);
-    }
-    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
       bot.drive.driveRobotCentric(0.2, 0, 0);
     }
-    else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
-      bot.drive.driveRobotCentric(0, 0.2, 0);
+    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
+      bot.drive.driveRobotCentric(-0.2, 0, 0);
     }
-    else if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
+    else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
       bot.drive.driveRobotCentric(0, -0.2, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_RIGHT)) {
+      bot.drive.driveRobotCentric(0, 0.2, 0);
     }
 
     // intake controls
@@ -150,13 +150,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     // all slides controls
     if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
-      bot.outtake.fullyRetract();
+      bot.outtake.goToCapstone();
     }
     else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
       bot.outtake.goToLowGoal();
-    }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
-      bot.outtake.goToMidGoal();
     }
     else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
@@ -170,11 +167,14 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     // carousel controls
-    else if (gamepadEx2.wasJustReleased(Button.A)){
+    if (gamepadEx2.wasJustReleased(Button.A)){
       bot.carousel.toggleBlue();
     }
     else if (gamepadEx2.wasJustReleased(Button.B)) {
       bot.carousel.toggleRed();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.X)) {
+      bot.carousel.stop();
     }
 
 
