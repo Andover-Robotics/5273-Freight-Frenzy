@@ -47,7 +47,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     TemplateState(double progressRate){this.progressRate = progressRate;}
   }
-
+// test edit
   Map<TemplateState, Map<Button, TemplateState>> stateMap = new StateMap().getStateMap();
 
   public TemplateState state = TemplateState.INTAKE;
