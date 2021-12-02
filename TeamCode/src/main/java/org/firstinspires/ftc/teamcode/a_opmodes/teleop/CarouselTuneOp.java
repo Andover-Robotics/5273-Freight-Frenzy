@@ -6,28 +6,45 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.d_util.utilclasses.BinarySearchHelper;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 public class CarouselTuneOp extends BaseOpMode{
 
 
-    double currentCarouselSpeed = 1150.0/2.0; // start from middle for a binary search to the perfect rpm to spin carousel at
-    double min = 0, max = 1150;
+    // start from middle for a binary search to the perfect rpm to spin carousel at
+    double MIN = 0, MID = 1150.0/2.0, MAX = 1150;
+
+    BinarySearchHelper curIter = new BinarySearchHelper(MIN, MID, MAX);
+
+    Deque<BinarySearchHelper> iters = new ArrayDeque<>();
 
     @Override
     void subInit() {
-
+        iters.push(curIter);
     }
 
     @Override
     void subLoop() {
-        bot.carousel.runAtRPM(currentCarouselSpeed);
+        bot.carousel.runAtRPM(curIter.getMid());
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-            max = currentCarouselSpeed;
-            currentCarouselSpeed = (min + max)/2;
+            iters.push(curIter.iterateLeft());
+            curIter = curIter.iterateLeft();
         }
         else if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-            min = currentCarouselSpeed;
-            currentCarouselSpeed = (min + max)/2;
+            iters.push(curIter.iterateRight());
+            curIter = curIter.iterateRight();
         }
-        telemetry.addData("Current Carousel RPM = ", currentCarouselSpeed);
+
+        telemetry.addData("Current Carousel RPM = ", curIter.getMid());
+        telemetry.addData("Current iteration of search = ", iters.size());
+
+        if(gamepadEx1.wasJustPressed(GamepadKeys.Button.B)) {
+            curIter = iters.pop();
+        }
     }
 }
+
+
