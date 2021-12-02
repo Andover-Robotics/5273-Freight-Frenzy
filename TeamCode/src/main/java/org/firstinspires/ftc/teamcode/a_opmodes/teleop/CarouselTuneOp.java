@@ -32,10 +32,12 @@ public class CarouselTuneOp extends BaseOpMode{
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
             iters.push(curIter.iterateLeft());
             curIter = curIter.iterateLeft();
+            System.gc();
         }
         else if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
             iters.push(curIter.iterateRight());
             curIter = curIter.iterateRight();
+            System.gc();
         }
 
         telemetry.addData("Current Carousel RPM = ", curIter.getMid());
@@ -43,7 +45,16 @@ public class CarouselTuneOp extends BaseOpMode{
 
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.B)) {
             curIter = iters.pop();
+            System.gc();
         }
+    }
+
+    @Override
+    public void stop() {
+        iters = null;
+        telemetry.addData("Final Rpm = ", curIter.getMid());
+        curIter = null;
+        System.gc();
     }
 }
 
