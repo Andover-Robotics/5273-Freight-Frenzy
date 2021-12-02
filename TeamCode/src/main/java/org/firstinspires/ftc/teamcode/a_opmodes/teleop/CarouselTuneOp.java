@@ -42,6 +42,7 @@ public class CarouselTuneOp extends BaseOpMode{
 
         telemetry.addData("Current Carousel RPM = ", curIter.getMid());
         telemetry.addData("Current iteration of search = ", iters.size());
+        telemetry.update();
 
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.B)) {
             curIter = iters.pop();
@@ -53,6 +54,7 @@ public class CarouselTuneOp extends BaseOpMode{
     public void stop() {
         iters = null;
         telemetry.addData("Final Rpm = ", curIter.getMid());
+        telemetry.update();
         curIter = null;
         System.gc();
     }
