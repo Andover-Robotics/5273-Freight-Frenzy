@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.GlobalConfig;
 
 @Config
 public class Carousel extends SubsystemBase {
-    public static final double MAX_SPEED = (1150 / 60 * 145.1);
+    public static final double MAX_SPEED = (1150.0 / 60.0 * 145.1);
     public static double OPTIMAL_RPM = 531;
     public static final double SPEED_PERCENT = OPTIMAL_RPM / 1150; //531 rpm
     public static final double RUN_SPEED = MAX_SPEED * SPEED_PERCENT;
@@ -78,6 +78,11 @@ public class Carousel extends SubsystemBase {
     public void stop() {
         motor.motorEx.setVelocity(0.0);
         runState = State.OFF;
+    }
+
+    public void runAtRPM(double rpmSpeed) {
+        double tickSpeed = (1150.0 / 60.0 * 145.1) * (rpmSpeed / 1150);
+        motor.motorEx.setVelocity(tickSpeed);
     }
 
 
