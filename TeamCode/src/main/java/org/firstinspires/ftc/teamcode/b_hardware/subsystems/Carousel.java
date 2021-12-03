@@ -19,7 +19,7 @@ public class Carousel extends SubsystemBase {
     public static final double RUN_SPEED = MAX_SPEED * SPEED_PERCENT;
 
 
-    private MotorEx motor;
+    private final MotorEx motor;
 
     private enum State {
         RED_ON,
