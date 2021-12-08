@@ -12,14 +12,16 @@ import org.firstinspires.ftc.teamcode.d_util.utilclasses.BinarySearchHelper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-@TeleOp(name = "CarouselTuningOp", group = "Competition")
+@TeleOp(name = "CarouselTuningOp", group = "Tuning")
 public class CarouselTuneOp extends BaseOpMode{
 
 
     // start from middle for a binary search to the perfect rpm to spin carousel at
-    double MIN = 0, MID = 1150.0/2.0, MAX = 1150;
+    double MOTOR_SPEED = 1150;
+    double MIN = 0, MID = MOTOR_SPEED/2.0, MAX = 1150;
 
-    BinarySearchHelper curIter = new BinarySearchHelper(MIN, MID, MAX);
+
+    BinarySearchHelper curIter = new BinarySearchHelper(MIN, MAX);
 
     Deque<BinarySearchHelper> iters = new ArrayDeque<>();
 
@@ -32,23 +34,22 @@ public class CarouselTuneOp extends BaseOpMode{
     void subLoop() {
         bot.carousel.runAtRPM(curIter.getMid());
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-            iters.push(curIter.iterateLeft());
-            curIter = curIter.iterateLeft();
-            System.gc();
+            BinarySearchHelper nextIter = curIter.iterateLeft();
+            iters.push(nextIter);
+            curIter = nextIter;
         }
         else if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-            iters.push(curIter.iterateRight());
-            curIter = curIter.iterateRight();
-            System.gc();
+            BinarySearchHelper nextIter = curIter.iterateRight();
+            iters.push(nextIter);
+            curIter = nextIter;
         }
 
         telemetry.addData("Current Carousel RPM = ", curIter.getMid());
         telemetry.addData("Current iteration of search = ", iters.size());
         telemetry.update();
 
-        if(gamepadEx1.wasJustPressed(GamepadKeys.Button.B)) {
+        if(gamepadEx1.wasJustPressed(GamepadKeys.Button.B) && iters.size() > 0) {
             curIter = iters.pop();
-            System.gc();
         }
     }
 
@@ -58,7 +59,6 @@ public class CarouselTuneOp extends BaseOpMode{
         telemetry.addData("Final Rpm = ", curIter.getMid());
         telemetry.update();
         curIter = null;
-        System.gc();
     }
 }
 

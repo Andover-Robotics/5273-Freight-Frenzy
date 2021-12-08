@@ -4,17 +4,17 @@ public class BinarySearchHelper {
 
     private double min, mid, max;
 
-    public BinarySearchHelper(double min, double mid, double max) {
+    public BinarySearchHelper(double min, double max) {
         this.min = min;
-        this.mid = mid;
+        this.mid = (min + max) / 2.0;
         this.max = max;
     }
 
     public BinarySearchHelper iterateRight() {
-        return new BinarySearchHelper(mid, (mid + min) / 2, max);
+        return new BinarySearchHelper(mid, max);
     }
     public BinarySearchHelper iterateLeft() {
-        return new BinarySearchHelper(min, (min + mid) / 2, mid);
+        return new BinarySearchHelper(min, mid);
     }
 
     public double getMax() {
