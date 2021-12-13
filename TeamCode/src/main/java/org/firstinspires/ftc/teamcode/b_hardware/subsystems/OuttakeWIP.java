@@ -40,6 +40,17 @@ public class OuttakeWIP extends SubsystemBase {
     }
     public SlideState slideState = SlideState.RETRACTED;
 
+    private enum BucketContents {
+        EMPTY,
+        SILVER_MINERAL,
+        GOLD_MINERAL_LIGHT,
+        GOLD_MINERAL_MEDIUM,
+        GOLD_MINERAL_HEAVY,
+        DUCK,
+        CAPPING_ELEMENT
+    }
+    public BucketContents bucketContents = BucketContents.EMPTY;
+
     private static final double RIGHT_OPEN = 0.0, RIGHT_CLOSED = 0.25;
     private static boolean rightFlapOpen = true;
     private static final double LEFT_OPEN = 0.25, LEFT_CLOSED = 0.0;
@@ -92,15 +103,7 @@ public class OuttakeWIP extends SubsystemBase {
 
         // end of slide code -- beginning of freight detection
 
-        if(checkLeftCS() || checkRightCS()) {
-            closeLeftFlap();
-            closeRightFlap();
-        }
-        else {
-            openLeftFlap();
-            openRightFlap();
-        }
-        // end of freight detection --
+
     }
 
     // TODO: add the code in main teleOP to make this outtake method work +
@@ -141,13 +144,6 @@ public class OuttakeWIP extends SubsystemBase {
         rightFlapOpen = false;
     }
 
-    public boolean checkLeftCS() {
-        return leftCS.alpha() < ALPHA_THRESHOLD;
-    }
-    public boolean checkRightCS() {
-        return rightCS.alpha() < ALPHA_THRESHOLD;
-    }
-
     public void flipBucket() {
         bucket.setPosition(FLIPPED);
         bucketFlipped = true;
@@ -165,8 +161,23 @@ public class OuttakeWIP extends SubsystemBase {
         }
     }
 
+    public boolean leftCSDetects() {
+        return leftCS.alpha() < ALPHA_THRESHOLD;
+    }
+    public boolean rightCSDetects() {
+        return rightCS.alpha() < ALPHA_THRESHOLD;
+    }
 
+    // TODO: add method to detect if its a cube or not --> then check what weight
+    //  Tune these values eventually
+    //  additionally, when something is detected as in the bucket, turn on the light for better color detection
+    public boolean isCubeIn() {
+        if(leftCSDetects() && rightCSDetects()) {
+            return leftCS.red() < 0 && leftCS.green() < 0
+                    && rightCS.red() < 0 && rightCS.green() < 0;
+        }
+        return false;
+    }
 
-    // TODO: add method to detect if its a cube or not --> returns boolean and to activiate a method to check what weight cube it is with curent draw
 
 }
