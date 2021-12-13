@@ -24,11 +24,11 @@ public class OuttakeWIP extends SubsystemBase {
 
     // Motor constants
 
-    private static final int RETRACTED    =    5;  // 5 all are in ticks
-    private static final int LOW_GOAL_POS = -226, MID_GOAL_POS = -377, TOP_GOAL_POS = -690, CAPSTONE_POS = -800;  // units in ticks
+    private static final int RETRACTED    =    -5;  // 5 all are in ticks
+    private static final int LOW_GOAL_POS = 226, MID_GOAL_POS = 377, TOP_GOAL_POS = 690, CAPSTONE_POS = 800;  // units in ticks
     // TODO: tune these values with the flipped bucket
     private static int targetPosition = RETRACTED;
-    private static final double SLIDE_SPEED = 0;
+    private static final double SLIDE_SPEED = 0.3;
     private static final int TOLERANCE = 15;
 
     private enum SlideState {
@@ -52,9 +52,10 @@ public class OuttakeWIP extends SubsystemBase {
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
-        slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        slideMotor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         slideMotor.set(SLIDE_SPEED);
+        slideMotor.setPositionTolerance(TOLERANCE);
         targetPosition = RETRACTED;
 
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
@@ -76,13 +77,18 @@ public class OuttakeWIP extends SubsystemBase {
 
         //TODO: make this method better to make it smoothly go to the next slide position and better tolerances
 
-        if(slideMotor.getCurrentPosition() > targetPosition - TOLERANCE || slideMotor.getCurrentPosition() < targetPosition + TOLERANCE) {
-            slideMotor.set(0);
-        }
-        else {
+        while(!slideMotor.atTargetPosition()) {
             slideMotor.set(SLIDE_SPEED);
+            slideMotor.setTargetPosition(targetPosition);
+            checkNewPos();
         }
+        slideMotor.setTargetPosition(targetPosition);
+        slideMotor.stopMotor();
         checkNewPos();
+
+        if(slideMotor.getCurrentPosition() < 0 && slideState == SlideState.RETRACTED) {
+            slideMotor.resetEncoder();
+        }
 
         // end of slide code -- beginning of freight detection
 
@@ -136,16 +142,10 @@ public class OuttakeWIP extends SubsystemBase {
     }
 
     public boolean checkLeftCS() {
-        if(leftCS.alpha() < ALPHA_THRESHOLD) {
-            return true;
-        }
-        return false;
+        return leftCS.alpha() < ALPHA_THRESHOLD;
     }
     public boolean checkRightCS() {
-        if(rightCS.alpha() < ALPHA_THRESHOLD) {
-            return true;
-        }
-        return false;
+        return rightCS.alpha() < ALPHA_THRESHOLD;
     }
 
     public void flipBucket() {
