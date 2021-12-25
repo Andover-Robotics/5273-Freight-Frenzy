@@ -60,9 +60,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 //  private MotorEx leftIntake;
 //  private MotorEx rightIntake;
 
-  void subInit() {
+  public void subInit() {
     //TODO: initialize subsystems not initialized in bot constructor
-//    timingScheduler = new TimingScheduler(this);
+    timingScheduler = new TimingScheduler(this);
 //    leftIntake = new MotorEx(hardwareMap, "leftIntake");
 //    leftIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 //    leftIntake.set(0);
@@ -266,8 +266,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
       else
         bot.drive.driveRobotCentric(
-                driveVector.getY() * -driveSpeed,
-                driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                driveVector.getX() * -driveSpeed,
                 turnVector.getX() * driveSpeed
         );
 

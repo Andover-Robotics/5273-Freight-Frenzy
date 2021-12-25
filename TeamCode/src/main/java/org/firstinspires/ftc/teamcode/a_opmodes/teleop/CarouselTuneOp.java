@@ -26,12 +26,12 @@ public class CarouselTuneOp extends BaseOpMode{
     Deque<BinarySearchHelper> iters = new ArrayDeque<>();
 
     @Override
-    void subInit() {
+    public void subInit() {
         iters.push(curIter);
     }
 
     @Override
-    void subLoop() {
+    public void subLoop() {
         bot.carousel.runAtRPM(curIter.getMid());
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
             BinarySearchHelper nextIter = curIter.iterateLeft();

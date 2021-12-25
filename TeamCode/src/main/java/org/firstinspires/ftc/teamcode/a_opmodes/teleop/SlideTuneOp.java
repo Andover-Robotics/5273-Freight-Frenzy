@@ -7,12 +7,12 @@ public class SlideTuneOp extends BaseOpMode{
     //     To do this maybe make the motor run to a position and be able to change the tolerance during the opMode
 
     @Override
-    void subInit() {
+    public void subInit() {
 
     }
 
     @Override
-    void subLoop() {
+    public void subLoop() {
 
     }
 }
