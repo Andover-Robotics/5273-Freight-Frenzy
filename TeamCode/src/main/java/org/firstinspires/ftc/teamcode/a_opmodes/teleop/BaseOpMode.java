@@ -17,9 +17,9 @@ import java.util.function.Function;
 
 public abstract class BaseOpMode extends OpMode {
 
-  Bot bot;
-  double driveSpeed;
-  GamepadEx gamepadEx1, gamepadEx2;
+  protected Bot bot;
+  protected double driveSpeed;
+  protected GamepadEx gamepadEx1, gamepadEx2;
 
   //button reader syntax
   // (g1 or g2)  (a, b, lt, lb, etc)
@@ -40,9 +40,9 @@ public abstract class BaseOpMode extends OpMode {
     subLoop();
   }
 
-  abstract void subInit();
+  protected abstract void subInit();
 
-  abstract void subLoop();
+  protected abstract void subLoop();
 
   void updateButtons(){
     gamepadEx1.readButtons();

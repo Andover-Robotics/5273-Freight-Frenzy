@@ -20,6 +20,7 @@ class Hubs extends SubsystemBase {
     private static ExpansionHubEx expansionHub;
 
 
+    double[] cBuffer = new double[500];
 
     // variables for current draw logic
     private static double leftAvgMilliamps;
@@ -48,14 +49,16 @@ class Hubs extends SubsystemBase {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            rgb[0] = (int) Math.random()*255 +1;
-            rgb[1] = (int) Math.random()*255 +1;
-            rgb[2] = (int) Math.random()*255 +1;
+            rgb[0] = (int) (Math.random()*255) +1;
+            rgb[1] = (int) (Math.random()*255) +1;
+            rgb[2] = (int) (Math.random()*255) +1;
         }
         else if (!partyMode){
             controlHub.setLedColor(0, 255, 0);
             expansionHub.setLedColor(0, 255, 0);
         }
+
+//        if()
     }
 
 

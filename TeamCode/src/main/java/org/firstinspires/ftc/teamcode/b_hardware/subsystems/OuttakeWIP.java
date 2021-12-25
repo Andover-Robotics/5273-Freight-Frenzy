@@ -16,7 +16,7 @@ public class OuttakeWIP extends SubsystemBase {
 
     private Servo leftFlap, rightFlap, bucket;
     private ColorSensor leftCS, rightCS;
-    private MotorEx slideMotor;
+    public   MotorEx slideMotor;
 
     //color sensor constants
     private static final int ALPHA_THRESHOLD = 50;
@@ -24,8 +24,7 @@ public class OuttakeWIP extends SubsystemBase {
 
     // Motor constants
 
-    private static final int RETRACTED    =    -5;  // 5 all are in ticks
-    private static final int LOW_GOAL_POS = 226, MID_GOAL_POS = 377, TOP_GOAL_POS = 690, CAPSTONE_POS = 800;  // units in ticks
+    private static final int RETRACTED = -5, LOW_GOAL_POS = 226, MID_GOAL_POS = 377, TOP_GOAL_POS = 690, CAPSTONE_POS = 800;  // units in ticks
     // TODO: tune these values with the flipped bucket
     private static int targetPosition = RETRACTED;
     private static final double SLIDE_SPEED = 0.3;
@@ -36,7 +35,7 @@ public class OuttakeWIP extends SubsystemBase {
         LOW_GOAL,
         MID_GOAL,
         TOP_GOAL,
-        CAPSTONE
+        CAPSTONE;
     }
     public SlideState slideState = SlideState.RETRACTED;
 
@@ -63,7 +62,7 @@ public class OuttakeWIP extends SubsystemBase {
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
-        slideMotor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        slideMotor.setInverted(false);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         slideMotor.set(SLIDE_SPEED);
         slideMotor.setPositionTolerance(TOLERANCE);
@@ -89,40 +88,43 @@ public class OuttakeWIP extends SubsystemBase {
         //TODO: make this method better to make it smoothly go to the next slide position and better tolerances
 
         while(!slideMotor.atTargetPosition()) {
-            slideMotor.set(SLIDE_SPEED);
+            slideMotor.set((targetPosition - slideMotor.getCurrentPosition()) < 50 ? SLIDE_SPEED/3 : SLIDE_SPEED);
             slideMotor.setTargetPosition(targetPosition);
             checkNewPos();
         }
-        slideMotor.setTargetPosition(targetPosition);
+
         slideMotor.stopMotor();
         checkNewPos();
 
-        if(slideMotor.getCurrentPosition() < 0 && slideState == SlideState.RETRACTED) {
-            slideMotor.resetEncoder();
-        }
-
         // end of slide code -- beginning of freight detection
 
-
+        if(freightInBucket()) {
+            closeRightFlap();
+            closeLeftFlap();
+        }
+        else {
+            openRightFlap();
+            openLeftFlap();
+        }
     }
 
     // TODO: add the code in main teleOP to make this outtake method work +
     //       add the current sensing for cube weight detection
     private void checkNewPos() {
         if(slideState == SlideState.RETRACTED) {
-            targetPosition = RETRACTED;
+            slideMotor.setTargetPosition(RETRACTED);
         }
         else if(slideState == SlideState.LOW_GOAL) {
-            targetPosition = LOW_GOAL_POS;
+            slideMotor.setTargetPosition(LOW_GOAL_POS);
         }
         else if(slideState == SlideState.MID_GOAL) {
-            targetPosition = MID_GOAL_POS;
+            slideMotor.setTargetPosition(MID_GOAL_POS);
         }
         else if(slideState == SlideState.TOP_GOAL) {
-            targetPosition = TOP_GOAL_POS;
+            slideMotor.setTargetPosition(TOP_GOAL_POS);
         }
         else if(slideState == SlideState.CAPSTONE) {
-            targetPosition = CAPSTONE_POS;
+            slideMotor.setTargetPosition(CAPSTONE_POS);
         }
     }
 
@@ -159,6 +161,11 @@ public class OuttakeWIP extends SubsystemBase {
         else if(!bucketFlipped) {
             flipBucket();
         }
+    }
+
+    public boolean freightInBucket() {
+        if(leftCSDetects() && rightCSDetects()) return true;
+        return false;
     }
 
     public boolean leftCSDetects() {

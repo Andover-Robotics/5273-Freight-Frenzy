@@ -63,6 +63,8 @@ public class DuckDetector {
       @Override
       public void onOpened() {
         opened = true;
+        camera.setPipeline(pipeline);
+        camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
       }
 
       @Override
@@ -70,11 +72,6 @@ public class DuckDetector {
 
       }
     });
-    //camera.openCameraDevice();
-    if (opened) {
-      camera.setPipeline(pipeline);
-      camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
-    }
   }
 
   public void saveImage() {
@@ -86,8 +83,8 @@ public class DuckDetector {
   }
 
   public void close() {
-    camera.stopStreaming();
-    camera.closeCameraDevice();
+      camera.stopStreaming();
+      camera.closeCameraDevice();
   }
 
   class TemplatePipeline extends OpenCvPipeline {

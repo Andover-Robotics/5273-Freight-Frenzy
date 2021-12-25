@@ -66,6 +66,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //TODO: insert action vals here
 
     private val runCarousel = AutoPathElement.Action("Run carousel motor") {
+              bot.carousel.runRed();
               Thread.sleep(2000)
               bot.carousel.stop()
     }

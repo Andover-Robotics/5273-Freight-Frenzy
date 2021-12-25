@@ -156,7 +156,7 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic(){
         if(!slideMotor.atTargetPosition()){
-            if (Math.abs(targetPosition) > Math.abs(slideMotor.getCurrentPosition()))
+            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition()))
             {
                 slideMotor.set(RETRACT_SPEED);
             }

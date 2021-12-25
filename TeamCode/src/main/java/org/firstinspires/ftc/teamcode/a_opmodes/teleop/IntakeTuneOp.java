@@ -9,12 +9,12 @@ public class IntakeTuneOp extends BaseOpMode{
 
 
     @Override
-    void subInit() {
+    public void subInit() {
 
     }
 
     @Override
-    void subLoop() {
+    public void subLoop() {
 
     }
 }
