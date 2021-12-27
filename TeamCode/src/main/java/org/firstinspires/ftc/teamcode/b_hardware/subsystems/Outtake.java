@@ -40,7 +40,7 @@ public class Outtake extends SubsystemBase {
     private FlapState flapState = FlapState.OPEN;
 
     private static final double SLIDE_SPEED = 0.7;
-    private static final double SLIDE_STOPPED = 0.03;
+    private static final double SLIDE_STOPPED = 0.2;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;

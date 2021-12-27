@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
+package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 
 //TODO: make a opmode able to change the speed of the carousel wheel to tune what speed exactly we can do
 // maybe increment in 1 percent increments, and remember that you can use any buttons
@@ -7,13 +7,14 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.BinarySearchHelper;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 @TeleOp(name = "CarouselTuningOp", group = "Tuning")
-public class CarouselTuneOp extends BaseOpMode{
+public class CarouselTuneOp extends BaseOpMode {
 
 
     // start from middle for a binary search to the perfect rpm to spin carousel at

@@ -10,9 +10,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 public class Intake extends SubsystemBase {
-    public static final double SPEED = 1.0;
+    public static final double SPEED = 0.6;
     public MotorEx leftIntake;
     public MotorEx rightIntake;
+
+    private double prevLeftVelo, curLeftVelo;
+    private double prevRightVelo, curRightVelo;
+    private final double INTAKE_DETECT_CONST = 100;
+    private final double IS_RUNNING_CONST = 15;
 
     private enum state {
         ON,
@@ -25,14 +30,23 @@ public class Intake extends SubsystemBase {
     public state runState = state.OFF;
 
     public Intake(@NonNull OpMode opMode){
-        // TODO: make a mojor change and run the intake to a specific velocity, so cube weight detection will work after calibration
-        //      for example, calibrate to a set velocity, and run the intakes at that set velocity during the duration of the match
         leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_312);
         leftIntake.setRunMode(Motor.RunMode.RawPower);
         leftIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightIntake = new MotorEx(opMode.hardwareMap, "rightIntake", Motor.GoBILDA.RPM_312);
         rightIntake.setRunMode(Motor.RunMode.RawPower);
         rightIntake.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        prevLeftVelo = 0;
+        prevRightVelo = 0;
+        curRightVelo = 0;
+        curLeftVelo = 0;
+
+
+    }
+
+    @Override
+    public void periodic() {
+        updateVeloVals();
     }
 
     public void runToggle() {
@@ -91,4 +105,33 @@ public class Intake extends SubsystemBase {
         rightIntake.set(0.0);
         runState = state.OFF;
     }
+
+    private void updateVeloVals() {
+        prevRightVelo = curRightVelo;
+        prevLeftVelo  = curLeftVelo;
+
+        curLeftVelo = leftIntake.getVelocity();
+        curRightVelo = rightIntake.getVelocity();
+    }
+
+    public boolean wasIntakedLeft() {
+        return Math.abs(curLeftVelo - prevLeftVelo) > INTAKE_DETECT_CONST;
+    }
+
+    public boolean wasIntakedRight() {
+        return Math.abs(curRightVelo - prevRightVelo) > INTAKE_DETECT_CONST;
+    }
+
+    public double getCurLeftVelo() { return curLeftVelo; }
+    public double getCurRightVelo() { return curRightVelo; }
+    public double getPrevLeftVelo() { return prevLeftVelo; }
+    public double getPrevRightVelo() { return prevRightVelo; }
+
+    public boolean isLeftRunning() {
+        return leftIntake.getVelocity() < IS_RUNNING_CONST;
+    }
+    public boolean isRightRunning() {
+        return rightIntake.getVelocity() < IS_RUNNING_CONST;
+    }
+
 }
