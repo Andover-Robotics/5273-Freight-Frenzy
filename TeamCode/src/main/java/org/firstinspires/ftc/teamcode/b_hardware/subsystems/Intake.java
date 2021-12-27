@@ -14,6 +14,10 @@ public class Intake extends SubsystemBase {
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 
+    private double prevLeftVelo, curLeftVelo;
+    private double prevRightVelo, curRightVelo;
+    private final double INTAKE_DETECT_CONST = 100;
+
     private enum state {
         ON,
         OFF,
@@ -33,6 +37,11 @@ public class Intake extends SubsystemBase {
         rightIntake = new MotorEx(opMode.hardwareMap, "rightIntake", Motor.GoBILDA.RPM_312);
         rightIntake.setRunMode(Motor.RunMode.RawPower);
         rightIntake.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+    }
+
+    @Override
+    public void periodic() {
+        updateVeloVals();
     }
 
     public void runToggle() {
@@ -91,4 +100,21 @@ public class Intake extends SubsystemBase {
         rightIntake.set(0.0);
         runState = state.OFF;
     }
+
+    private void updateVeloVals() {
+        prevRightVelo = curRightVelo;
+        prevLeftVelo  = curLeftVelo;
+
+        curLeftVelo = leftIntake.getCorrectedVelocity();
+        curRightVelo = rightIntake.getCorrectedVelocity();
+    }
+
+    public boolean wasIntakedLeft() {
+        return Math.abs(curLeftVelo/prevLeftVelo) > INTAKE_DETECT_CONST;
+    }
+
+    public boolean wasIntakedRight() {
+        return Math.abs(curRightVelo/prevRightVelo) > INTAKE_DETECT_CONST;
+    }
+
 }
