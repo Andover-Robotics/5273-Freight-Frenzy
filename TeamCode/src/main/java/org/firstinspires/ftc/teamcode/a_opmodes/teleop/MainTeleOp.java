@@ -108,16 +108,16 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
-      bot.drive.driveRobotCentric(0.2, 0, 0);
-    }
-    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
       bot.drive.driveRobotCentric(-0.2, 0, 0);
     }
+    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
+      bot.drive.driveRobotCentric(0.2, 0, 0);
+    }
     else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
-      bot.drive.driveRobotCentric(0, -0.2, 0);
+      bot.drive.driveRobotCentric(0, 0.2, 0);
     }
     else if(gamepadEx1.isDown(Button.DPAD_RIGHT)) {
-      bot.drive.driveRobotCentric(0, 0.2, 0);
+      bot.drive.driveRobotCentric(0, -0.2, 0);
     }
 
     // intake controls

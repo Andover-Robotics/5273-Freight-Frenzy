@@ -1,6 +1,11 @@
-package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
+package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 
-public class SlideTuneOp extends BaseOpMode{
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
+
+@TeleOp(name="SlideTuneOp", group="Tuning")
+public class SlideTuneOp extends BaseOpMode {
 
     //TODO:
     //     Make a tuning opMode to get the tolerance of the slides as low as possible
