@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 import androidx.annotation.NonNull;
 
+import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -10,7 +12,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 public class Intake extends SubsystemBase {
-    public static final double SPEED = 1.0;
+
+
+    public final Command cmdRunLeft = new InstantCommand(this::runLeft, this);
+    public final Command cmdRunRight = new InstantCommand(this::runRight, this);
+    public final Command cmdStopIntake = new InstantCommand(this::stop, this);
+
+    public static final double SPEED = .6;
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 

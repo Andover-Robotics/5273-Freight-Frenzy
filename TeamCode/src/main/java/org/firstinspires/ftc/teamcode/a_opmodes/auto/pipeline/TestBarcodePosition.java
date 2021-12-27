@@ -16,6 +16,7 @@ public class TestBarcodePosition extends OpMode {
     public void loop() {
         duckDetector.currentlyDetected()
                 .ifPresent((pipelineResultDoublePair -> {
+                    telemetry.addData("Camera Status", duckDetector.opened);
                     telemetry.addData("Status", "Looking for a duck");
                     telemetry.addData("Detected", pipelineResultDoublePair.first);
                     telemetry.addData("Confidence", pipelineResultDoublePair.second);

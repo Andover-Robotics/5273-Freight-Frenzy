@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
+import static java.lang.Thread.sleep;
+
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.util.Pair;
@@ -41,9 +43,9 @@ public class DuckDetector {
 
   private final OpenCvCamera camera;
   private final TemplatePipeline pipeline = new TemplatePipeline();
-  private volatile Pair<PipelineResult, Double> result = null;
+  private volatile Pair<PipelineResult, Double> result = Pair.create(PipelineResult.RIGHT, 0.8);
   private volatile boolean saveImageNext = true;
-  private volatile boolean opened = false;
+  public volatile boolean opened = false;
 
   public DuckDetector(OpMode opMode, Telemetry telemetry) {
     /*

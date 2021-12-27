@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 import androidx.annotation.NonNull;
 
+import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -12,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.concurrent.ExecutorService;
@@ -20,38 +24,84 @@ import java.util.concurrent.Future;
 
 public class Outtake extends SubsystemBase {
 
+    public class RunSlides extends CommandBase {
+        private final int intendedTarget;
+        private final SlideState state;
+
+        public RunSlides(int target, SlideState state) {
+            intendedTarget = target;
+            this.state = state;
+        }
+
+        @Override
+        public void initialize() {
+            targetPosition = intendedTarget;
+            slideState = state;
+            slideMotor.setTargetPosition(intendedTarget);
+            slideRun = SlideRun.RUNNING;
+        }
+
+        @Override
+        public void execute() {
+            // periodic() should run? no https://docs.ftclib.org/ftclib/command-base/command-system/command-scheduler
+        }
+
+        @Override
+        public boolean isFinished() {
+//            return Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE;
+            return slideMotor.atTargetPosition();
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            slideRun = SlideRun.HOLDING;
+        }
+    }
+
+    public final Command cmdFlipBucket = new InstantCommand(this::flipBucket, this);
+    public final Command cmdUnflipBucket = new InstantCommand(this::unFlipBucket, this);
+
+    public final Command cmdOpenRightFlap = new InstantCommand(this::openRightFlap, this);
+    public final Command cmdCloseRightFlap = new InstantCommand(this::closeRightFlap, this);
+    public final Command cmdOpenLeftFlap = new InstantCommand(this::openLeftFlap, this);
+    public final Command cmdCloseLeftFlap = new InstantCommand(this::closeLeftFlap, this);
+
     // Servo positions for the arms and the bucket
-    private static final double RIGHT_OPEN = 0.0;
-    private static final double RIGHT_CLOSED = 0.25;
-    private static final double LEFT_OPEN = 0.25;
-    private static final double LEFT_CLOSED = 0.0;
-    private static final double FLIPPED = 0.45;
+    private static final double FLAP_OPEN = 0.26;
+    private static final double FLAP_CLOSED = 0.0;
+    private static final double FLAP_DEPOSIT = 0.5;
+
+    private static final double FLIPPED = 0.46;
     private static final double UNFLIPPED = 0;
 
     private enum BucketState {
         FLIPPED,
         UNFLIPPED
     }
+
     private BucketState bucketState = BucketState.UNFLIPPED;
+
     private enum FlapState {
         OPEN,
         CLOSED
     }
+
     private FlapState flapState = FlapState.OPEN;
 
     private static final double SLIDE_SPEED = 0.7;
-    private static final double SLIDE_STOPPED = 0.03;
+    private static final double SLIDE_STOPPED = 0.15;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;
-    private static final int RETRACTED =  0;
-    private static final int LOW_GOAL_POS = -226; // ticks
-    private static final int MID_GOAL_POS = -377;
-    private static final int TOP_GOAL_POS = -650;
+    public static final int RETRACTED = 0;
+    public static final int LOW_GOAL_POS = -226; // ticks
+    public static final int MID_GOAL_POS = -377;
+    public static final int TOP_GOAL_POS = -690;
     private static final int CAPSTONE_POS = -650; //TODO: tune these values
 
     private static int targetPosition;
-    private enum SlideState {
+
+    public enum SlideState {
         RETRACTED,
         AT_LOW_GOAL,
         AT_MID_GOAL,
@@ -66,7 +116,6 @@ public class Outtake extends SubsystemBase {
 
     private SlideState slideState = SlideState.AT_LOW_GOAL;
     private SlideRun slideRun = SlideRun.HOLDING;
-
     private static boolean leftFlapOpen = true;
     private static boolean rightFlapOpen = true;
 
@@ -75,15 +124,15 @@ public class Outtake extends SubsystemBase {
     private static final int RED_WHITE = 255;
     private static final int GREEN_WHITE = 255;
     private static final int BLUE_WHITE = 255;
-    private static int[] white = new int[] {RED_WHITE, GREEN_WHITE, BLUE_WHITE};
+    private static int[] white = new int[]{RED_WHITE, GREEN_WHITE, BLUE_WHITE};
 
     //color sensing vars for cubes
     private static final int RED_YELLOW = 0;
     private static final int GREEN_YELLOW = 255;
     private static final int BLUE_YELLOW = 255;
-    private static int[] yellow = new int[] {RED_YELLOW, GREEN_YELLOW, BLUE_YELLOW};
+    private static int[] yellow = new int[]{RED_YELLOW, GREEN_YELLOW, BLUE_YELLOW};
 
-    private static int[][] colors = new int[][] {white, yellow};
+    private static int[][] colors = new int[][]{white, yellow};
 
     private static final double MARGIN = 0.15;
 
@@ -99,11 +148,11 @@ public class Outtake extends SubsystemBase {
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
 //        this.executorService = executorService;
         leftFlap.setDirection(Servo.Direction.FORWARD);
-        leftFlap.setPosition(LEFT_OPEN);
+        leftFlap.setPosition(FLAP_OPEN);
 
         rightFlap = opMode.hardwareMap.servo.get("rightFlap");
-        rightFlap.setDirection(Servo.Direction.FORWARD);
-        rightFlap.setPosition(RIGHT_OPEN);
+        rightFlap.setDirection(Servo.Direction.REVERSE);
+        rightFlap.setPosition(FLAP_OPEN);
 
         bucket = opMode.hardwareMap.servo.get("bucketServo");
         bucket.setDirection(Servo.Direction.FORWARD);
@@ -123,69 +172,107 @@ public class Outtake extends SubsystemBase {
         //closeBucket();
     }
 
-    public void fullyRetract() {
+    public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
+        unFlipBucket();
         targetPosition = RETRACTED;
         slideMotor.setTargetPosition(RETRACTED);
         slideRun = SlideRun.RUNNING;
         slideState = SlideState.RETRACTED;
     }
+
     public void goToLowGoal() {
         targetPosition = LOW_GOAL_POS;
         slideState = SlideState.AT_LOW_GOAL;
         slideMotor.setTargetPosition(LOW_GOAL_POS);
         slideRun = SlideRun.RUNNING;
     }
+
     public void goToMidGoal() {
         targetPosition = MID_GOAL_POS;
         slideState = SlideState.AT_MID_GOAL;
         slideMotor.setTargetPosition(MID_GOAL_POS);
         slideRun = SlideRun.RUNNING;
     }
+
     public void goToTopGoal() {
+        closeRightFlap();
+        closeLeftFlap();
+        leftFlap.close();
         targetPosition = TOP_GOAL_POS;
         slideState = SlideState.AT_TOP_GOAL;
         slideMotor.setTargetPosition(TOP_GOAL_POS);
         slideRun = SlideRun.RUNNING;
     }
+
     public void goToCapstone() {
         slideState = SlideState.AT_CAPSTONE;
         slideMotor.setTargetPosition(CAPSTONE_POS);
         slideRun = SlideRun.RUNNING;
     }
 
-    @Override
-    public void periodic(){
-        if(!slideMotor.atTargetPosition()){
-            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition()))
-            {
-                slideMotor.set(RETRACT_SPEED);
+    public void autoRun() {
+        while (true) {
+            if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
+                slideMotor.set(SLIDE_STOPPED);
+                return;
+            } else {
+                if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+                    slideMotor.set(RETRACT_SPEED);
+                } else {
+                    slideMotor.setPositionCoefficient(0.05);
+                    slideMotor.set(SLIDE_SPEED);
+                }
             }
-            else{
+        }
+    }
+
+    @Override
+    public void periodic() {
+        if (!slideMotor.atTargetPosition()) {
+            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+                slideMotor.set(RETRACT_SPEED);
+            } else {
                 slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(SLIDE_SPEED);
                 //slideMotor.set((SLIDE_SPEED) * (((Math.abs(slideMotor.getCurrentPosition() - targetPosition)) / (double)Math.abs(targetPosition))));
             }
-        }else{
-            slideMotor.set(SLIDE_STOPPED);
+            opMode.telemetry.addData("atPosition", "no");
+        } else {
+            if (slideState == SlideState.RETRACTED) {
+                slideMotor.stopMotor();
+            } else
+                slideMotor.set(SLIDE_STOPPED);
+            opMode.telemetry.addData("atPosition", "yes");
         }
-
-        opMode.telemetry.addData("P coef", slideMotor.getPositionCoefficient());
     }
 
     public void toggleBucket() {
-        if(bucketState == BucketState.UNFLIPPED) {
+        if (bucketState == BucketState.UNFLIPPED) {
             flipBucket();
-        }
-        else if(bucketState == BucketState.FLIPPED) {
+        } else if (bucketState == BucketState.FLIPPED) {
             unFlipBucket();
         }
     }
+
     public void flipBucket() {
         bucket.setPosition(FLIPPED);
+        rightFlap.setPosition(FLAP_DEPOSIT);
+        leftFlap.setPosition(FLAP_DEPOSIT);
         bucketState = BucketState.FLIPPED;
     }
+
     public void unFlipBucket() {
         bucket.setPosition(UNFLIPPED);
+        if (GlobalConfig.alliance == GlobalConfig.Alliance.BLUE) {
+            openLeftFlap();
+            closeRightFlap();
+        } else if (GlobalConfig.alliance == GlobalConfig.Alliance.RED) {
+            closeLeftFlap();
+            openRightFlap();
+        } else {
+            openLeftFlap();
+            openRightFlap();
+        }
         bucketState = BucketState.UNFLIPPED;
     }
 
@@ -225,35 +312,38 @@ public class Outtake extends SubsystemBase {
     }
      */
 
-
-
     public void openLeftFlap() {
-        leftFlap.setPosition(LEFT_OPEN);
+        leftFlap.setPosition(FLAP_OPEN);
+        leftFlapOpen = true;
     }
+
     public void closeLeftFlap() {
-        leftFlap.setPosition(LEFT_CLOSED);
+        leftFlap.setPosition(FLAP_CLOSED);
+        leftFlapOpen = false;
     }
+
     public void openRightFlap() {
-        rightFlap.setPosition(RIGHT_OPEN);
+        rightFlap.setPosition(FLAP_OPEN);
+        rightFlapOpen = true;
     }
+
     public void closeRightFlap() {
-        rightFlap.setPosition(RIGHT_CLOSED);
+        rightFlap.setPosition(FLAP_CLOSED);
+        rightFlapOpen = false;
     }
 
     public void toggleLeftFlap() {
-        if(leftFlapOpen) {
+        if (leftFlapOpen) {
             closeLeftFlap();
-        }
-        else if(!leftFlapOpen) {
+        } else {
             openLeftFlap();
         }
     }
 
     public void toggleRightFlap() {
-        if(rightFlapOpen) {
+        if (rightFlapOpen) {
             closeRightFlap();
-        }
-        else if(!rightFlapOpen) {
+        } else {
             openRightFlap();
         }
     }
