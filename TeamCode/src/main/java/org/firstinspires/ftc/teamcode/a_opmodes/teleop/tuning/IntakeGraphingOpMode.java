@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 
 
-@TeleOp(name = "IntakeTuning", group = "Tuning")
-public class IntakeTuningOpMode extends BaseOpMode {
+@TeleOp(name = "IntakeTuningGraphing", group = "ZDashBoard graphing tool")
+public class IntakeGraphingOpMode extends BaseOpMode {
 
     TelemetryPacket packet = new TelemetryPacket();
 
@@ -33,10 +33,7 @@ public class IntakeTuningOpMode extends BaseOpMode {
         if(gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= TRIGGER_TOLERANCE) {
             bot.intake.runRight();
         }
-        else {
-            bot.intake.stop();
-        }
-        if(gamepadEx1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) >= TRIGGER_TOLERANCE) {
+        else if(gamepadEx1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) >= TRIGGER_TOLERANCE) {
             bot.intake.runLeft();
         }
         else {

@@ -12,7 +12,7 @@ public class SwapAlliance extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         GlobalConfig.alliance = GlobalConfig.alliance == GlobalConfig.Alliance.RED ? GlobalConfig.Alliance.BLUE : GlobalConfig.Alliance.RED;
         Bot.instance = null;
-        telemetry.addLine(GlobalConfig.alliance + " is now sus");
+        telemetry.addLine(GlobalConfig.alliance.toString() + " is now sus");
         telemetry.update();
     }
 }

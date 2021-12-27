@@ -52,7 +52,35 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     // test edit
     Map<TemplateState, Map<Button, TemplateState>> stateMap = new StateMap().getStateMap();
 
+
+// another test push
+
+
+    //TODO: insert actual teleop stuff here
+
+    //slow driving controls
+    if(gamepadEx1.isDown(Button.X)) {
+      bot.drive.driveRobotCentric(0, 0, -0.2);
+    }
+    else if (gamepadEx1.isDown(Button.B)) {
+      bot.drive.driveRobotCentric(0, 0, 0.2);
+    }
+
+    if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
+      bot.drive.driveRobotCentric(-0.2, 0, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
+      bot.drive.driveRobotCentric(0.2, 0, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
+      bot.drive.driveRobotCentric(0, 0.2, 0);
+    }
+    else if(gamepadEx1.isDown(Button.DPAD_RIGHT)) {
+      bot.drive.driveRobotCentric(0, -0.2, 0);
+    }
+
     public TemplateState state = TemplateState.INTAKE;
+
 
 
     //opmode vars here ==============================================================================================
