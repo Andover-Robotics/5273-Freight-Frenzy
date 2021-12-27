@@ -10,173 +10,208 @@ import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
 import java.lang.Math.toRadians
 import kotlin.math.PI
-import kotlin.math.roundToInt
 
 class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths functionality to this
 
     //TODO: reverse this
 
     sealed class AutoPathElement(open val name: String) {
-        class Path(override val name: String, val trajectory: Trajectory): AutoPathElement(name)
+        class Path(override val name: String, val trajectory: Trajectory) : AutoPathElement(name)
+
         //AutoPathElement.Path(name, trajectory)
-        class Action(override val name: String, val runner: () -> Unit): AutoPathElement(name)
+        class Action(override val name: String, val runner: () -> Unit) : AutoPathElement(name)
         //AutoPathElement.Action(name) {actions to take(include sleeps)}
     }
 
-    public val rightStartPose = Pose2d(- 12.0, - 66.5, 0.0)
-    public val leftStartPose = Pose2d(- 12.0, 67.5, 0.0)
-
 
     private fun Pose2d(x: Double, result: Map<DuckDetector.PipelineResult, Double>, heading: Double): Pose2d {
-        return Pose2d(x, mapOf(DuckDetector.PipelineResult.LEFT to - 67.5, DuckDetector.PipelineResult.RIGHT to 67.5), 180.0)
+        return Pose2d(x, mapOf(DuckDetector.PipelineResult.LEFT to -67.5, DuckDetector.PipelineResult.RIGHT to 67.5), 180.0)
     }
 
     val bot: Bot = Bot.getInstance()
     val drive: RRMecanumDrive = bot.roadRunner
+
     val Double.toRadians get() = (toRadians(this))
     val Int.toRadians get() = (this.toDouble().toRadians)
     private fun Pose2d.reverse() = copy(heading = heading + PI)
     private var lastPosition: Pose2d = Pose2d()
 
-    fun makePath(name: String, trajectory: Trajectory): AutoPathElement.Path{
+    fun makePath(name: String, trajectory: Trajectory): AutoPathElement.Path {
         lastPosition = trajectory.end()
         return AutoPathElement.Path(name, trajectory)
         //Start of list of trajectories should not be lastPosition
     }
+    private val intakeStart = AutoPathElement.Action("start intake") {
+        bot.intake.runRight()
+    }
+    private val intakeStop = AutoPathElement.Action("stop intake") {
+        //bot.intake.stop()
+        Thread.sleep(1000)
+        bot.intake.reverseRight()
+        bot.outtake.closeRightFlap()
+    }
+    
+    private val outtakeHigh = AutoPathElement.Action("Outtake High") {
+        bot.intake.stop()
+        bot.outtake.goToTopGoal()
+        bot.outtake.autoRun()
+        bot.outtake.flipBucket()
+        Thread.sleep(1000)
+        bot.outtake.unFlipBucket()
+        bot.outtake.fullyRetract()
+        bot.outtake.autoRun()
+        bot.outtake.closeLeftFlap()
+        bot.outtake.openRightFlap()
+        bot.carousel.runRed()
+    }
+
+    private val outtakeMid = AutoPathElement.Action("Outtake Middle") {
+        bot.outtake.goToMidGoal()
+        bot.outtake.autoRun()
+        bot.outtake.flipBucket()
+        Thread.sleep(1500)
+        bot.outtake.unFlipBucket()
+        bot.outtake.fullyRetract()
+        bot.outtake.autoRun()
+    }
+    private val outtakeLow = AutoPathElement.Action("Outtake Low") {
+        bot.outtake.goToLowGoal()
+        bot.outtake.autoRun()
+        bot.outtake.flipBucket()
+        Thread.sleep(1500)
+        bot.outtake.unFlipBucket()
+        bot.outtake.fullyRetract()
+        bot.outtake.autoRun()
+    }
 
     //Probably won't be used, but here just in case
-    fun makeAction(name: String, action: () -> Unit): AutoPathElement.Action{
+    /*
+    fun makeAction(name: String, action: Unit): AutoPathElement.Action{
         return AutoPathElement.Action(name, action)
         //Redundant but conforms to naming scheme
     }
-
+*/
     // Kotlin 1.3 does not support inline instantiation of SAM interfaces
-    class MarkerCallbackImpl(val func: () -> Unit): MarkerCallback {
+    class MarkerCallbackImpl(val func: () -> Unit) : MarkerCallback {
         override fun onMarkerReached() = func()
     }
-
-    private fun turn(from: Double, to: Double): AutoPathElement.Action {
-        return AutoPathElement.Action("Turn from ${Math.toDegrees(from).roundToInt()}deg" +
-                "to ${Math.toDegrees(to).roundToInt()}deg") {
-            bot.roadRunner.turn(to - from)
-        }
-    }
-
 
     //TODO: insert action vals here
 
     private val runCarousel = AutoPathElement.Action("Run carousel motor") {
-              bot.carousel.runRed();
-              Thread.sleep(2000)
-              bot.carousel.stop()
+        //bot.carousel.runRed()
+        Thread.sleep(1500)
+        bot.carousel.stop()
     }
-
-    private val runSlides = AutoPathElement.Action("Run slides to shipping hubs"){
-              bot.outtake.goToTopGoal()
-              Thread.sleep(1500)
-              bot.outtake.flipBucket()
-              Thread.sleep(1000)
-              bot.outtake.unFlipBucket()
-              Thread.sleep(500)
-              bot.outtake.fullyRetract()
+    private val prepare = AutoPathElement.Action("Prepare for teleOp") {
+        bot.outtake.closeLeftFlap()
+        bot.outtake.openRightFlap()
     }
-    //                                                                  =======================================================
+    
+    fun asVector2D(pos: Pose2d) : Vector2d
+    {
+        return Vector2d(pos.x, pos.y)
+    }
+    //TODO: Insert pose/vector vals here //
+    val offset = -90.0.toRadians; // need to subtract drift from the previos position to be accurate
+    // implement a on off feature, so the driver can pick and choose what we do for the auto
+    public var xDrift = 0; // maybe implement a flag system, like this pos is for spline to spline ans so on
+    public val carouselPosition = Pose2d(61.0, -58.0-3, 0.0.toRadians + offset);
+    public val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func
+            Pose2d(65.0, -34.0, 0.0.toRadians + offset), // remove + 2 later for all
+            Pose2d(44.0, -20.0, (-45.0).toRadians + offset),
+            outtakeHigh,
+            carouselPosition,
+            runCarousel,
+            intakeStart,
+            Pose2d(64.0,  50.0 + 8, 0.0.toRadians + offset),
+            intakeStop,
+            Pose2d(50.0+3.0, -9.0, 0.0.toRadians + offset),
+            outtakeHigh,
+            intakeStart,
+            Pose2d(64.0+8,  50.0 + 15, 0.0.toRadians + offset),
+            intakeStop,
+            Pose2d(50.0+12, -6.0, 0.0.toRadians + offset),
+            outtakeHigh,
+            Pose2d(64.0+12,  46.0+10, 0.0.toRadians + offset),
+            prepare
+            )
 
-    //example
-    //private val shootRings = AutoPathElement.Action("Shoot 3 rings") {
-    //        bot.shooter.shootRings(opMode, 3, 0.8)
-    //        bot.shooter.turnOff()
-    //        Thread.sleep(1000)
-    //    }
+    public val outtakeCubeTrajectory = makePath("Outtake Preloaded Cube",
+        bot.roadRunner.trajectoryBuilder(lastPosition)
+            .splineToSplineHeading(Pose2d(65.0, -34.0, 0.0.toRadians + offset), 180.0)
+            .build()
+    )
 
+    public val tangents = listOf(
+            listOf<Double>((-60.0).toRadians + offset, (-45.0).toRadians + offset),
+            listOf<Double>((-45.0).toRadians + offset, (-45.0).toRadians + offset),
+            listOf<Double>((180.0).toRadians + offset, (210.0).toRadians + offset),
+            listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
+            listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset),
+            listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
+            listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset)
 
-    //Copy from here on into AutoPathVisualizer ==============================================================================
-
-    //TODO: Insert pose/vector vals here
-
-    private val strafe_distance = 28.0;
-
-    // val elementY = (pipelineResult == TemplateDetector.PipelineResult.LEFT ? )
-
-    //                                                                  ===================================================
-
-    //example
-    // private val dropSecondWobble = mapOf(
-    //            0 to Pose2d(-4.2 + 1.5, -48.0 - 3.056 + 1f, (-90.0 + 30.268).toRadians),
-    //            1 to Pose2d(24.0 - 9.45428 + 3f, -24.0 - 25.16465, (102.4 - 90.0).toRadians),
-    //            4 to Pose2d(48 - 5.1, -48.0 - 3.0556 - 3f, (-90.0 + 30.268).toRadians)
-    //    )
+    )
+    public val rightStartPose = path[0] as Pose2d
+    public val leftStartPose = path[0] as Pose2d
 
     //TODO: Make Trajectories in trajectorySets
+    private fun calcTrajectories() : List<AutoPathElement>
+    {
+        val p = mutableListOf<AutoPathElement>()
+        var i = 0
+        var prevPath = 0
+        var tanCount = 0
+        while (true)
+        {
+            if (path[i+1] == prepare)
+            {
+                p += path[i+1] as AutoPathElement.Action
+                return p
+            }
+/*
+            else if (path[i+1] == carouselPosition){
+                p += (makePath("Path", drive.trajectoryBuilder(path[prevPath] as Pose2d).lineToSplineHeading(path[i+1] as Pose2d).addSpatialMarker(Vector2d(44.0, -20.0)) { runCarousel }.build()))
+            }
+*/
+            else if  (path[i+1] is AutoPathElement.Action)
+            {
+                p += path[i + 1] as AutoPathElement.Action
+            }
 
+            else if (path[i+1] is Int)
+            {
+                xDrift += path[i+1] as Int
+            }
+
+            else if (path[i+1] is Pose2d || path[i+1] is Vector2d) {
+                if ((path[i+1] as Pose2d).heading != (path[prevPath] as Pose2d).heading)
+                    p += (makePath("Path", drive.trajectoryBuilder(path[prevPath] as Pose2d).lineToSplineHeading(path[i+1] as Pose2d).build()))
+                else
+                    p += (makePath("Path", drive.trajectoryBuilder(path[prevPath] as Pose2d, tangents[tanCount][0]).splineToLinearHeading(path[i+1] as Pose2d, tangents[tanCount][1]).build()))
+                prevPath = i + 1
+                tanCount += 1
+            }
+            i += 1
+        }
+    }
     //TODO: Separate alliance-specific and position-specific paths                                                                            ====================================================
     private val trajectorySets: Map<DuckDetector.PipelineResult, List<AutoPathElement>> = mapOf(
             //use !! when accessing maps ie: dropSecondWobble[0]!!
             //example
             DuckDetector.PipelineResult.LEFT to run {
-                listOf(
-                    makePath("Strafe Right to Shipping Hub",
-                        drive.trajectoryBuilder(leftStartPose)
-                            .strafeRight(strafe_distance)
-                            .build()),
-                    runSlides,
-                    makePath("Strafe Left to Wall",
-                        drive.trajectoryBuilder(lastPosition)
-                            .strafeLeft(strafe_distance - 2.0)
-                            .build()),
-                    makePath("Drive Backwards to Carousel",
-                        drive.trajectoryBuilder(lastPosition)
-                            .back(50.5)
-                            .addSpatialMarker(Vector2d(-48.0, -66.5)){
-//                                bot.carousel.run()
-                            }
-                            .build()),
-                    runCarousel,
-                    makePath("Drive Forward to Park",
-                        drive.trajectoryBuilder(lastPosition)
-                            .forward(102.0)
-                            .build())
-                    )
-                    /* makePath("Pick Up Team Shipping Element",
-                        drive.trajectoryBuilder(startPose.plus(Pose2d(-16.75, 0.0, 0.0)))
-                            .splineToLinearHeading(elementPose, 100.0)
-                            .build()))
-
-                     */
+                calcTrajectories()
             },
-
-            DuckDetector.PipelineResult.RIGHT to run{
-                listOf(
-                    makePath("Strafe Right to Shipping Hub",
-                        drive.trajectoryBuilder(rightStartPose)
-                            .strafeRight(strafe_distance)
-                            .build()),
-                    runSlides,
-                    makePath("Strafe Left to Wall",
-                        drive.trajectoryBuilder(lastPosition)
-                            .strafeLeft(strafe_distance - 2.0)
-                            .build()),
-                    makePath("Drive Backwards to Carousel",
-                        drive.trajectoryBuilder(lastPosition)
-                            .forward( 50.5)
-                            .addSpatialMarker(Vector2d(-48.0, -66.5)){
-                                bot.carousel.runRed()
-                            }
-                            .build()),
-                    runCarousel,
-                    makePath("Drive Forward to Park",
-                        drive.trajectoryBuilder(lastPosition)
-                            .back(96.0)
-                            .build())
-                )
-            }
-//
+            DuckDetector.PipelineResult.MIDDLE to run {
+                calcTrajectories()
+            },
+            DuckDetector.PipelineResult.RIGHT to run {
+                calcTrajectories()
+           }
     )
-
-
-    fun getTrajectories(a: DuckDetector.PipelineResult): List<AutoPathElement>{
+    // features as functions, that return command groups
+    fun getTrajectories(a: DuckDetector.PipelineResult): List<AutoPathElement> {
         return trajectorySets[a]!!
     }
-
-
 }
