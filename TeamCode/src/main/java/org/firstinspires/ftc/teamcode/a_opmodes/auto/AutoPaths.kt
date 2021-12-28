@@ -113,11 +113,18 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         return Vector2d(pos.x, pos.y)
     }
     //TODO: Insert pose/vector vals here //
-    val offset = -90.0.toRadians; // need to subtract drift from the previos position to be accurate
+    val offset = -90.0.toRadians // need to subtract drift from the previos position to be accurate
     // implement a on off feature, so the driver can pick and choose what we do for the auto
-    public var xDrift = 0; // maybe implement a flag system, like this pos is for spline to spline ans so on
-    public val carouselPosition = Pose2d(61.0, -58.0-3, 0.0.toRadians + offset);
-    public val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func
+    var xDrift = 0 // maybe implement a flag system, like this pos is for spline to spline ans so on
+    private val carouselPosition = Pose2d(61.0, -61.0, 0.0.toRadians + offset)
+    private val intialOuttakeCubePosition = Pose2d(44.0, -20.0, (-45.0).toRadians + offset)
+    private val initialIntakePosition = Pose2d(64.0,  58.0, 0.0.toRadians + offset)
+    private val followingOuttakePosition = Pose2d(53.0, -9.0, 0.0.toRadians + offset)
+    private val followingIntakePosition = Pose2d(72.0,  65.0, 0.0.toRadians + offset)
+    private val thirdOuttakePosition = Pose2d(62.0, -6.0, 0.0.toRadians + offset)
+    private val parkingPosition = Pose2d(76.0, 56.0, 0.0.toRadians + offset)
+
+    private val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func
             Pose2d(65.0, -34.0, 0.0.toRadians + offset), // remove + 2 later for all
             Pose2d(44.0, -20.0, (-45.0).toRadians + offset),
             outtakeHigh,
@@ -137,13 +144,20 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
             prepare
             )
 
-    public val outtakeCubeTrajectory = makePath("Outtake Preloaded Cube",
+    val outtakeCubeTrajectory = makePath("Outtake Preloaded Cube Trajectory",
         bot.roadRunner.trajectoryBuilder(lastPosition)
-            .splineToSplineHeading(Pose2d(65.0, -34.0, 0.0.toRadians + offset), 180.0)
+            .lineToSplineHeading(intialOuttakeCubePosition)
             .build()
     )
 
-    public val tangents = listOf(
+    val carouselTrajectory = makePath("Carousel Trajectory",
+        bot.roadRunner.trajectoryBuilder(lastPosition)
+            .lineToSplineHeading(carouselPosition)
+            .build())
+
+
+
+    val tangents = listOf(
             listOf<Double>((-60.0).toRadians + offset, (-45.0).toRadians + offset),
             listOf<Double>((-45.0).toRadians + offset, (-45.0).toRadians + offset),
             listOf<Double>((180.0).toRadians + offset, (210.0).toRadians + offset),
@@ -153,8 +167,8 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
             listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset)
 
     )
-    public val rightStartPose = path[0] as Pose2d
-    public val leftStartPose = path[0] as Pose2d
+    val rightStartPose = path[0] as Pose2d
+    val leftStartPose = path[0] as Pose2d
 
     //TODO: Make Trajectories in trajectorySets
     private fun calcTrajectories() : List<AutoPathElement>

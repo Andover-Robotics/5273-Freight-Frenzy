@@ -19,11 +19,13 @@ class CommandAuto : OpMode() {
     val features = listOf(
         // functions (don't call them yet!)
         "run carousel" to AutoCommands::generateRunCarouselFeature,
-        "deliver" to { AutoCommands.generateOuttakeFeature(Vector2d(-1.0, -4.0))},
+        "deliver" to {
+            AutoCommands.generateOuttakeFeature(Vector2d(-3.0, 0.0))
+        },
         "intake" to AutoCommands::generateIntakeFeature,
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
-        "intake" to { AutoCommands.generateIntakeFeature(Vector2d(0.0, 3.0)) },
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
+        "deliver cycle" to { AutoCommands.generateOuttakeFeature() },
+        "intake" to AutoCommands::generateIntakeFeature,
+        "deliver cycle" to { AutoCommands.generateOuttakeFeature() },
         "park" to AutoCommands::generateParkDepotFeature
     )
     var currentFeature = 0
