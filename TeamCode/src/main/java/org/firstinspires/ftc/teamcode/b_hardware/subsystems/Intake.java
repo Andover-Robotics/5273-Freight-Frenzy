@@ -24,8 +24,10 @@ public class Intake extends SubsystemBase {
 
     private double prevLeftVelo, curLeftVelo;
     private double prevRightVelo, curRightVelo;
-    private final double INTAKE_DETECT_CONST = 100;
+    private final double INTAKE_DETECT_CONST = 1100;
     private final double IS_RUNNING_CONST = 15;
+    private boolean leftRunning = false, rightRunning= false;
+    private double timeWhenIntake, timeWhenReverse;
 
     private enum state {
         ON,
@@ -55,7 +57,40 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         updateVeloVals();
+
+        if(wasIntakedLeft() && timeWhenIntake == -1) {
+            timeWhenIntake = System.currentTimeMillis();
+        }
+        else if(System.currentTimeMillis() - timeWhenIntake > 2000) {
+            if(timeWhenReverse == -1) {
+                timeWhenReverse = System.currentTimeMillis();
+            }
+            else if(System.currentTimeMillis() - timeWhenReverse > 250) {
+                timeWhenReverse = -1;
+            }
+            else {
+                reverseLeft();
+            }
+        }
+
+        if(wasIntakedRight() && timeWhenIntake == -1) {
+            timeWhenIntake = System.currentTimeMillis();
+        }
+        else if(System.currentTimeMillis() - timeWhenIntake > 2000) {
+            if(timeWhenReverse == -1) {
+                timeWhenReverse = System.currentTimeMillis();
+            }
+            else if(System.currentTimeMillis() - timeWhenReverse > 250) {
+                timeWhenReverse = -1;
+            }
+            else {
+                reverseRight();
+            }
+        }
+
+
     }
+
 
     public void runToggle() {
         if(runState == state.OFF) {
@@ -69,6 +104,7 @@ public class Intake extends SubsystemBase {
     public void run(){
         leftIntake.set(SPEED);
         rightIntake.set(SPEED);
+        leftRunning = true;
         runState = state.ON;
     }
 
@@ -88,19 +124,15 @@ public class Intake extends SubsystemBase {
     }
 
     public void runLeft(){
-        rightIntake.set(0.0);
         leftIntake.set(SPEED);
-        runState = state.LEFT;
     }
 
     public void runRight(){
-        leftIntake.set(0.0);
         rightIntake.set(SPEED);
-        runState = state.RIGHT;
     }
 
     public void switchIntake(){
-        if (runState == state.LEFT) {
+        if (leftRunning) {
             runRight();
         }
         else {
@@ -123,22 +155,23 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean wasIntakedLeft() {
-        return Math.abs(curLeftVelo - prevLeftVelo) > INTAKE_DETECT_CONST;
+        return curLeftVelo < INTAKE_DETECT_CONST;
     }
 
     public boolean wasIntakedRight() {
-        return Math.abs(curRightVelo - prevRightVelo) > INTAKE_DETECT_CONST;
+        return curRightVelo < INTAKE_DETECT_CONST;
     }
+
 
     public double getCurLeftVelo() { return curLeftVelo; }
     public double getCurRightVelo() { return curRightVelo; }
     public double getPrevLeftVelo() { return prevLeftVelo; }
     public double getPrevRightVelo() { return prevRightVelo; }
 
-    public boolean isLeftRunning() {
+    public boolean isLeftIntaking() {
         return leftIntake.getVelocity() < IS_RUNNING_CONST;
     }
-    public boolean isRightRunning() {
+    public boolean isRightIntaking() {
         return rightIntake.getVelocity() < IS_RUNNING_CONST;
     }
 

@@ -4,6 +4,7 @@ import android.hardware.TriggerEvent;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -56,28 +57,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 // another test push
 
 
-    //TODO: insert actual teleop stuff here
 
-    //slow driving controls
-    if(gamepadEx1.isDown(Button.X)) {
-      bot.drive.driveRobotCentric(0, 0, -0.2);
-    }
-    else if (gamepadEx1.isDown(Button.B)) {
-      bot.drive.driveRobotCentric(0, 0, 0.2);
-    }
-
-    if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
-      bot.drive.driveRobotCentric(-0.2, 0, 0);
-    }
-    else if(gamepadEx1.isDown(Button.DPAD_UP)) {
-      bot.drive.driveRobotCentric(0.2, 0, 0);
-    }
-    else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
-      bot.drive.driveRobotCentric(0, 0.2, 0);
-    }
-    else if(gamepadEx1.isDown(Button.DPAD_RIGHT)) {
-      bot.drive.driveRobotCentric(0, -0.2, 0);
-    }
 
     public TemplateState state = TemplateState.INTAKE;
 
@@ -186,6 +166,29 @@ public class MainTeleOp extends BaseOpMode {//required vars here
             bot.carousel.toggleRed();
         } else if (gamepadEx2.wasJustReleased(Button.X)) {
             bot.carousel.stop();
+        }
+
+        //TODO: insert actual teleop stuff here
+
+        //slow driving controls
+        if(gamepadEx1.isDown(Button.X)) {
+            bot.drive.driveRobotCentric(0, 0, -0.2);
+        }
+        else if (gamepadEx1.isDown(Button.B)) {
+            bot.drive.driveRobotCentric(0, 0, 0.2);
+        }
+
+        if(gamepadEx1.isDown(Button.DPAD_DOWN)) {
+            bot.drive.driveRobotCentric(-0.2, 0, 0);
+        }
+        else if(gamepadEx1.isDown(Button.DPAD_UP)) {
+            bot.drive.driveRobotCentric(0.2, 0, 0);
+        }
+        else if(gamepadEx1.isDown(Button.DPAD_LEFT)) {
+            bot.drive.driveRobotCentric(0, 0.2, 0);
+        }
+        else if(gamepadEx1.isDown(Button.DPAD_RIGHT)) {
+            bot.drive.driveRobotCentric(0, -0.2, 0);
         }
 
     /*//TODO: make control scheme

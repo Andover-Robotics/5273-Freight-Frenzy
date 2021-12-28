@@ -15,7 +15,6 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 public class OuttakeWIP extends SubsystemBase {
 
     private Servo leftFlap, rightFlap, bucket;
-    private ColorSensor leftCS, rightCS;
     public   MotorEx slideMotor;
 
     //color sensor constants
@@ -24,8 +23,7 @@ public class OuttakeWIP extends SubsystemBase {
 
     // Motor constants
 
-    private static final int RETRACTED = -5, LOW_GOAL_POS = 226, MID_GOAL_POS = 377, TOP_GOAL_POS = 690, CAPSTONE_POS = 800;  // units in ticks
-    // TODO: tune these values with the flipped bucket
+    private static final int RETRACTED = 0, LOW_GOAL_POS = 226, MID_GOAL_POS = 377, TOP_GOAL_POS = 690, CAPSTONE_POS = 800;  // units in ticks
     private static int targetPosition = RETRACTED;
     private static final double SLIDE_SPEED = 0.3;
     private static final int TOLERANCE = 15;
@@ -39,16 +37,7 @@ public class OuttakeWIP extends SubsystemBase {
     }
     public SlideState slideState = SlideState.RETRACTED;
 
-    private enum BucketContents {
-        EMPTY,
-        SILVER_MINERAL,
-        GOLD_MINERAL_LIGHT,
-        GOLD_MINERAL_MEDIUM,
-        GOLD_MINERAL_HEAVY,
-        DUCK,
-        CAPPING_ELEMENT
-    }
-    public BucketContents bucketContents = BucketContents.EMPTY;
+    private boolean bucketFull = false;
 
     private static final double RIGHT_OPEN = 0.0, RIGHT_CLOSED = 0.25;
     private static boolean rightFlapOpen = true;
@@ -97,15 +86,6 @@ public class OuttakeWIP extends SubsystemBase {
         checkNewPos();
 
         // end of slide code -- beginning of freight detection
-
-        if(freightInBucket()) {
-            closeRightFlap();
-            closeLeftFlap();
-        }
-        else {
-            openRightFlap();
-            openLeftFlap();
-        }
     }
 
     // TODO: add the code in main teleOP to make this outtake method work +
@@ -163,28 +143,7 @@ public class OuttakeWIP extends SubsystemBase {
         }
     }
 
-    public boolean freightInBucket() {
-        if(leftCSDetects() && rightCSDetects()) return true;
-        return false;
-    }
 
-    public boolean leftCSDetects() {
-        return leftCS.alpha() < ALPHA_THRESHOLD;
-    }
-    public boolean rightCSDetects() {
-        return rightCS.alpha() < ALPHA_THRESHOLD;
-    }
-
-    // TODO: add method to detect if its a cube or not --> then check what weight
-    //  Tune these values eventually
-    //  additionally, when something is detected as in the bucket, turn on the light for better color detection
-    public boolean isCubeIn() {
-        if(leftCSDetects() && rightCSDetects()) {
-            return leftCS.red() < 0 && leftCS.green() < 0
-                    && rightCS.red() < 0 && rightCS.green() < 0;
-        }
-        return false;
-    }
 
 
 }

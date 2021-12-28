@@ -42,9 +42,9 @@ public class IntakeDetectionTestingOpMode extends BaseOpMode {
             bot.intake.stop();
         }
 
-        if(leftIntakeVelo < INTAKE_DETECT_CONST && !bot.intake.isLeftRunning()) packet.put("Left Intaked", 300);
+        if(leftIntakeVelo < INTAKE_DETECT_CONST && !bot.intake.isLeftIntaking()) packet.put("Left Intaked", 300);
         else packet.put("Left Intaked", 0);
-        if(rightIntakeVelo < INTAKE_DETECT_CONST && !bot.intake.isRightRunning()) packet.put("Right Intaked", 300);
+        if(rightIntakeVelo < INTAKE_DETECT_CONST && !bot.intake.isRightIntaking()) packet.put("Right Intaked", 300);
         else packet.put("Right Intaked", 0);
 
         packet.put("Left Intake Accel", leftIntakeVelo - prevLeftVelo);
