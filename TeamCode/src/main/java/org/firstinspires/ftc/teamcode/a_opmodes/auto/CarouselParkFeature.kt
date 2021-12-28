@@ -11,20 +11,15 @@ import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoCommands.offset
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
 import java.util.function.Supplier
 
-@Autonomous(name = "Exp: Command-based Auto", group = "Experimental")
-class CommandAuto : OpMode() {
+@Autonomous(name = "Carousel Park(Feature-based)", group = "Experimental")
+class CarouselParkFeature : OpMode() {
     lateinit var bot: Bot
     lateinit var scheduler: CommandScheduler
 
     val features = listOf(
-        // functions (don't call them yet!)
-        "run carousel" to AutoCommands::generateRunCarouselFeature,
-        "deliver" to { AutoCommands.generateOuttakeFeature(Vector2d(-1.0, -4.0))},
-        "intake" to AutoCommands::generateIntakeFeature,
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
-        "intake" to { AutoCommands.generateIntakeFeature(Vector2d(0.0, 3.0)) },
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
-        "park" to AutoCommands::generateParkDepotFeature
+            // functions (don't call them yet!)
+            "deliver"       to { AutoCommands.generatePreloadedFreightFeature(Vector2d(0.0, 0.0)) },
+            "park"          to { AutoCommands.generateParkDepotFeature(Vector2d(5.0, -5.0)) }
     )
     var currentFeature = 0
 
@@ -32,7 +27,7 @@ class CommandAuto : OpMode() {
         currentFeature = 0
         Bot.instance = null
         bot = Bot.getInstance(this)
-        bot.roadRunner.poseEstimate = Pose2d(65.0, -34.0, 0.0 + offset)
+        bot.roadRunner.poseEstimate = Pose2d(65.0, -31.0, 0.0 + offset)
         scheduler = CommandScheduler.getInstance()
 
         scheduler.onCommandFinish {

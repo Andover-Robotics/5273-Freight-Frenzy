@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.usb.serial.RobotUsbDeviceTty;
 
 
 public class Intake extends SubsystemBase {
@@ -38,8 +39,9 @@ public class Intake extends SubsystemBase {
     }
 
     public state runState = state.OFF;
-
+    public OpMode opMode;
     public Intake(@NonNull OpMode opMode){
+        this.opMode = opMode;
         leftIntake = new MotorEx(opMode.hardwareMap, "leftIntake", Motor.GoBILDA.RPM_312);
         leftIntake.setRunMode(Motor.RunMode.RawPower);
         leftIntake.motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -50,22 +52,23 @@ public class Intake extends SubsystemBase {
         prevRightVelo = 0;
         curRightVelo = 0;
         curLeftVelo = 0;
-
-
     }
-
+/*
     @Override
     public void periodic() {
         updateVeloVals();
 
-        if(wasIntakedLeft() && timeWhenIntake == -1) {
+        if(wasIntakedLeft() && Math.abs(timeWhenIntake - System.currentTimeMillis()) <= 10) {
             timeWhenIntake = System.currentTimeMillis();
-        }
-        else if(System.currentTimeMillis() - timeWhenIntake > 2000) {
-            if(timeWhenReverse == -1) {
-                timeWhenReverse = System.currentTimeMillis();
+            if (Math.abs(System.currentTimeMillis() - timeWhenIntake) > 200)
+            {
+                stop();
             }
-            else if(System.currentTimeMillis() - timeWhenReverse > 250) {
+        }
+        else if(Math.abs(System.currentTimeMillis() - timeWhenIntake) > 2000 && wasIntakedLeft()) {
+            timeWhenReverse = System.currentTimeMillis();
+            if(Math.abs(System.currentTimeMillis() - timeWhenReverse) > 1000) {
+                stop();
                 timeWhenReverse = -1;
             }
             else {
@@ -73,24 +76,25 @@ public class Intake extends SubsystemBase {
             }
         }
 
-        if(wasIntakedRight() && timeWhenIntake == -1) {
+        if(wasIntakedRight() && Math.abs(timeWhenIntake - System.currentTimeMillis()) <= 10) {
             timeWhenIntake = System.currentTimeMillis();
         }
-        else if(System.currentTimeMillis() - timeWhenIntake > 2000) {
-            if(timeWhenReverse == -1) {
-                timeWhenReverse = System.currentTimeMillis();
-            }
-            else if(System.currentTimeMillis() - timeWhenReverse > 250) {
+        else if(Math.abs(System.currentTimeMillis() - timeWhenIntake) > 2000 && wasIntakedLeft()) {
+            timeWhenReverse = System.currentTimeMillis();
+            if(Math.abs(System.currentTimeMillis() - timeWhenReverse) > 250) {
+                stop();
                 timeWhenReverse = -1;
             }
             else {
                 reverseRight();
             }
         }
-
-
+        else
+        {
+            opMode.telemetry.addData("Intake: waiting", true);
+        }
     }
-
+*/
 
     public void runToggle() {
         if(runState == state.OFF) {

@@ -47,9 +47,9 @@ object AutoCommands {
         )
     }
 
-    /*fun generatePreloadedFreightFeature(): CommandBase {
+    fun generatePreloadedFreightFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
-        val pos = bot.roadRunner.poseEstimate
+        val pos = bot.roadRunner.poseEstimate + Pose2d(drift, 0.0.toRadians)
         val startTangent = if (pos.x > 56) 315.0.toRadians + offset else pos.heading
         val traj = bot.roadRunner.trajectoryBuilder(pos, startTangent)
                 .lineToSplineHeading(Pose2d(40.0, -24.0, (-45.0).toRadians + offset))
@@ -67,7 +67,6 @@ object AutoCommands {
                     WaitCommand(1000),
                     bot.outtake.cmdUnflipBucket)
     }
-*/
     fun generateOuttakeFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
@@ -104,25 +103,19 @@ object AutoCommands {
         val startTangent = 90.0.toRadians + offset
 
         val trajToBarrier = bot.roadRunner.trajectoryBuilder(pos, startTangent)
-//            .lineToLinearHeading(Pose2d(64.0, 20.0, 0.0 + offset))
             .splineToLinearHeading(endPos, 210.0.toRadians+ offset)
             .build()
-//        val trajToWarehouse = bot.roadRunner.trajectoryBuilder(trajToBarrier.end(), 180.0.toRadians)
-//            .strafeTo(Vector2d(64.0, 58.0))
-//            .build()
 
 //if (GlobalConfig.alliance == GlobalConfig.Alliance.RED)
         return SequentialCommandGroup(
                 InstantCommand(bot.outtake::closeLeftFlap, bot.outtake),
                 InstantCommand(bot.outtake::openRightFlap, bot.outtake),
-                InstantCommand(bot.intake::runRight, bot.intake),
                 ParallelDeadlineGroup(FollowTrajectory(bot, trajToBarrier),
                         SequentialCommandGroup(
                             bot.outtake.RunSlides(Outtake.RETRACTED, Outtake.SlideState.RETRACTED),
                             InstantCommand(bot.intake::runRight, bot.intake),
                             InstantCommand(bot.intake::reverseLeft, bot.intake))),
-                InstantCommand(bot.intake::runRight, bot.intake),
-                InstantCommand(bot.intake::reverseLeft, bot.intake),
+                InstantCommand(bot.intake::reverseRight, bot.intake),
                 WaitCommand(500))
     }
     fun generateParkDepotFeature(drift: Vector2d = Vector2d()): CommandBase {
