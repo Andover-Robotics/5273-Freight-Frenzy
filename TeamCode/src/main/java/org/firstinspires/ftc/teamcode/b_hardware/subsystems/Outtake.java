@@ -182,6 +182,8 @@ public class Outtake extends SubsystemBase {
     }
 
     public void goToLowGoal() {
+        closeRightFlap();
+        closeLeftFlap();
         targetPosition = LOW_GOAL_POS;
         slideState = SlideState.AT_LOW_GOAL;
         slideMotor.setTargetPosition(LOW_GOAL_POS);
@@ -189,6 +191,9 @@ public class Outtake extends SubsystemBase {
     }
 
     public void goToMidGoal() {
+        closeRightFlap();
+        closeLeftFlap();
+        leftFlap.close();
         targetPosition = MID_GOAL_POS;
         slideState = SlideState.AT_MID_GOAL;
         slideMotor.setTargetPosition(MID_GOAL_POS);
