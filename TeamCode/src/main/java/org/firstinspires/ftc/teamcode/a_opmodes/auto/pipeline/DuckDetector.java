@@ -172,7 +172,6 @@ public class DuckDetector {
     }
 
     private void extractRectBounds(ArrayList<MatOfPoint> contours) {
-      //bounds.clear(); //TODO: Test if this is needed
       for (MatOfPoint contour : contours) {
         // if polydp fails, switch to a local new MatOfPoint2f();
         Imgproc.approxPolyDP(new MatOfPoint2f(contour.toArray()), polyDpResult, 3, true);

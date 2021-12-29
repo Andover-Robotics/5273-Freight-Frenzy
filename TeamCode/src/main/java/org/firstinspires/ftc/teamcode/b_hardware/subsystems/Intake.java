@@ -19,7 +19,10 @@ public class Intake extends SubsystemBase {
     public final Command cmdRunRight = new InstantCommand(this::runRight, this);
     public final Command cmdStopIntake = new InstantCommand(this::stop, this);
 
-    public static final double SPEED = 0.6;
+
+    public static final double INTAKE_SPEED = 0.6;
+    private static final double OUTTAKE_SPEED = 1.0;
+
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 
@@ -109,8 +112,8 @@ public class Intake extends SubsystemBase {
     }
 
     public void run(){
-        leftIntake.set(SPEED);
-        rightIntake.set(SPEED);
+        leftIntake.set(INTAKE_SPEED);
+        rightIntake.set(INTAKE_SPEED);
         leftRunning = true;
         rightRunning = true;
         runState = state.ON;
@@ -119,20 +122,20 @@ public class Intake extends SubsystemBase {
 
 
     public void reverseLeft() {
-        leftIntake.set(-SPEED);
+        leftIntake.set(-OUTTAKE_SPEED);
     }
 
     public void reverseRight() {
-        rightIntake.set(-SPEED);
+        rightIntake.set(-OUTTAKE_SPEED);
     }
 
     public void runLeft(){
-        leftIntake.set(SPEED);
+        leftIntake.set(INTAKE_SPEED);
         leftRunning = true;
     }
 
     public void runRight(){
-        rightIntake.set(SPEED);
+        rightIntake.set(INTAKE_SPEED);
         rightRunning = true;
     }
 
