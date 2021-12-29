@@ -19,14 +19,16 @@ public class Intake extends SubsystemBase {
     public final Command cmdRunRight = new InstantCommand(this::runRight, this);
     public final Command cmdStopIntake = new InstantCommand(this::stop, this);
 
+
     public static final double INTAKE_SPEED = 0.6;
     private static final double OUTTAKE_SPEED = 1.0;
+
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 
     private double prevLeftVelo, curLeftVelo;
     private double prevRightVelo, curRightVelo;
-    private final double INTAKE_DETECT_CONST = 1100;
+    private final double INTAKE_DETECT_CONST;
     private final double IS_RUNNING_CONST = 15;
     private boolean leftRunning = false, rightRunning= false;
     private double timeWhenIntake, timeWhenReverse;
@@ -53,8 +55,11 @@ public class Intake extends SubsystemBase {
         prevRightVelo = 0;
         curRightVelo = 0;
         curLeftVelo = 0;
+
+        //                    ____   <-  that is the constant ration level where intaking gets detected
+        INTAKE_DETECT_CONST = 0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
     }
-/*
+
     @Override
     public void periodic() {
         updateVeloVals();
@@ -95,7 +100,7 @@ public class Intake extends SubsystemBase {
             opMode.telemetry.addData("Intake: waiting", true);
         }
     }
-*/
+
 
     public void runToggle() {
         if(runState == state.OFF) {
@@ -110,15 +115,11 @@ public class Intake extends SubsystemBase {
         leftIntake.set(INTAKE_SPEED);
         rightIntake.set(INTAKE_SPEED);
         leftRunning = true;
+        rightRunning = true;
         runState = state.ON;
     }
 
-//    public void reverse() {
-//        runState = state.REVERSE;
-//        leftIntake.set(-SPEED);
-//        rightIntake.set(-SPEED);
-//    }
-//    deprecated
+
 
     public void reverseLeft() {
         leftIntake.set(-OUTTAKE_SPEED);
@@ -130,10 +131,12 @@ public class Intake extends SubsystemBase {
 
     public void runLeft(){
         leftIntake.set(INTAKE_SPEED);
+        leftRunning = true;
     }
 
     public void runRight(){
         rightIntake.set(INTAKE_SPEED);
+        rightRunning = true;
     }
 
     public void switchIntake(){
@@ -146,10 +149,21 @@ public class Intake extends SubsystemBase {
     }
 
     public void stop(){
-        leftIntake.set(0.0);
-        rightIntake.set(0.0);
+        leftIntake.stopMotor();
+        rightIntake.stopMotor();
+        leftRunning = false;
+        rightRunning = false;
         runState = state.OFF;
     }
+    public void stopLeft() {
+        leftIntake.stopMotor();
+        leftRunning = false;
+    }
+    public void stopRight() {
+        rightIntake.stopMotor();
+        rightRunning = false;
+    }
+
 
     private void updateVeloVals() {
         prevRightVelo = curRightVelo;
