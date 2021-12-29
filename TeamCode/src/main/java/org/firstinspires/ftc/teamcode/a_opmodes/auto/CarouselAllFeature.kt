@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoCommands.offset
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
 import java.util.function.Supplier
+import kotlin.reflect.jvm.reflect
 
 @Autonomous(name = "Carousel All(Feature-based)", group = "Experimental")
 class CarouselAllFeature : OpMode() {
@@ -18,15 +19,13 @@ class CarouselAllFeature : OpMode() {
 
     val features = listOf(
         // functions (don't call them yet!)
-        "run carousel" to AutoCommands::generateRunCarouselFeature,
-        "deliver" to {
-            AutoCommands.generateOuttakeFeature(Vector2d(-3.0, 0.0))
-        },
-        "intake" to AutoCommands::generateIntakeFeature,
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature() },
-        "intake" to AutoCommands::generateIntakeFeature,
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature() },
-        "park" to AutoCommands::generateParkDepotFeature
+            "run carousel"  to { AutoCommands.generateRunCarouselFeature(Vector2d(1.0, -7.0)) },
+            "deliver"       to { AutoCommands.generateOuttakeFeature(Vector2d(-3.0, -8.0)) },
+            "intake"        to { AutoCommands.generateIntakeFeature(Vector2d(0.0, -8.0)) },
+            "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
+            "intake"        to { AutoCommands.generateIntakeFeature(Vector2d(0.0, -8.0)) },
+            "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
+            "park"          to { AutoCommands.generateParkDepotFeature(Vector2d(0.0, 0.0)) }
     )
     var currentFeature = 0
 
