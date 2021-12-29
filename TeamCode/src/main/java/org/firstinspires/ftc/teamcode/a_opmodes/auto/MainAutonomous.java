@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto;
 
+import android.widget.Button;
+
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -33,58 +35,52 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
     gamepad = new GamepadEx(gamepad1);
 
     AutoPaths paths = new AutoPaths(this);
-//    pipeline = new TemplateDetector(this);
+    pipeline = new DuckDetector(this, telemetry);
 
     //TODO: add initialization here
+
+    bot.roadRunner.setPoseEstimate(paths.getInitialPosition());
 
     //  ie set servo position                             ========================================================================
 
 
     //Pipeline stuff
 
-//    while (!isStarted()) {
-//      if (isStopRequested())
-//        return;
-//      // keep getting results from the pipeline
-//      pipeline.currentlyDetected()
-//          .ifPresent((pair) -> {
-//            telemetry.addData("detected", pair.first);
-//            telemetry.addData("confidence", pair.second);
-//            telemetry.update();
-//            detected = pair.first;
-//            confidence = pair.second;
-//          });
-//      if (gamepad1.x) {
-//        performActions = false;
-//      }
-//      if (gamepad.wasJustPressed(Button.Y)) {
-//        pipeline.saveImage();
-//      }
-//    }
-//
-//    pipeline.currentlyDetected().ifPresent(pair -> {
-//      detected = pair.first;
-//      confidence = pair.second;
-//    });
-//
-//    if (detected == null)
-//      detected = PipelineResult.LEFT;
+    while (!isStarted()) {
+      if (isStopRequested())
+        return;
+      // keep getting results from the pipeline
+      pipeline.currentlyDetected()
+          .ifPresent((pair) -> {
+            telemetry.addData("detected", pair.first);
+            telemetry.addData("confidence", pair.second);
+            telemetry.update();
+            detected = pair.first;
+            confidence = pair.second;
+          });
+      if (gamepad1.x) {
+        performActions = false;
+      }
+      if (gamepad1.y) {
+        pipeline.saveImage();
+      }
+    }
+
+    pipeline.currentlyDetected().ifPresent(pair -> {
+      detected = pair.first;
+      confidence = pair.second;
+    });
+
+    if (detected == null)
+      detected = PipelineResult.LEFT;
 
     waitForStart();
 
-    detected = PipelineResult.RIGHT;
     List<AutoPathElement> trajectories = paths.getTrajectories(detected);
-//    pipeline.close();,m 
+    pipeline.close();
 
 
     //Roadrunner stuff
-
-    if (detected == PipelineResult.RIGHT){
-      bot.roadRunner.setPoseEstimate(paths.getRightStartPose());
-    }
-    else {
-      bot.roadRunner.setPoseEstimate(paths.getLeftStartPose());
-    }
 
 
     if (isStopRequested())

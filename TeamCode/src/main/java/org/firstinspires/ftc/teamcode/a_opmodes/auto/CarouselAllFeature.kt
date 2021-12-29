@@ -18,13 +18,15 @@ class CarouselAllFeature : OpMode() {
 
     val features = listOf(
         // functions (don't call them yet!)
-        "run carousel"  to { AutoCommands.generateRunCarouselFeature(Vector2d(1.0, -7.0)) },
-        "deliver"       to { AutoCommands.generateOuttakeFeature(Vector2d(-3.0, -8.0)) },
-        "intake"        to { AutoCommands.generateIntakeFeature(Vector2d(0.0, -8.0)) },
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
-        "intake"        to { AutoCommands.generateIntakeFeature(Vector2d(0.0, -8.0)) },
-        "deliver cycle" to { AutoCommands.generateOuttakeFeature(Vector2d(2.0, 0.0)) },
-        "park"          to { AutoCommands.generateParkDepotFeature(Vector2d(0.0, 0.0)) }
+        "run carousel" to AutoCommands::generateRunCarouselFeature,
+        "deliver" to {
+            AutoCommands.generateOuttakeFeature(Vector2d(-3.0, 0.0))
+        },
+        "intake" to AutoCommands::generateIntakeFeature,
+        "deliver cycle" to { AutoCommands.generateOuttakeFeature() },
+        "intake" to AutoCommands::generateIntakeFeature,
+        "deliver cycle" to { AutoCommands.generateOuttakeFeature() },
+        "park" to AutoCommands::generateParkDepotFeature
     )
     var currentFeature = 0
 

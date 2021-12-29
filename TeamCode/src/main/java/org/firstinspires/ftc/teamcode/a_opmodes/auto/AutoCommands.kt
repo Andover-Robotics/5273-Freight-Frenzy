@@ -12,6 +12,9 @@ import java.lang.Math.toRadians
 import kotlin.math.atan
 
 object AutoCommands {
+
+    // remeber to use endPose and pos to make it easier please
+
     // wrap trajectories in a command
     // wrap outtake controls in commands (BucketUp, BucketDown)
     // wrap carousel controls in commands
@@ -63,7 +66,7 @@ object AutoCommands {
     fun generateOuttakeFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
-        val endPos = Pose2d(Vector2d(.0-4, -12.0+4), 0.0.toRadians + offset)
+        val endPos = Pose2d(50.0-4, -12.0+4, 0.0.toRadians + offset) + Pose2d(drift, 0.0)
         var startTangent = 30.0.toRadians + offset
 
         if (!bot.isInWarehouse)
@@ -92,7 +95,7 @@ object AutoCommands {
     fun generateIntakeFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
-        val endPos = Pose2d(Vector2d(64.0, 58.0) + drift, 0.0 + offset)
+        val endPos = Pose2d(64.0, 58.0, 0.0 + offset)
         val startTangent = 90.0.toRadians + offset
 
         val trajToBarrier = bot.roadRunner.trajectoryBuilder(pos, startTangent)
