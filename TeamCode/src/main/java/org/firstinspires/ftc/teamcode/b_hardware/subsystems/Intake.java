@@ -135,6 +135,14 @@ public class Intake extends SubsystemBase {
         rightIntake.set(SPEED);
     }
 
+    public void switchIntake(){
+        if (leftRunning) {
+            runRight();
+        }
+        else {
+            runLeft();
+        }
+    }
 
     public void stop(){
         leftIntake.set(0.0);

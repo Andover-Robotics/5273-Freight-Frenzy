@@ -89,6 +89,7 @@ public class Outtake extends SubsystemBase {
     private FlapState flapState = FlapState.OPEN;
 
     private static final double SLIDE_SPEED = 0.7;
+
     private static final double SLIDE_STOPPED = 0.15;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
@@ -181,6 +182,9 @@ public class Outtake extends SubsystemBase {
     }
 
     public void goToLowGoal() {
+        closeRightFlap();
+        closeLeftFlap();
+        leftFlap.close();
         targetPosition = LOW_GOAL_POS;
         slideState = SlideState.AT_LOW_GOAL;
         slideMotor.setTargetPosition(LOW_GOAL_POS);
@@ -188,6 +192,9 @@ public class Outtake extends SubsystemBase {
     }
 
     public void goToMidGoal() {
+        closeRightFlap();
+        closeLeftFlap();
+        leftFlap.close();
         targetPosition = MID_GOAL_POS;
         slideState = SlideState.AT_MID_GOAL;
         slideMotor.setTargetPosition(MID_GOAL_POS);

@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.MarkerCallback
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import org.firstinspires.ftc.teamcode.GlobalConfig
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
@@ -35,23 +36,38 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     val Int.toRadians get() = (this.toDouble().toRadians)
     private fun Pose2d.reverse() = copy(heading = heading + PI)
     private var lastPosition: Pose2d = Pose2d()
+    private var redAlliance = (GlobalConfig.alliance == GlobalConfig.Alliance.RED)
+    private var multiplier = if (redAlliance) 1 else -1
 
     fun makePath(name: String, trajectory: Trajectory): AutoPathElement.Path {
         lastPosition = trajectory.end()
         return AutoPathElement.Path(name, trajectory)
         //Start of list of trajectories should not be lastPosition
     }
+
     private val intakeStart = AutoPathElement.Action("start intake") {
-        bot.intake.runRight()
+        if (redAlliance) bot.intake.runRight() else bot.intake.runLeft()
     }
     private val intakeStop = AutoPathElement.Action("stop intake") {
         //bot.intake.stop()
         Thread.sleep(1000)
-        bot.intake.reverseRight()
-        bot.outtake.closeRightFlap()
+        if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
+        if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
     }
-    
+
     private val outtakeHigh = AutoPathElement.Action("Outtake High") {
+        bot.intake.stop()
+        bot.outtake.goToTopGoal()}
+
+    private val outtakeMid = AutoPathElement.Action("Outtake High") {
+        bot.intake.stop()
+        bot.outtake.goToMidGoal()}
+
+    private val outtakeLow = AutoPathElement.Action("Outtake High") {
+        bot.intake.stop()
+        bot.outtake.goToLowGoal()}
+    
+    private val outtakeEnd = AutoPathElement.Action("Outtake High") {
         bot.intake.stop()
         bot.outtake.goToTopGoal()
         bot.outtake.autoRun()
@@ -60,28 +76,9 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         bot.outtake.unFlipBucket()
         bot.outtake.fullyRetract()
         bot.outtake.autoRun()
-        bot.outtake.closeLeftFlap()
-        bot.outtake.openRightFlap()
-        bot.carousel.runRed()
-    }
-
-    private val outtakeMid = AutoPathElement.Action("Outtake Middle") {
-        bot.outtake.goToMidGoal()
-        bot.outtake.autoRun()
-        bot.outtake.flipBucket()
-        Thread.sleep(1500)
-        bot.outtake.unFlipBucket()
-        bot.outtake.fullyRetract()
-        bot.outtake.autoRun()
-    }
-    private val outtakeLow = AutoPathElement.Action("Outtake Low") {
-        bot.outtake.goToLowGoal()
-        bot.outtake.autoRun()
-        bot.outtake.flipBucket()
-        Thread.sleep(1500)
-        bot.outtake.unFlipBucket()
-        bot.outtake.fullyRetract()
-        bot.outtake.autoRun()
+        if (redAlliance) bot.outtake.closeLeftFlap() else bot.outtake.closeRightFlap()
+        if (redAlliance) bot.outtake.openRightFlap() else bot.outtake.openLeftFlap()
+        if (redAlliance) bot.carousel.runRed() else bot.carousel.runBlue()
     }
 
     //Probably won't be used, but here just in case
@@ -99,13 +96,19 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //TODO: insert action vals here
 
     private val runCarousel = AutoPathElement.Action("Run carousel motor") {
-        //bot.carousel.runRed()
-        Thread.sleep(1500)
+        if (redAlliance) bot.carousel.runRed() else bot.carousel.runBlue()
+    }
+
+    private val carouselWait = AutoPathElement.Action("Wait for Carousel") {
+        Thread.sleep(750)
+    }
+
+    private val carouselStop = AutoPathElement.Action("Stop Carousel") {
         bot.carousel.stop()
     }
     private val prepare = AutoPathElement.Action("Prepare for teleOp") {
-        bot.outtake.closeLeftFlap()
-        bot.outtake.openRightFlap()
+        if (redAlliance) bot.outtake.closeLeftFlap() else bot.outtake.closeRightFlap()
+        if (redAlliance) bot.outtake.openRightFlap() else bot.outtake.openLeftFlap()
     }
     
     fun asVector2D(pos: Pose2d) : Vector2d
@@ -116,13 +119,20 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     val offset = -90.0.toRadians // need to subtract drift from the previos position to be accurate
     // implement a on off feature, so the driver can pick and choose what we do for the auto
     var xDrift = 0 // maybe implement a flag system, like this pos is for spline to spline ans so on
-    private val carouselPosition = Pose2d(61.0, -61.0, 0.0.toRadians + offset)
-    private val intialOuttakeCubePosition = Pose2d(44.0, -20.0, (-45.0).toRadians + offset)
-    private val initialIntakePosition = Pose2d(64.0,  58.0, 0.0.toRadians + offset)
-    private val followingOuttakePosition = Pose2d(53.0, -9.0, 0.0.toRadians + offset)
-    private val followingIntakePosition = Pose2d(72.0,  65.0, 0.0.toRadians + offset)
-    private val thirdOuttakePosition = Pose2d(62.0, -6.0, 0.0.toRadians + offset)
-    private val parkingPosition = Pose2d(76.0, 56.0, 0.0.toRadians + offset)
+
+    public val initialPosition = Pose2d(multiplier * 65.0, -31.0, 0.0.toRadians + offset)
+    private val carouselPosition = Pose2d(multiplier * 61.0, -61.0, 0.0.toRadians + offset)
+    private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, (-45.0).toRadians + offset)
+    private val initialIntakePosition = Pose2d(multiplier * 64.0,  58.0, 0.0.toRadians + offset)
+    private val initialIntakeTangents = listOf((180.0).toRadians + offset, (210.0).toRadians + offset)
+    private val followingOuttakePosition = Pose2d(multiplier * 53.0, -9.0, 0.0.toRadians + offset)
+    private val followingOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset);
+    private val followingIntakePosition = Pose2d(multiplier * 72.0,  65.0, 0.0.toRadians + offset)
+    private val followingIntakeTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
+    private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0, 0.0.toRadians + offset)
+    private val thirdOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset)
+    private val parkingPosition = Pose2d(multiplier * 76.0, 56.0, 0.0.toRadians + offset)
+    private val parkingTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
 
     private val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func
             Pose2d(65.0, -34.0, 0.0.toRadians + offset), // remove + 2 later for all
@@ -144,8 +154,8 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
             prepare
             )
 
-    val outtakeCubeTrajectory = makePath("Outtake Preloaded Cube Trajectory",
-        bot.roadRunner.trajectoryBuilder(lastPosition)
+    val initialOuttakeTrajectory = makePath("Outtake Preloaded Cube Trajectory",
+        bot.roadRunner.trajectoryBuilder(initialPosition)
             .lineToSplineHeading(intialOuttakeCubePosition)
             .build()
     )
@@ -153,13 +163,43 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     val carouselTrajectory = makePath("Carousel Trajectory",
         bot.roadRunner.trajectoryBuilder(lastPosition)
             .lineToSplineHeading(carouselPosition)
+            .addSpatialMarker(Vector2d(44.0, -20.0)){runCarousel}
             .build())
 
+    val initialIntakeTrajectory = makePath("Initial Intake Trajectory",
+        bot.roadRunner.trajectoryBuilder(lastPosition, initialIntakeTangents[0])
+            .splineToLinearHeading(initialIntakePosition, initialIntakeTangents[1])
+            .addSpatialMarker(Vector2d(61.0, -61.0)) {intakeStart}
+            .addSpatialMarker(Vector2d(61.0, -61.0)) {carouselStop}
+            .build())
 
+    val followingOuttakeTrajectory = makePath("Following Outtake Trajectory",
+        bot.roadRunner.trajectoryBuilder(lastPosition, followingOuttakeTangents[0])
+            .splineToLinearHeading(followingOuttakePosition, followingOuttakeTangents[1])
+            .addSpatialMarker(Vector2d(64.0,  58.0)){intakeStop}
+            .build())
+
+    val followingIntakeTrajectory = makePath("Following Intake Trajectory",
+        bot.roadRunner.trajectoryBuilder(lastPosition, followingIntakeTangents[0])
+            .splineToLinearHeading(followingIntakePosition, followingOuttakeTangents[1])
+            .addSpatialMarker(Vector2d(53.0, -9.0)){intakeStart}
+            .build())
+
+    val thirdOuttakeTrajectory = makePath("Third Outtake Trajectory",
+        bot.roadRunner.trajectoryBuilder(lastPosition, thirdOuttakeTangents[0])
+            .splineToLinearHeading(thirdOuttakePosition, thirdOuttakeTangents[1])
+            .addSpatialMarker(Vector2d(72.0,  65.0)){intakeStop}
+            .build())
+
+    val parkingTrajectory = makePath("Parking Trajectory",
+        bot.roadRunner.trajectoryBuilder(lastPosition, parkingTangents[0])
+            .splineToLinearHeading(parkingPosition, parkingTangents[1])
+            .addSpatialMarker(Vector2d(62.0, -6.0)){prepare}
+            .build())
 
     val tangents = listOf(
-            listOf<Double>((-60.0).toRadians + offset, (-45.0).toRadians + offset),
-            listOf<Double>((-45.0).toRadians + offset, (-45.0).toRadians + offset),
+            //listOf<Double>((-60.0).toRadians + offset, (-45.0).toRadians + offset),
+            //listOf<Double>((-45.0).toRadians + offset, (-45.0).toRadians + offset),
             listOf<Double>((180.0).toRadians + offset, (210.0).toRadians + offset),
             listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
             listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset),
@@ -215,13 +255,49 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
             //use !! when accessing maps ie: dropSecondWobble[0]!!
             //example
             DuckDetector.PipelineResult.LEFT to run {
-                calcTrajectories()
+                //calcTrajectories()
+                listOf(
+                    initialOuttakeTrajectory,
+                    outtakeLow,
+                    outtakeEnd,
+                    carouselTrajectory,
+                    carouselWait,
+                    initialIntakeTrajectory,
+                    followingOuttakeTrajectory,
+                    followingIntakeTrajectory,
+                    thirdOuttakeTrajectory,
+                    parkingTrajectory
+                )
             },
             DuckDetector.PipelineResult.MIDDLE to run {
-                calcTrajectories()
+                //calcTrajectories()
+                listOf(
+                    initialOuttakeTrajectory,
+                    outtakeMid,
+                    outtakeEnd,
+                    carouselTrajectory,
+                    carouselWait,
+                    initialIntakeTrajectory,
+                    followingOuttakeTrajectory,
+                    followingIntakeTrajectory,
+                    thirdOuttakeTrajectory,
+                    parkingTrajectory
+                )
             },
             DuckDetector.PipelineResult.RIGHT to run {
-                calcTrajectories()
+                //calcTrajectories()
+                listOf(
+                    initialOuttakeTrajectory,
+                    outtakeHigh,
+                    outtakeEnd,
+                    carouselTrajectory,
+                    carouselWait,
+                    initialIntakeTrajectory,
+                    followingOuttakeTrajectory,
+                    followingIntakeTrajectory,
+                    thirdOuttakeTrajectory,
+                    parkingTrajectory
+                )
            }
     )
     // features as functions, that return command groups

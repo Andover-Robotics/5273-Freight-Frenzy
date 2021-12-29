@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.arcrobotics.ftclib.command.*
+import org.firstinspires.ftc.teamcode.GlobalConfig
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake
 import java.lang.Math.toRadians
@@ -28,20 +29,26 @@ object AutoCommands {
         override fun isFinished() = !bot.roadRunner.isBusy
     }
 
-    fun generateRunCarouselFeature(): CommandBase {
+    fun generateRunCarouselFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
         val startTangent = if (pos.x > 56) 315.0.toRadians + offset else pos.heading
         val traj = bot.roadRunner.trajectoryBuilder(pos, startTangent)
-            .splineToLinearHeading(Pose2d(55.0, -58.0, 0.0.toRadians + offset),
-                45.0.toRadians + offset)
+                .splineToLinearHeading(
+                        if(GlobalConfig.alliance == GlobalConfig.Alliance.RED)
+                            Pose2d(55.0 + drift.x, -58.0 + drift.y, 0.0.toRadians + offset)
+                        else
+                            Pose2d(-55.0 + -drift.x, -58.0 + drift.y, 0.0.toRadians + offset),
+                        if(GlobalConfig.alliance == GlobalConfig.Alliance.RED) 45.0.toRadians + offset
+                        else -45.0.toRadians + offset)
         return SequentialCommandGroup(
-            ParallelCommandGroup(
-                FollowTrajectory(bot, traj.build()),
-                InstantCommand(bot.carousel::runRed),
-                bot.outtake.RunSlides(Outtake.RETRACTED, Outtake.SlideState.RETRACTED)),
-            WaitCommand(1800),
-            InstantCommand(bot.carousel::stop))
+
+                ParallelCommandGroup(
+                        FollowTrajectory(bot, traj.build()),
+                        InstantCommand(if (GlobalConfig.alliance == GlobalConfig.Alliance.RED) bot.carousel::runRed else bot.carousel::runBlue),
+                        bot.outtake.RunSlides(Outtake.RETRACTED, Outtake.SlideState.RETRACTED)),
+                WaitCommand(1800),
+                InstantCommand(bot.carousel::stop))
     }
 
     fun generateExitWarehouseFeature(): CommandBase {
@@ -53,30 +60,10 @@ object AutoCommands {
         )
     }
 
-    fun generatePreloadedFreightFeature(drift: Vector2d = Vector2d()): CommandBase {
-        val bot = Bot.getInstance()
-        val pos = bot.roadRunner.poseEstimate + Pose2d(drift, 0.0.toRadians)
-        val startTangent = if (pos.x > 56) 315.0.toRadians + offset else pos.heading
-        val traj = bot.roadRunner.trajectoryBuilder(pos, startTangent)
-                .lineToSplineHeading(Pose2d(40.0, -24.0, (-45.0).toRadians + offset))
-
-        return SequentialCommandGroup(
-                    bot.outtake.cmdCloseLeftFlap,
-                    bot.outtake.cmdCloseRightFlap,
-                    ParallelCommandGroup(
-                        FollowTrajectory(bot, traj.build()),
-                        SequentialCommandGroup(
-                            WaitCommand(600),
-                            bot.outtake.RunSlides(Outtake.TOP_GOAL_POS,
-                                Outtake.SlideState.AT_TOP_GOAL))),
-                    bot.outtake.cmdFlipBucket,
-                    WaitCommand(1000),
-                    bot.outtake.cmdUnflipBucket)
-    }
     fun generateOuttakeFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
-        val endPos = Pose2d(50.0-4, -12.0+4, 0.0.toRadians + offset) + Pose2d(drift, 0.0)
+        val endPos = Pose2d(Vector2d(.0-4, -12.0+4), 0.0.toRadians + offset)
         var startTangent = 30.0.toRadians + offset
 
         if (!bot.isInWarehouse)
@@ -102,20 +89,25 @@ object AutoCommands {
                 InstantCommand(bot.outtake::unFlipBucket, bot.outtake)
         )
     }
-    fun generateIntakeFeature(): CommandBase {
+    fun generateIntakeFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
-        val endPos = Pose2d(64.0, 58.0, 0.0 + offset)
+        val endPos = Pose2d(Vector2d(64.0, 58.0) + drift, 0.0 + offset)
         val startTangent = 90.0.toRadians + offset
 
         val trajToBarrier = bot.roadRunner.trajectoryBuilder(pos, startTangent)
+//            .lineToLinearHeading(Pose2d(64.0, 20.0, 0.0 + offset))
             .splineToLinearHeading(endPos, 210.0.toRadians+ offset)
             .build()
+//        val trajToWarehouse = bot.roadRunner.trajectoryBuilder(trajToBarrier.end(), 180.0.toRadians)
+//            .strafeTo(Vector2d(64.0, 58.0))
+//            .build()
 
 //if (GlobalConfig.alliance == GlobalConfig.Alliance.RED)
         return SequentialCommandGroup(
                 InstantCommand(bot.outtake::closeLeftFlap, bot.outtake),
                 InstantCommand(bot.outtake::openRightFlap, bot.outtake),
+                InstantCommand(bot.intake::runRight, bot.intake),
                 ParallelDeadlineGroup(FollowTrajectory(bot, trajToBarrier),
                         SequentialCommandGroup(
                             bot.outtake.RunSlides(Outtake.RETRACTED, Outtake.SlideState.RETRACTED),
@@ -125,12 +117,33 @@ object AutoCommands {
                 WaitCommand(500))
     }
 
-    fun generateParkDepotFeature(): CommandBase {
+    fun generateParkDepotFeature(drift: Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val traj = bot.roadRunner.trajectoryBuilder(bot.roadRunner.poseEstimate)
-            .strafeTo(Vector2d(39.0, -63.0)).build()
+            .strafeTo(Vector2d(39.0, -63.0) + drift).build()
         return ParallelDeadlineGroup(FollowTrajectory(bot, traj),
             bot.outtake.RunSlides(Outtake.RETRACTED, Outtake.SlideState.RETRACTED))
+    }
+
+    fun generatePreloadedFreightFeature(drift: Vector2d = Vector2d()): CommandBase {
+        val bot = Bot.getInstance()
+        val pos = bot.roadRunner.poseEstimate
+        val startTangent = if (pos.x > 56) 315.0.toRadians + offset else pos.heading
+        val traj = bot.roadRunner.trajectoryBuilder(pos, startTangent)
+                .lineToSplineHeading(Pose2d(Vector2d(.0, -24.0) + drift, (-45.0).toRadians + offset))
+
+        return SequentialCommandGroup(
+                bot.outtake.cmdCloseLeftFlap,
+                bot.outtake.cmdCloseRightFlap,
+                ParallelCommandGroup(
+                        FollowTrajectory(bot, traj.build()),
+                        SequentialCommandGroup(
+                                WaitCommand(600),
+                                bot.outtake.RunSlides(Outtake.TOP_GOAL_POS,
+                                        Outtake.SlideState.AT_TOP_GOAL))),
+                bot.outtake.cmdFlipBucket,
+                WaitCommand(1000),
+                bot.outtake.cmdUnflipBucket)
     }
 
     private val Bot.isInWarehouse get() =
