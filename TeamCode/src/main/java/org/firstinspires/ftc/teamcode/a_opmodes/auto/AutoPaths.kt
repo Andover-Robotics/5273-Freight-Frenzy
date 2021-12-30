@@ -115,18 +115,19 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //TODO: Insert pose/vector vals here //
     val offset = -90.0.toRadians // need to subtract drift from the previos position to be accurate
     // implement a on off feature, so the driver can pick and choose what we do for the auto
-    var xDrift = 0 // maybe implement a flag system, like this pos is for spline to spline ans so on
+    var xDrift = 0 // maybe implement a flag system, like this pos is for spline to spline ans so
+    // on
 
     public val initialPosition = Pose2d(multiplier * 65.0, -31.0, 0.0.toRadians + offset)
     private val carouselPosition = Pose2d(multiplier * 61.0, -63.0, 0.0.toRadians + offset)
     private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, (-45.0).toRadians + offset)
-    private val initialIntakePosition = Pose2d(multiplier * 64.0,  54.0, 0.0.toRadians + offset)
+    private val initialIntakePosition = Pose2d(multiplier * 64.0,  54.0-4.0, 0.0.toRadians + offset)
     private val initialIntakeTangents = listOf((180.0).toRadians + offset, (210.0).toRadians + offset)
-    private val followingOuttakePosition = Pose2d(multiplier * 57.0, -15.0, 0.0.toRadians + offset)
+    private val followingOuttakePosition = Pose2d(multiplier * 57.0, -15.0-3.0, 0.0.toRadians + offset)
     private val followingOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset);
-    private val followingIntakePosition = Pose2d(multiplier * 72.0,  61.0, 0.0.toRadians + offset)
+    private val followingIntakePosition = Pose2d(multiplier * 72.0,  61.0 - 6.0, 0.0.toRadians + offset)
     private val followingIntakeTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
-    private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0, 0.0.toRadians + offset)
+    private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0-3.0, 0.0.toRadians + offset)
     private val thirdOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset)
     private val parkingPosition = Pose2d(multiplier * 78.0, 56.0, 0.0.toRadians + offset)
     private val parkingTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)

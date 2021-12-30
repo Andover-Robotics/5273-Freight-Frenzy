@@ -83,7 +83,7 @@ public class Carousel extends SubsystemBase {
     }
 
     public void stop() {
-        motor.stopMotor();
+        //motor.stopMotor();
         servo.setPower(0);
         runState = State.OFF;
     }

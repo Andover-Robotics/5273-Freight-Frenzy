@@ -1,15 +1,14 @@
-package org.firstinspires.ftc.teamcode.a_opmodes.auto
+package org.firstinspires.ftc.teamcode.a_opmodes.auto.sequentialAutos.carouselSide
 
 import android.util.Log
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
-import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoCommands
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoCommands.offset
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
-import java.util.function.Supplier
 
 @Autonomous(name = "Carousel Park(Feature-based)", group = "Experimental")
 class CarouselParkFeature : OpMode() {

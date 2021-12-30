@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase {
     public final Command cmdStopIntake = new InstantCommand(this::stop, this);
 
 
-    public static final double INTAKE_SPEED = 0.6;
+    public static final double INTAKE_SPEED = 0.9;
     private static final double OUTTAKE_SPEED = 1.0;
 
     public MotorEx leftIntake;
