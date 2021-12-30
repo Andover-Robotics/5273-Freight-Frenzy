@@ -49,7 +49,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         if (redAlliance) bot.intake.runRight() else bot.intake.runLeft()
     }
     private val intakeStop = AutoPathElement.Action("stop intake") {
-        while (if (redAlliance) ! bot.intake.isRightIntaking else ! bot.intake.isLeftIntaking) {Thread.sleep(25)}
+        while (if (redAlliance) ! bot.intake.wasIntakedRight() else ! bot.intake.wasIntakedLeft()) {Thread.sleep(250)}
         if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
         if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
         //bot.intake.stop()
@@ -117,18 +117,18 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     // implement a on off feature, so the driver can pick and choose what we do for the auto
     var xDrift = 0 // maybe implement a flag system, like this pos is for spline to spline ans so on
 
-    public val initialPosition = Pose2d(multiplier * 65.0, -31.0, 0.0.toRadians + offset)
-    private val carouselPosition = Pose2d(multiplier * 61.0, -63.0, 0.0.toRadians + offset)
-    private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, (-45.0).toRadians + offset)
-    private val initialIntakePosition = Pose2d(multiplier * 64.0,  54.0, 0.0.toRadians + offset)
+    public val initialPosition = Pose2d(multiplier * 65.0, -31.0, multiplier * offset)
+    private val carouselPosition = Pose2d(multiplier * 61.0, -63.0, multiplier * offset)
+    private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, multiplier * (-PI/8 + offset))
+    private val initialIntakePosition = Pose2d(multiplier * 64.0,  54.0, multiplier * offset)
     private val initialIntakeTangents = listOf((180.0).toRadians + offset, (210.0).toRadians + offset)
-    private val followingOuttakePosition = Pose2d(multiplier * 57.0, -15.0, 0.0.toRadians + offset)
+    private val followingOuttakePosition = Pose2d(multiplier * 57.0, -15.0, multiplier * offset)
     private val followingOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset);
-    private val followingIntakePosition = Pose2d(multiplier * 72.0,  61.0, 0.0.toRadians + offset)
+    private val followingIntakePosition = Pose2d(multiplier * 72.0,  61.0, multiplier * offset)
     private val followingIntakeTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
-    private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0, 0.0.toRadians + offset)
+    private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0, multiplier * offset)
     private val thirdOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset)
-    private val parkingPosition = Pose2d(multiplier * 78.0, 56.0, 0.0.toRadians + offset)
+    private val parkingPosition = Pose2d(multiplier * 78.0, 56.0, multiplier * offset)
     private val parkingTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
 
     private val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func

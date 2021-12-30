@@ -92,7 +92,7 @@ public class DuckDetector {
     final Scalar lowerRange = new Scalar(10, 90, 140);
     final Scalar upperRange = new Scalar(30, 200, 255);
 
-    static final double DUCK_AREA = 2000;
+    static final double DUCK_AREA = 1500;
 
     final double MIDDLE_RIGHT_X = 720;
     final double MIDDLE_LEFT_X = 320;
@@ -125,7 +125,7 @@ public class DuckDetector {
         Imgproc.rectangle(input, t, lowerRange, 2);
       }
 
-      result = identifyStackFromBounds().orElse(null);
+      result = identifyDuckFromBounds().orElse(null);
       if (saveImageNext) {
         Mat cvt = new Mat();
         Imgproc.cvtColor(input, cvt, COLOR_RGB2HLS);
@@ -141,7 +141,7 @@ public class DuckDetector {
       return input;
     }
 
-    private Optional<Pair<PipelineResult, Double>> identifyStackFromBounds() {
+    private Optional<Pair<PipelineResult, Double>> identifyDuckFromBounds() {
       if (bounds.size() == 0) {
         return Optional.of(Pair.create(PipelineResult.NONE, 0.7));
       }
