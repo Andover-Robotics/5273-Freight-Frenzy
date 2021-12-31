@@ -108,40 +108,43 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     // driver 2
 
     // toggling flaps to hold freight in bucket
-    if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
+    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
       bot.outtake.toggleLeftFlap();
     }
 
-    else if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
+    else if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)){
       bot.outtake.toggleRightFlap();
     }
 
     // all slides controls
-    if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
+    if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.goToCapstone();
     }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
       bot.outtake.goToLowGoal();
     }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
+      bot.outtake.goToMidGoal();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
     }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.fullyRetract();
 
     }
-    else if (gamepadEx2.wasJustReleased(Button.Y)){
+    else if (gamepadEx2.wasJustPressed(Button.Y)){
       bot.outtake.toggleBucket();
     }
 
     // carousel controls
-    if (gamepadEx2.wasJustReleased(Button.A)){
+    if (gamepadEx2.wasJustPressed(Button.A)){
       bot.carousel.toggleBlue();
     }
-    else if (gamepadEx2.wasJustReleased(Button.B)) {
+    else if (gamepadEx2.wasJustPressed(Button.B)) {
       bot.carousel.toggleRed();
     }
-    else if (gamepadEx2.wasJustReleased(Button.X)) {
+    else if (gamepadEx2.wasJustPressed(Button.X)) {
       bot.carousel.stop();
     }
 
@@ -205,9 +208,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     final double gyroAngle =
             bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).secondAngle//TODO: make sure that the orientation is correct
                     - fieldCentricOffset;
-    Vector2d driveVector = stickSignal(Direction.LEFT),
+    Vector2d driveVector = new Vector2d(gamepadEx1.getLeftX(), gamepadEx1.getLeftY()),
             turnVector = new Vector2d(
-                    stickSignal(Direction.RIGHT).getX() * Math.abs(stickSignal(Direction.RIGHT).getX()),
+                    gamepadEx1.getRightX() * Math.abs(gamepadEx1.getRightX()),
                     0);
     if (bot.roadRunner.mode == Mode.IDLE) {
 
