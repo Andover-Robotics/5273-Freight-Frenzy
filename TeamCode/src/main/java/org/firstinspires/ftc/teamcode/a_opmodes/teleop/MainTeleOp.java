@@ -135,16 +135,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     // all slides controls
-    if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
+    if(gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {
       bot.outtake.goToCapstone();
     }
 
-    else if(gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)) {
-      bot.outtake.hookCapstone();
-    }
-
     else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
-      bot.outtake.goToLowGoal();
+      bot.outtake.fullyRetract();
     }
 
     else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
@@ -152,8 +148,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
-      bot.outtake.fullyRetract();
+      bot.outtake.goToLowGoal();
+    }
 
+    else if(gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)) {
+      bot.outtake.hookCapstone();
     }
 
     else if (gamepadEx2.wasJustReleased(Button.Y)){
