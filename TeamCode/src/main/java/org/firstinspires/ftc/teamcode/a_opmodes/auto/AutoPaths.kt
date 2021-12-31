@@ -33,11 +33,13 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     val drive: RRMecanumDrive = bot.roadRunner
 
     val Double.toRadians get() = (toRadians(this))
-    val Int.toRadians get() = (this.toDouble().toRadians)
+    //val Int.toRadians get() = (this.toDouble().toRadians)
     private fun Pose2d.reverse() = copy(heading = heading + PI)
     private var lastPosition: Pose2d = Pose2d()
     private var redAlliance = (GlobalConfig.alliance == GlobalConfig.Alliance.RED)
     private var multiplier = if (redAlliance) 1 else -1
+    private val endTangentAddition = if (redAlliance) 0.0 else -PI
+    private var INTAKE_DELAY = 750;
 
     fun makePath(name: String, trajectory: Trajectory): AutoPathElement.Path {
         lastPosition = trajectory.end()
@@ -49,13 +51,11 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         if (redAlliance) bot.intake.runRight() else bot.intake.runLeft()
     }
     private val intakeStop = AutoPathElement.Action("stop intake") {
-        while (if (redAlliance) ! bot.intake.wasIntakedRight() else ! bot.intake.wasIntakedLeft()) {Thread.sleep(250)}
+        //TODO: Use Amperage Detection Methods Once Up to Par
+        while (if (redAlliance) ! bot.intake.isRightIntaking() else ! bot.intake.isLeftIntaking()) Thread.sleep(INTAKE_DELAY.toLong())
         if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
         if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
-        //bot.intake.stop()
-        Thread.sleep(1000)
-        if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
-        if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
+        bot.intake.stop()
     }
 
     private val outtakeHigh = AutoPathElement.Action("Outtake High") {
@@ -112,24 +112,25 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     {
         return Vector2d(pos.x, pos.y)
     }
-    //TODO: Insert pose/vector vals here //
-    val offset = -90.0.toRadians // need to subtract drift from the previos position to be accurate
+
+    val offset = - PI / 4 // need to subtract drift from the previous position to be accurate
     // implement a on off feature, so the driver can pick and choose what we do for the auto
     var xDrift = 0 // maybe implement a flag system, like this pos is for spline to spline ans so on
 
+    //TODO: Tune endTangents for Blue Alliance
     public val initialPosition = Pose2d(multiplier * 65.0, -31.0, multiplier * offset)
     private val carouselPosition = Pose2d(multiplier * 61.0, -63.0, multiplier * offset)
-    private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, multiplier * (-PI/8 + offset))
+    private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, multiplier * (-PI / 8 + offset))
     private val initialIntakePosition = Pose2d(multiplier * 64.0,  54.0, multiplier * offset)
-    private val initialIntakeTangents = listOf((180.0).toRadians + offset, (210.0).toRadians + offset)
+    private val initialIntakeTangents = listOf((PI / 2).toRadians + offset + endTangentAddition, (7 * PI / 12) + offset + endTangentAddition)
     private val followingOuttakePosition = Pose2d(multiplier * 57.0, -15.0, multiplier * offset)
-    private val followingOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset);
+    private val followingOuttakeTangents = listOf((PI / 8).toRadians + offset + endTangentAddition, (3 * PI / 4).toRadians + offset + endTangentAddition);
     private val followingIntakePosition = Pose2d(multiplier * 72.0,  61.0, multiplier * offset)
-    private val followingIntakeTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
+    private val followingIntakeTangents = listOf((PI / 4).toRadians + offset + endTangentAddition, (7 * PI / 12).toRadians + offset + endTangentAddition)
     private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0, multiplier * offset)
-    private val thirdOuttakeTangents = listOf((45.0).toRadians + offset, (270.0).toRadians + offset)
+    private val thirdOuttakeTangents = listOf((PI / 8).toRadians + offset + endTangentAddition, (3 * PI / 4).toRadians + offset + endTangentAddition)
     private val parkingPosition = Pose2d(multiplier * 78.0, 56.0, multiplier * offset)
-    private val parkingTangents = listOf((90.0).toRadians + offset, (210.0).toRadians + offset)
+    private val parkingTangents = listOf((PI / 4).toRadians + offset + endTangentAddition, (7 * PI / 12).toRadians + offset + endTangentAddition)
 
     private val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func
             Pose2d(65.0, -34.0, 0.0.toRadians + offset), // remove + 2 later for all

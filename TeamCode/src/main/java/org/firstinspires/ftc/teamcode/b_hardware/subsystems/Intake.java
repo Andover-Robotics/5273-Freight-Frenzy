@@ -85,15 +85,19 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
+
         updateVeloVals();
         updateAmpVals();
+
+        //TODO: Debug Intake Amperage Detection and Following Actions
+
 
         if (!elementIntook) {
             intookLeft = false;
             intookRight = false;
         }
 
-        if((wasIntakedLeft() || wasIntakedRight()) && timeWhenIntake == -1) {
+        if ((wasIntakedLeft() || wasIntakedRight()) && !elementIntook) {
             timeWhenIntake = System.currentTimeMillis();
             elementIntook = true;
 
@@ -107,11 +111,9 @@ public class Intake extends SubsystemBase {
 
         else if (elementIntook && Math.abs(System.currentTimeMillis() - timeWhenIntake) > REVERSE_INTAKE_DELAY) {
             if (intookLeft) {
-                reverseLeft = true;
                 reverseLeft();
             }
             else if (intookRight) {
-                reverseRight = true;
                 reverseRight();
             }
         }
@@ -119,8 +121,10 @@ public class Intake extends SubsystemBase {
         else if (elementIntook && Math.abs(System.currentTimeMillis() - timeWhenIntake) > REVERSE_INTAKE_DELAY + STOP_DELAY) {
             stop();
             elementIntook = false;
-            timeWhenIntake = -1;
+            curLeftAmps = -1;
+            curRightAmps = -1;
         }
+
     }
 
     public double leftIntakeCurrentDraw() {
@@ -227,8 +231,9 @@ public class Intake extends SubsystemBase {
         prevLeftVelo  = curLeftVelo;
          */
 
-        curLeftAmps = leftIntakeCurrentDraw();
-        curRightAmps = rightIntakeCurrentDraw();
+        //keep track of maximum amperage
+        curLeftAmps = Math.max(curLeftAmps, leftIntakeCurrentDraw());
+        curRightAmps = Math.max(curRightAmps, rightIntakeCurrentDraw());
     }
 
     public boolean wasIntakedLeft() {

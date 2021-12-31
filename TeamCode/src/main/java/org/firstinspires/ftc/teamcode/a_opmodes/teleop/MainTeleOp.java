@@ -139,6 +139,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.goToCapstone();
     }
 
+    else if(gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)) {
+      bot.outtake.hookCapstone();
+    }
+
     else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
       bot.outtake.goToLowGoal();
     }
@@ -146,6 +150,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
     }
+
     else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
       bot.outtake.fullyRetract();
 
