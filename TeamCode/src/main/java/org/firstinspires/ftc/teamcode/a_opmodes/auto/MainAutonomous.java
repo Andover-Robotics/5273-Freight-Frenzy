@@ -39,6 +39,10 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
 
     //TODO: add initialization here
 
+    bot.outtake.fullyRetract();
+    bot.outtake.closeRightFlap();
+    bot.outtake.closeLeftFlap();
+
     bot.roadRunner.setPoseEstimate(paths.getInitialPosition());
 
     //  ie set servo position                             ========================================================================

@@ -66,7 +66,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     private val outtakeLow = AutoPathElement.Action("Outtake Low") {
         bot.outtake.goToLowGoal()
-        }
+    }
 
     private val outtakeEnd = AutoPathElement.Action("Outtake End") {
         bot.outtake.autoRun()
@@ -107,7 +107,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         if (redAlliance) bot.outtake.closeLeftFlap() else bot.outtake.closeRightFlap()
         if (redAlliance) bot.outtake.openRightFlap() else bot.outtake.openLeftFlap()
     }
-    
+
     fun asVector2D(pos: Pose2d) : Vector2d
     {
         return Vector2d(pos.x, pos.y)
@@ -122,35 +122,35 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     private val carouselPosition = Pose2d(multiplier * 61.0, -63.0, multiplier * offset)
     private val intialOuttakeCubePosition = Pose2d(multiplier * 44.0, -20.0, multiplier * (-PI / 8 + offset))
     private val initialIntakePosition = Pose2d(multiplier * 64.0,  54.0, multiplier * offset)
-    private val initialIntakeTangents = listOf((PI / 2).toRadians + offset + endTangentAddition, (7 * PI / 12) + offset + endTangentAddition)
+    private val initialIntakeTangents = listOf((PI / 2) + offset + endTangentAddition, (7 * PI / 12) + offset + endTangentAddition)
     private val followingOuttakePosition = Pose2d(multiplier * 57.0, -15.0, multiplier * offset)
-    private val followingOuttakeTangents = listOf((PI / 8).toRadians + offset + endTangentAddition, (3 * PI / 4).toRadians + offset + endTangentAddition);
+    private val followingOuttakeTangents = listOf((PI / 8) + offset + endTangentAddition, (3 * PI / 4) + offset + endTangentAddition);
     private val followingIntakePosition = Pose2d(multiplier * 72.0,  61.0, multiplier * offset)
-    private val followingIntakeTangents = listOf((PI / 4).toRadians + offset + endTangentAddition, (7 * PI / 12).toRadians + offset + endTangentAddition)
+    private val followingIntakeTangents = listOf((PI / 4) + offset + endTangentAddition, (7 * PI / 12) + offset + endTangentAddition)
     private val thirdOuttakePosition = Pose2d(multiplier * 62.0, -6.0, multiplier * offset)
-    private val thirdOuttakeTangents = listOf((PI / 8).toRadians + offset + endTangentAddition, (3 * PI / 4).toRadians + offset + endTangentAddition)
+    private val thirdOuttakeTangents = listOf((PI / 8) + offset + endTangentAddition, (3 * PI / 4) + offset + endTangentAddition)
     private val parkingPosition = Pose2d(multiplier * 78.0, 56.0, multiplier * offset)
-    private val parkingTangents = listOf((PI / 4).toRadians + offset + endTangentAddition, (7 * PI / 12).toRadians + offset + endTangentAddition)
+    private val parkingTangents = listOf((PI / 4) + offset + endTangentAddition, (7 * PI / 12) + offset + endTangentAddition)
 
     private val path = listOf( // what if we have one big 3d array with all our paths, and add that to our calc paths func
-            Pose2d(65.0, -34.0, 0.0.toRadians + offset), // remove + 2 later for all
-            Pose2d(44.0, -20.0, (-45.0).toRadians + offset),
-            outtakeHigh,
-            carouselPosition,
-            runCarousel,
-            intakeStart,
-            Pose2d(64.0,  50.0 + 8, 0.0.toRadians + offset),
-            intakeStop,
-            Pose2d(50.0+3.0, -9.0, 0.0.toRadians + offset),
-            outtakeHigh,
-            intakeStart,
-            Pose2d(64.0+8,  50.0 + 15, 0.0.toRadians + offset),
-            intakeStop,
-            Pose2d(50.0+12, -6.0, 0.0.toRadians + offset),
-            outtakeHigh,
-            Pose2d(64.0+12,  46.0+10, 0.0.toRadians + offset),
-            prepare
-            )
+        Pose2d(65.0, -34.0, 0.0.toRadians + offset), // remove + 2 later for all
+        Pose2d(44.0, -20.0, (-45.0).toRadians + offset),
+        outtakeHigh,
+        carouselPosition,
+        runCarousel,
+        intakeStart,
+        Pose2d(64.0,  50.0 + 8, 0.0.toRadians + offset),
+        intakeStop,
+        Pose2d(50.0+3.0, -9.0, 0.0.toRadians + offset),
+        outtakeHigh,
+        intakeStart,
+        Pose2d(64.0+8,  50.0 + 15, 0.0.toRadians + offset),
+        intakeStop,
+        Pose2d(50.0+12, -6.0, 0.0.toRadians + offset),
+        outtakeHigh,
+        Pose2d(64.0+12,  46.0+10, 0.0.toRadians + offset),
+        prepare
+    )
 
     val initialOuttakeTrajectory = makePath("Outtake Preloaded Cube Trajectory",
         bot.roadRunner.trajectoryBuilder(initialPosition)
@@ -169,6 +169,22 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
             .splineToLinearHeading(initialIntakePosition, initialIntakeTangents[1])
             .addSpatialMarker(Vector2d(lastPosition.x, lastPosition.y)) {intakeStart}
             .build())
+
+    /*
+
+    val blueCarouselTurn = AutoPathElement.Action("Blue Carousel Trajectory"){
+        bot.roadRunner.turn(- PI /2)
+    }
+
+     */
+
+    /*
+    val blueInitialIntakeTrajectory = makePath("Initial Intake Trajectory" ,
+        bot.roadRunner.trajectoryBuilder(lastPosition)
+            .lineToSplineHeading(initialIntakePosition)
+            .addSpatialMarker(Vector2d(lastPosition.x, lastPosition.y)) { intakeStart }
+            .build())
+     */
 
     val followingOuttakeTrajectory = makePath("Following Outtake Trajectory",
         bot.roadRunner.trajectoryBuilder(lastPosition, followingOuttakeTangents[0])
@@ -195,13 +211,13 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
             .build())
 
     val tangents = listOf(
-            //listOf<Double>((-60.0).toRadians + offset, (-45.0).toRadians + offset),
-            //listOf<Double>((-45.0).toRadians + offset, (-45.0).toRadians + offset),
-            listOf<Double>((180.0).toRadians + offset, (210.0).toRadians + offset),
-            listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
-            listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset),
-            listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
-            listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset)
+        //listOf<Double>((-60.0).toRadians + offset, (-45.0).toRadians + offset),
+        //listOf<Double>((-45.0).toRadians + offset, (-45.0).toRadians + offset),
+        listOf<Double>((180.0).toRadians + offset, (210.0).toRadians + offset),
+        listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
+        listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset),
+        listOf<Double>((45.0).toRadians + offset, (270.0).toRadians + offset),
+        listOf<Double>((90.0).toRadians + offset, (210.0).toRadians + offset)
 
     )
     val rightStartPose = path[0] as Pose2d
@@ -249,77 +265,77 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
     //TODO: Separate alliance-specific and position-specific paths                                                                            ====================================================
     private val trajectorySets: Map<DuckDetector.PipelineResult, List<AutoPathElement>> = mapOf(
-            //use !! when accessing maps ie: dropSecondWobble[0]!!
-            //example
-            DuckDetector.PipelineResult.LEFT to run {
-                //calcTrajectories()
-                listOf(
-                    initialOuttakeTrajectory,
-                    outtakeLow,
-                    outtakeEnd,
-                    carouselTrajectory,
-                    carouselWait,
-                    intakeStart,
-                    initialIntakeTrajectory,
-                    intakeStop,
-                    followingOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    intakeStart,
-                    followingIntakeTrajectory,
-                    intakeStop,
-                    thirdOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    parkingTrajectory
-                )
-            },
-            DuckDetector.PipelineResult.MIDDLE to run {
-                //calcTrajectories()
-                listOf(
-                    initialOuttakeTrajectory,
-                    outtakeMid,
-                    outtakeEnd,
-                    carouselTrajectory,
-                    carouselWait,
-                    intakeStart,
-                    initialIntakeTrajectory,
-                    intakeStop,
-                    followingOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    intakeStart,
-                    followingIntakeTrajectory,
-                    intakeStop,
-                    thirdOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    parkingTrajectory
-                )
-            },
-            DuckDetector.PipelineResult.RIGHT to run {
-                //calcTrajectories()
-                listOf(
-                    initialOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    carouselTrajectory,
-                    carouselWait,
-                    intakeStart,
-                    initialIntakeTrajectory,
-                    intakeStop,
-                    followingOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    intakeStart,
-                    followingIntakeTrajectory,
-                    intakeStop,
-                    thirdOuttakeTrajectory,
-                    outtakeHigh,
-                    outtakeEnd,
-                    parkingTrajectory
-                )
-           }
+        //use !! when accessing maps ie: dropSecondWobble[0]!!
+        //example
+        DuckDetector.PipelineResult.LEFT to run {
+            //calcTrajectories()
+            listOf(
+                initialOuttakeTrajectory,
+                outtakeLow,
+                outtakeEnd,
+                carouselTrajectory,
+                carouselWait,
+                intakeStart,
+                initialIntakeTrajectory,
+                intakeStop,
+                followingOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                intakeStart,
+                followingIntakeTrajectory,
+                intakeStop,
+                thirdOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                parkingTrajectory
+            )
+        },
+        DuckDetector.PipelineResult.MIDDLE to run {
+            //calcTrajectories()
+            listOf(
+                initialOuttakeTrajectory,
+                outtakeMid,
+                outtakeEnd,
+                carouselTrajectory,
+                carouselWait,
+                intakeStart,
+                initialIntakeTrajectory,
+                intakeStop,
+                followingOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                intakeStart,
+                followingIntakeTrajectory,
+                intakeStop,
+                thirdOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                parkingTrajectory
+            )
+        },
+        DuckDetector.PipelineResult.RIGHT to run {
+            //calcTrajectories()
+            listOf(
+                initialOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                carouselTrajectory,
+                carouselWait,
+                intakeStart,
+                initialIntakeTrajectory,
+                intakeStop,
+                followingOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                intakeStart,
+                followingIntakeTrajectory,
+                intakeStop,
+                thirdOuttakeTrajectory,
+                outtakeHigh,
+                outtakeEnd,
+                parkingTrajectory
+            )
+        }
     )
     // features as functions, that return command groups
     fun getTrajectories(a: DuckDetector.PipelineResult): List<AutoPathElement> {

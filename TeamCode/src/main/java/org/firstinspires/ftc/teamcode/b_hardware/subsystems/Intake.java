@@ -29,11 +29,28 @@ public class Intake extends SubsystemBase {
     public MotorEx leftIntake;
     public MotorEx rightIntake;
 
+    /*
+
+    val blueCarouselTurn = AutoPathElement.Action("Blue Carousel Trajectory"){
+        bot.roadRunner.turn(- PI /2)
+    }
+
+     */
+
+    /*
+    val blueInitialIntakeTrajectory = makePath("Initial Intake Trajectory" ,
+        bot.roadRunner.trajectoryBuilder(lastPosition)
+            .lineToSplineHeading(initialIntakePosition)
+            .addSpatialMarker(Vector2d(lastPosition.x, lastPosition.y)) { intakeStart }
+            .build())
+     */
+
     private double curLeftVelo, curRightVelo;
     private double curRightAmps, curLeftAmps;
     private final double INTAKE_DETECT_CONST_RPM;
-    private final double INTAKE_DETECT_CONST_AMPS = 1100;
-    private final double REVERSE_INTAKE_DELAY = 300;
+    private final double LEFT_INTAKE_DETECT_CONST_AMPS = 1500;
+    private final double RIGHT_INTAKE_DETECT_CONST_AMPS = 4000;
+    private final double REVERSE_INTAKE_DELAY = 1250;
     private static final double STOP_DELAY = 500;
     private final double IS_RUNNING_CONST_RPM = 15;
     private final double IS_RUNNING_CONST_AMPS = 30;
@@ -109,7 +126,10 @@ public class Intake extends SubsystemBase {
             }
         }
 
-        else if (elementIntook && Math.abs(System.currentTimeMillis() - timeWhenIntake) > REVERSE_INTAKE_DELAY) {
+
+
+        else if (elementIntook && Math.abs(System.currentTimeMillis() - timeWhenIntake) > REVERSE_INTAKE_DELAY
+                    && Math.abs(System.currentTimeMillis() - timeWhenIntake) < REVERSE_INTAKE_DELAY + STOP_DELAY) {
             if (intookLeft) {
                 reverseLeft();
             }
@@ -160,21 +180,25 @@ public class Intake extends SubsystemBase {
 
     public void reverseLeft() {
         leftIntake.set(-OUTTAKE_SPEED);
+        reverseLeft = true;
     }
 
     public void reverseRight() {
         rightIntake.set(-OUTTAKE_SPEED);
+        reverseRight = true;
     }
 
     public void runLeft(){
         if (!elementIntook)
             leftIntake.set(INTAKE_SPEED);
+            reverseLeft = false;
             //leftRunning = true;
     }
 
     public void runRight(){
         if (!elementIntook)
             rightIntake.set(INTAKE_SPEED);
+            reverseRight = false;
             //rightRunning = true;
     }
 
@@ -204,7 +228,6 @@ public class Intake extends SubsystemBase {
 
     public void stopLeft() {
         leftIntake.stopMotor();
-
         //leftRunning = false;
     }
 
@@ -237,12 +260,12 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean wasIntakedLeft() {
-        return curLeftAmps > INTAKE_DETECT_CONST_AMPS;
+        return curLeftAmps > LEFT_INTAKE_DETECT_CONST_AMPS && !reverseLeft;
                 //(curLeftVelo < INTAKE_DETECT_CONST_RPM && isLeftIntaking())
     }
 
     public boolean wasIntakedRight() {
-        return curRightAmps > INTAKE_DETECT_CONST_AMPS;
+        return curRightAmps > RIGHT_INTAKE_DETECT_CONST_AMPS && !reverseRight;
                 //(curRightVelo < INTAKE_DETECT_CONST_RPM && isRightIntaking()) || rightIntakeCurrentDraw() > INTAKE_DETECT_CONST_AMPS;
     }
 

@@ -274,12 +274,11 @@ public class Outtake extends SubsystemBase {
         } else {
             if (slideState == SlideState.RETRACTED) {
                 slideMotor.stopMotor();
-            //TODO: Test Automatic Outtake Bucket Methods
             } else {
                 slideMotor.set(SLIDE_STOPPED);
             }
 
-            if (slideRun == SlideRun.RUNNING) {
+            if (slideRun == SlideRun.RUNNING && slideState != SlideState.RETRACTED && slideState != SlideState.AT_CAPSTONE) {
                 flipBucket();
             }
 

@@ -116,10 +116,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     if (bot.intake.elementIntook) {
       if (bot.intake.reverseLeft) {
-        bot.outtake.closeRightFlap();
+        bot.outtake.closeLeftFlap();
       }
       else {
-        bot.outtake.closeLeftFlap();
+        bot.outtake.closeRightFlap();
       }
     }
 
