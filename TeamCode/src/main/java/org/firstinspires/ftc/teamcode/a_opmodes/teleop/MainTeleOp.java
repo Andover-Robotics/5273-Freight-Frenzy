@@ -21,15 +21,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private boolean centricity = false;
   private boolean isManual = true;
   private int percent = 1, part = 0;
-  private double TRIGGER_CONSTANT = 0.15;
-  double slowModeSpeed = 0.4;
+  private final double TRIGGER_CONSTANT = 0.15;
+  private final double slowModeSpeed = 0.4;
 
 
 
 
   //config? stuff here =========================================================================
 
-  private double fieldCentricOffset = -90.0;
+  private double fieldCentricOffset = 0.0;
   public enum TemplateState{
     INTAKE(0.5),
     TRANSPORT(0.5),
@@ -206,8 +206,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
   private void drive(){//Driving ===================================================================================
     final double gyroAngle =
-            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).secondAngle; //TODO: make sure that the orientation is correct
-//                    - fieldCentricOffset;
+            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle //TODO: make sure that the orientation is correct
+                    - fieldCentricOffset;
     Vector2d driveVector = new Vector2d(gamepadEx1.getLeftX(), gamepadEx1.getLeftY()),
             turnVector = new Vector2d(
                     gamepadEx1.getRightX() * Math.abs(gamepadEx1.getRightX()),
@@ -231,7 +231,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       else if (dpadPressed || buttonPressed)
         bot.drive.driveRobotCentric(
                 strafeSpeed * slowModeSpeed,
-                forwardSpeed * slowModeSpeed,
+                forwardSpeed * -slowModeSpeed,
                 turnSpeed * slowModeSpeed
           );
 
