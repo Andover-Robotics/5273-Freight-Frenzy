@@ -60,46 +60,46 @@ public class Intake extends SubsystemBase {
         INTAKE_DETECT_CONST = 0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
     }
 
-    @Override
-    public void periodic() {
-        updateVeloVals();
-
-        if(wasIntakedLeft() && Math.abs(timeWhenIntake - System.currentTimeMillis()) <= 10) {
-            timeWhenIntake = System.currentTimeMillis();
-            if (Math.abs(System.currentTimeMillis() - timeWhenIntake) > 200)
-            {
-                stop();
-            }
-        }
-        else if(Math.abs(System.currentTimeMillis() - timeWhenIntake) > 2000 && wasIntakedLeft()) {
-            timeWhenReverse = System.currentTimeMillis();
-            if(Math.abs(System.currentTimeMillis() - timeWhenReverse) > 1000) {
-                stop();
-                timeWhenReverse = -1;
-            }
-            else {
-                reverseLeft();
-            }
-        }
-
-        if(wasIntakedRight() && Math.abs(timeWhenIntake - System.currentTimeMillis()) <= 10) {
-            timeWhenIntake = System.currentTimeMillis();
-        }
-        else if(Math.abs(System.currentTimeMillis() - timeWhenIntake) > 2000 && wasIntakedLeft()) {
-            timeWhenReverse = System.currentTimeMillis();
-            if(Math.abs(System.currentTimeMillis() - timeWhenReverse) > 250) {
-                stop();
-                timeWhenReverse = -1;
-            }
-            else {
-                reverseRight();
-            }
-        }
-        else
-        {
-            opMode.telemetry.addData("Intake: waiting", true);
-        }
-    }
+//    @Override
+//    public void periodic() {
+//        updateVeloVals();
+//
+//        if(wasIntakedLeft() && Math.abs(timeWhenIntake - System.currentTimeMillis()) <= 10) {
+//            timeWhenIntake = System.currentTimeMillis();
+//            if (Math.abs(System.currentTimeMillis() - timeWhenIntake) > 200)
+//            {
+//                stop();
+//            }
+//        }
+//        else if(Math.abs(System.currentTimeMillis() - timeWhenIntake) > 2000 && wasIntakedLeft()) {
+//            timeWhenReverse = System.currentTimeMillis();
+//            if(Math.abs(System.currentTimeMillis() - timeWhenReverse) > 1000) {
+//                stop();
+//                timeWhenReverse = -1;
+//            }
+//            else {
+//                reverseLeft();
+//            }
+//        }
+//
+//        if(wasIntakedRight() && Math.abs(timeWhenIntake - System.currentTimeMillis()) <= 10) {
+//            timeWhenIntake = System.currentTimeMillis();
+//        }
+//        else if(Math.abs(System.currentTimeMillis() - timeWhenIntake) > 2000 && wasIntakedLeft()) {
+//            timeWhenReverse = System.currentTimeMillis();
+//            if(Math.abs(System.currentTimeMillis() - timeWhenReverse) > 250) {
+//                stop();
+//                timeWhenReverse = -1;
+//            }
+//            else {
+//                reverseRight();
+//            }
+//        }
+//        else
+//        {
+//            opMode.telemetry.addData("Intake: waiting", true);
+//        }
+//    }
 
 
     public void runToggle() {
