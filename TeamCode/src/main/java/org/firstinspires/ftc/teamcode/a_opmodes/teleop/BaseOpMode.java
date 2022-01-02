@@ -17,9 +17,9 @@ import java.util.function.Function;
 
 public abstract class BaseOpMode extends OpMode {
 
-  protected Bot bot;
-  protected double driveSpeed;
-  protected GamepadEx gamepadEx1, gamepadEx2;
+  public Bot bot;
+  public double driveSpeed;
+  public GamepadEx gamepadEx1, gamepadEx2;
 
   //button reader syntax
   // (g1 or g2)  (a, b, lt, lb, etc)
@@ -40,9 +40,9 @@ public abstract class BaseOpMode extends OpMode {
     subLoop();
   }
 
-  protected abstract void subInit();
+  public abstract void subInit();
 
-  protected abstract void subLoop();
+  public abstract void subLoop();
 
   void updateButtons(){
     gamepadEx1.readButtons();
@@ -51,17 +51,17 @@ public abstract class BaseOpMode extends OpMode {
 
 
 
-  boolean buttonSignal(Button button) {
+  public boolean buttonSignal(Button button) {
     return gamepadEx1.isDown(button) || gamepadEx2.isDown(button);
   }
 
-  double triggerSignal(Trigger trigger) {
+  public double triggerSignal(Trigger trigger) {
     double in1 = gamepadEx1.getTrigger(trigger),
         in2 = gamepadEx2.getTrigger(trigger);
     return Math.max(in1, in2);
   }
 
-  Vector2d stickSignal(Direction side) {
+  public Vector2d stickSignal(Direction side) {
     Function<GamepadEx, Vector2d> toCoords = pad ->
         side == Direction.LEFT ? new Vector2d(pad.getLeftX(), pad.getLeftY()) :
             new Vector2d(pad.getRightX(), pad.getRightY());
@@ -72,11 +72,11 @@ public abstract class BaseOpMode extends OpMode {
     return v1.magnitude() > 0.02 ? v1 : v2;
   }
 
-  boolean justPressed(Button button) {
+  public boolean justPressed(Button button) {
     return gamepadEx1.wasJustPressed(button) || gamepadEx2.wasJustPressed(button);
   }
 
-  boolean justReleased(Button button){
+  public boolean justReleased(Button button){
     return !(gamepadEx1.isDown(button) || gamepadEx2.isDown(button)) && (gamepadEx1.wasJustReleased(button) || gamepadEx2.wasJustReleased(button));
   }
 }
