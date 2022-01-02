@@ -10,52 +10,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive.Mode;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 @TeleOp(name = "Main TeleOp", group = "Competition")
 public class MainTeleOp extends BaseOpMode {//required vars here
   private double cycle = 0;
   private double prevRead = 0;
   private TimingScheduler timingScheduler;
   private boolean centricity = false;
-  private boolean isManual = true;
-  private int percent = 1, part = 0;
   private final double TRIGGER_CONSTANT = 0.15;
-  private final double slowModeSpeed = 0.4;
-
-
-
+  private final double SLOW_MODE_SPEED = 0.4;
 
   //config? stuff here =========================================================================
 
   private double fieldCentricOffset = 0.0;
-  public enum TemplateState{
-    INTAKE(0.5),
-    TRANSPORT(0.5),
-    OUTTAKE(0.5);
-
-    public final double progressRate;
-
-    TemplateState(double progressRate){this.progressRate = progressRate;}
-  }
-// test edit
-  Map<TemplateState, Map<Button, TemplateState>> stateMap = new StateMap().getStateMap();
-
-  public TemplateState state = TemplateState.INTAKE;
-
 
   //opmode vars here ==============================================================================================
-  //If there is a module-specific var, put it in the module class ie slideStage goes in the slides module
-
-
-//  private MotorEx leftIntake;
-//  private MotorEx rightIntake;
-
   public void subInit() {
-    //TODO: initialize subsystems not initialized in bot constructor
     timingScheduler = new TimingScheduler(this);
-
   }
 
   @Override
@@ -66,21 +36,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     timingScheduler.run();
 
     //Movement =================================================================================================
-    //TODO: change depending on mode
-    driveSpeed = 1;//- 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
-
-//    if(justPressed(Button.BACK)){
-//      isManual = !isManual;
-//    }
-//
-//    if (isManual) {
-//      drive();
-//    }
-//    else {
-//      followPath();
-//    }
-
     drive();
+
+
+    //Subsystem control =========================================================================================
 
     // intake controls
     if (gamepadEx1.isDown(Button.LEFT_BUMPER)){
@@ -148,10 +107,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
 
-
-
-
-    /*//TODO: make control scheme
+    /*
     Controller 1
     A:      B:      X:      Y:
     DPAD
@@ -179,23 +135,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     Start:  Back:switch between automation and driving
      */
 
-    
-
-
-    /*
-    AUTOMATION CONTROL SCHEME
-
-     */
-
-
-
     CommandScheduler.getInstance().run();
 
-    // TODO organize this test code
-    updateLocalization();
     telemetry.addData("Centricity", centricity);
-    telemetry.addData("percent", percent);
-    telemetry.addData("part", part);
     telemetry.addData("cycle", cycle);
     telemetry.addData("x", bot.roadRunner.getPoseEstimate().getX());
     telemetry.addData("y", bot.roadRunner.getPoseEstimate().getY());
@@ -206,7 +148,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
   private void drive(){//Driving ===================================================================================
     final double gyroAngle =
-            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle //TODO: make sure that the orientation is correct
+            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle
                     - fieldCentricOffset;
     Vector2d driveVector = new Vector2d(gamepadEx1.getLeftX(), gamepadEx1.getLeftY()),
             turnVector = new Vector2d(
@@ -230,9 +172,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
       else if (dpadPressed || buttonPressed)
         bot.drive.driveRobotCentric(
-                strafeSpeed * slowModeSpeed,
-                forwardSpeed * -slowModeSpeed,
-                turnSpeed * slowModeSpeed
+                strafeSpeed * SLOW_MODE_SPEED,
+                forwardSpeed * -SLOW_MODE_SPEED,
+                turnSpeed * SLOW_MODE_SPEED
           );
 
       else
@@ -251,24 +193,5 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       centricity = !centricity;
     }
 
-  }
-
-  private void followPath(){//Path following ===================================================================================
-
-    updateState();
-
-  }
-
-  private void updateState(){
-    for(Entry<Button, TemplateState> pair : stateMap.get(state).entrySet()){
-      if(justPressed(pair.getKey())){
-        state = pair.getValue();
-        percent = 0;
-      }
-    }
-  }
-
-  private void updateLocalization() {
-    bot.roadRunner.update();
   }
 }
