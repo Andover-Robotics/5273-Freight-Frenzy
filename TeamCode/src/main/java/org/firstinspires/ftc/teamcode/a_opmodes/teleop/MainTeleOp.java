@@ -142,13 +142,13 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("x", bot.roadRunner.getPoseEstimate().getX());
     telemetry.addData("y", bot.roadRunner.getPoseEstimate().getY());
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
-    telemetry.addData("current raw angle", bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle);
+    telemetry.addData("current raw angle", bot.imu0.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle);
   }
 
 
   private void drive(){//Driving ===================================================================================
     final double gyroAngle =
-            bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle
+            bot.imu0.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle
                     - fieldCentricOffset;
     Vector2d driveVector = new Vector2d(gamepadEx1.getLeftX(), gamepadEx1.getLeftY()),
             turnVector = new Vector2d(
@@ -186,7 +186,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     }
     if (gamepadEx1.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
-      fieldCentricOffset = bot.imu.getAngularOrientation()
+      fieldCentricOffset = bot.imu0.getAngularOrientation()
           .toAngleUnit(AngleUnit.DEGREES).firstAngle;
     }
     if (gamepadEx1.wasJustPressed(Button.RIGHT_STICK_BUTTON)){
