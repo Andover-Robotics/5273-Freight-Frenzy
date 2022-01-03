@@ -79,4 +79,5 @@ public abstract class BaseOpMode extends OpMode {
   protected boolean justReleased(Button button){
     return !(gamepadEx1.isDown(button) || gamepadEx2.isDown(button)) && (gamepadEx1.wasJustReleased(button) || gamepadEx2.wasJustReleased(button));
   }
+
 }
