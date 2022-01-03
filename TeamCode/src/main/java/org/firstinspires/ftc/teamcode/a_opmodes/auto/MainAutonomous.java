@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto;
 
+import android.util.Pair;
 import android.widget.Button;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement.Action;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement.Path;
@@ -35,6 +37,12 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
     gamepad = new GamepadEx(gamepad1);
 
     AutoPaths paths = new AutoPaths(this);
+
+    telemetry.addData("Side", GlobalConfig.side);
+    telemetry.addData("Alliance", GlobalConfig.alliance);
+    telemetry.update();
+
+
     pipeline = new DuckDetector(this, telemetry);
 
     //TODO: add initialization here
@@ -43,7 +51,7 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
     bot.outtake.closeRightFlap();
     bot.outtake.closeLeftFlap();
 
-    bot.roadRunner.setPoseEstimate(paths.getInitialPosition());
+    bot.roadRunner.setPoseEstimate(paths.initialPosition());
 
     //  ie set servo position                             ========================================================================
 
@@ -75,12 +83,13 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
       confidence = pair.second;
     });
 
-    if (detected == null)
+    if (detected == PipelineResult.NONE)
       detected = PipelineResult.LEFT;
 
     waitForStart();
 
-    List<AutoPathElement> trajectories = paths.getTrajectories(detected);
+    Pair<DuckDetector.PipelineResult, GlobalConfig.Alliance> pair = new Pair<>(detected, GlobalConfig.alliance);
+    List<AutoPathElement> trajectories = paths.getTrajectories(pair.first, pair.second);
     pipeline.close();
 
 

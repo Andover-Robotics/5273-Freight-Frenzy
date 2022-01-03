@@ -69,7 +69,7 @@ public class Outtake extends SubsystemBase {
     public final Command cmdCloseLeftFlap = new InstantCommand(this::closeLeftFlap, this);
 
     // Servo positions for the arms and the bucket
-    private static final double FLAP_OPEN = 0.26;
+    private static final double FLAP_OPEN = 0.28;
     private static final double FLAP_CLOSED = 0.0;
     private static final double FLAP_DEPOSIT = 0.5;
     private static final double FLAP_HOOK = 0.85;
@@ -251,7 +251,7 @@ public class Outtake extends SubsystemBase {
                 if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
                     slideMotor.set(RETRACT_SPEED);
                 } else {
-                    slideMotor.setPositionCoefficient(0.05);
+                    slideMotor.setPositionCoefficient(0.03);
                     slideMotor.set(SLIDE_SPEED);
                 }
                 slideRun = SlideRun.RUNNING;

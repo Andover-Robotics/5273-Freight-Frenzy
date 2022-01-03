@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
     private static ExpansionHubEx controlHub;
     private static ExpansionHubEx expansionHub;
 
-    public static final double INTAKE_SPEED = 0.6;
+    public static final double INTAKE_SPEED = 1.0;
     private static final double OUTTAKE_SPEED = 1.0;
 
     public MotorEx leftIntake;
@@ -49,7 +49,7 @@ public class Intake extends SubsystemBase {
     private double curRightAmps, curLeftAmps;
     private final double INTAKE_DETECT_CONST_RPM;
     private final double LEFT_INTAKE_DETECT_CONST_AMPS = 1500;
-    private final double RIGHT_INTAKE_DETECT_CONST_AMPS = 4000;
+    private final double RIGHT_INTAKE_DETECT_CONST_AMPS = 2500;
     private final double REVERSE_INTAKE_DELAY = 1250;
     private static final double STOP_DELAY = 500;
     private final double IS_RUNNING_CONST_RPM = 15;
@@ -106,9 +106,9 @@ public class Intake extends SubsystemBase {
         updateVeloVals();
         updateAmpVals();
 
-        //TODO: Debug Intake Amperage Detection and Following Actions
+        //TODO: Tune Amperage Values
 
-
+        /*
         if (!elementIntook) {
             intookLeft = false;
             intookRight = false;
@@ -144,6 +144,8 @@ public class Intake extends SubsystemBase {
             curLeftAmps = -1;
             curRightAmps = -1;
         }
+
+         */
 
     }
 
