@@ -87,9 +87,7 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
       detected = PipelineResult.LEFT;
 
     waitForStart();
-
-    Pair<DuckDetector.PipelineResult, GlobalConfig.Alliance> pair = new Pair<>(detected, GlobalConfig.alliance);
-    List<AutoPathElement> trajectories = paths.getTrajectories(pair.first, pair.second);
+    List<AutoPathElement> trajectories = paths.getTrajectories(detected);
     pipeline.close();
 
 

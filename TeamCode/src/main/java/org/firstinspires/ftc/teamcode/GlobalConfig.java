@@ -36,6 +36,12 @@ public class GlobalConfig {//make all fields final
   public static Alliance alliance = Alliance.RED;
   public static Side side = Side.DEPOT;
 
+  public static Boolean carousel = true;
+  public static Boolean outtakeCube = true;
+  public static Integer cycles = 2;
+  public static boolean parking = true;
+
+
 
 
   public static class SensorFusionValues{
