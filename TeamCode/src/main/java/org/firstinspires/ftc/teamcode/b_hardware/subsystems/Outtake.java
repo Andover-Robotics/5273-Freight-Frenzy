@@ -67,12 +67,21 @@ public class Outtake extends SubsystemBase {
     public final Command cmdCloseLeftFlap = new InstantCommand(this::closeLeftFlap, this);
 
     // Servo positions for the arms and the bucket
-    private static final double FLAP_OPEN = 0.26;
-    private static final double FLAP_CLOSED = 0.0;
+
+    /*
+    CLOSED: 0.05
+    OPEN: 0.35
+
+    FLIPPED: 0.45
+    UNFLIPPED: 0.0
+     */
+
+    private static final double FLAP_OPEN = 0.35;
+    private static final double FLAP_CLOSED = 0.00;
     private static final double FLAP_DEPOSIT = 0.5;
 
-    private static final double FLIPPED = 0.46;
-    private static final double UNFLIPPED = 0;
+    private static final double FLIPPED = 0.45;
+    private static final double UNFLIPPED = 0.0;
 
     private enum BucketState {
         FLIPPED,
@@ -261,6 +270,12 @@ public class Outtake extends SubsystemBase {
         }
     }
 
+
+    /*
+
+    CONST
+
+     */
     public void flipBucket() {
         bucket.setPosition(FLIPPED);
         rightFlap.setPosition(FLAP_DEPOSIT);
