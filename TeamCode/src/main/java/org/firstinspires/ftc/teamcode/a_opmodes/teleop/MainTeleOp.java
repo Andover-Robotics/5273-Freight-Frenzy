@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
-import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive.Mode;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
 @TeleOp(name = "Main TeleOp", group = "Competition")
@@ -160,7 +159,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
             bot.imu1.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle
                     - fieldCentricOffset1
             : gyroAngle0;
-    final double avgGyroAngle = (gyroAngle0 + gyroAngle1)/2;
+    final double avgGyroAngle = ((gyroAngle0 + gyroAngle1)/2);
 
     Vector2d driveVector = new Vector2d(gamepadEx1.getLeftX(), gamepadEx1.getLeftY()),
             turnVector = new Vector2d(
@@ -181,14 +180,29 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                 driveVector.getY() * driveSpeed,
                 driveVector.getX() * -driveSpeed,
                 turnVector.getX() * driveSpeed,
-                avgGyroAngle);
+                        (  avgGyroAngle > gyroAngle0 + 0.5
+                        || avgGyroAngle > gyroAngle1 + 0.5
+                        || avgGyroAngle < gyroAngle0 - 0.5
+                        || avgGyroAngle < gyroAngle1 - 0.5) ?
+                                Math.abs(gyroAngle0 - avgGyroAngle) <
+                                        Math.abs(gyroAngle1 - avgGyroAngle) ?
+                                        gyroAngle0 : gyroAngle1 : avgGyroAngle
+                // Epic Java Syntax here
+                /*
+                 * In theory, this check ensures that when the avgGyroAngle is VERY off
+                 * due to one IMU giving ~0.01, and the second giving ~1.99 which SHOULD be considered an angle of 2 or 0
+                 * This problem was encountered while first testing the dual IMU dependant field centric drive
+                 * the robot would run two motors on the corners of the robot in opposite directions, causing negligible movement
+                 * Because I believe the rarer incorrect averages, these ternary statements, should correct this.
+                 */
+        );
       }
       else if (dpadPressed || buttonPressed) {
-        driveSpeed *= SLOW_MODE_PERCENT;
+        double tempDriveSpeed = driveSpeed *= SLOW_MODE_PERCENT;
         bot.drive.driveRobotCentric(
-                strafeSpeed * SLOW_MODE_PERCENT * driveSpeed,
-                forwardSpeed * -SLOW_MODE_PERCENT * driveSpeed,
-                turnSpeed * SLOW_MODE_PERCENT * driveSpeed
+                strafeSpeed * tempDriveSpeed,
+                forwardSpeed * -tempDriveSpeed,
+                turnSpeed * tempDriveSpeed
         );
       }
 
