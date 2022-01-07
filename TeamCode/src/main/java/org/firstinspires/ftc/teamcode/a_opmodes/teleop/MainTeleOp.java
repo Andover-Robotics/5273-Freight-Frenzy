@@ -75,7 +75,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     //Movement =================================================================================================
     //TODO: change depending on mode
-    driveSpeed = 1;//- 0.75 * (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) + gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER));
+    driveSpeed = 1;
 
     if(justPressed(Button.BACK)){
       isManual = !isManual;
@@ -84,6 +84,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if (isManual) {
       drive();
     }
+
     else {
       followPath();
     }
@@ -92,17 +93,34 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if (gamepadEx1.isDown(Button.LEFT_BUMPER)){
       bot.intake.reverseLeft();
     }
+
     else if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
       bot.intake.reverseRight();
     }
+
     else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > triggerConstant) {
       bot.intake.runRight();
     }
+
     else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > triggerConstant){
       bot.intake.runLeft();
     }
+
+    else if (gamepadEx1.getButton(Button.B)){
+      bot.intake.elementIntook = false;
+    }
+
     else {
       bot.intake.stop();
+    }
+
+    if (bot.intake.elementIntook) {
+      if (bot.intake.reverseLeft) {
+        bot.outtake.closeLeftFlap();
+      }
+      else {
+        bot.outtake.closeRightFlap();
+      }
     }
 
     // driver 2
@@ -117,19 +135,26 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     // all slides controls
-    if(gamepadEx2.wasJustReleased(Button.LEFT_STICK_BUTTON)) {
+    if(gamepadEx2.wasJustReleased(Button.DPAD_LEFT)) {
       bot.outtake.goToCapstone();
     }
+
     else if(gamepadEx2.wasJustReleased(Button.DPAD_DOWN)) {
-      bot.outtake.goToLowGoal();
+      bot.outtake.fullyRetract();
     }
+
     else if(gamepadEx2.wasJustReleased(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
     }
-    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
-      bot.outtake.fullyRetract();
 
+    else if(gamepadEx2.wasJustReleased(Button.DPAD_RIGHT)) {
+      bot.outtake.goToLowGoal();
     }
+
+    else if(gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)) {
+      bot.outtake.hookCapstone();
+    }
+
     else if (gamepadEx2.wasJustReleased(Button.Y)){
       bot.outtake.toggleBucket();
     }
@@ -138,9 +163,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if (gamepadEx2.wasJustReleased(Button.A)){
       bot.carousel.toggleBlue();
     }
+
     else if (gamepadEx2.wasJustReleased(Button.B)) {
       bot.carousel.toggleRed();
     }
+
     else if (gamepadEx2.wasJustReleased(Button.X)) {
       bot.carousel.stop();
     }
@@ -191,6 +218,14 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     // TODO organize this test code
     updateLocalization();
+    telemetry.addData("Right Detected?", bot.intake.intookRight);
+    telemetry.addData("Left Detected?", bot.intake.intookLeft);
+    telemetry.addData("Right Amperage:", bot.intake.rightIntakeCurrentDraw());
+    telemetry.addData("Left Amperage:", bot.intake.leftIntakeCurrentDraw());
+    telemetry.addData("Right Intake", bot.intake.isRightIntaking());
+    telemetry.addData("Left Intake", bot.intake.isLeftIntaking());
+    telemetry.addData("Right Intake", bot.intake.runState);
+    /*
     telemetry.addData("percent", percent);
     telemetry.addData("part", part);
     telemetry.addData("cycle", cycle);
@@ -198,6 +233,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("y", bot.roadRunner.getPoseEstimate().getY());
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
     telemetry.addData("current raw angle", bot.imu.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle);
+
+     */
   }
 
 

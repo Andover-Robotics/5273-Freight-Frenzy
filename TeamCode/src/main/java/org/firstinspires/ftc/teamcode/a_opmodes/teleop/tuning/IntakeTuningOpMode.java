@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Hubs;
 
 
-@TeleOp(name = "IntakeTuningGraphing", group = "ZDashBoard graphing tool")
-public class IntakeGraphingOpMode extends BaseOpMode {
+@TeleOp(name = "IntakeTuning", group = "Tuning")
+public class IntakeTuningOpMode extends BaseOpMode {
 
     TelemetryPacket packet = new TelemetryPacket();
 

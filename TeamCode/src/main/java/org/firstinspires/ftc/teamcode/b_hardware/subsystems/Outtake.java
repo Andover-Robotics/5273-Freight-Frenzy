@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 
+import android.transition.Slide;
+
 import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.command.Command;
@@ -67,16 +69,18 @@ public class Outtake extends SubsystemBase {
     public final Command cmdCloseLeftFlap = new InstantCommand(this::closeLeftFlap, this);
 
     // Servo positions for the arms and the bucket
-    private static final double FLAP_OPEN = 0.26;
+    private static final double FLAP_OPEN = 0.28;
     private static final double FLAP_CLOSED = 0.0;
     private static final double FLAP_DEPOSIT = 0.5;
+    private static final double FLAP_HOOK = 0.85;
 
     private static final double FLIPPED = 0.46;
     private static final double UNFLIPPED = 0;
 
     private enum BucketState {
         FLIPPED,
-        UNFLIPPED
+        UNFLIPPED,
+        HOOKING
     }
 
     private BucketState bucketState = BucketState.UNFLIPPED;
@@ -95,6 +99,7 @@ public class Outtake extends SubsystemBase {
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;
     public static final int RETRACTED = 0;
+    public static final int HOOK_CAPSTONE_POS = -176;
     public static final int LOW_GOAL_POS = -226; // ticks
     public static final int MID_GOAL_POS = -377;
     public static final int TOP_GOAL_POS = -690;
@@ -107,7 +112,8 @@ public class Outtake extends SubsystemBase {
         AT_LOW_GOAL,
         AT_MID_GOAL,
         AT_TOP_GOAL,
-        AT_CAPSTONE
+        AT_CAPSTONE,
+        INTAKING_CAPSTONE
     }
 
     private enum SlideRun {
@@ -217,18 +223,38 @@ public class Outtake extends SubsystemBase {
         slideRun = SlideRun.RUNNING;
     }
 
+    public void hookCapstone() {
+        slideState = SlideState.INTAKING_CAPSTONE;
+        slideMotor.setTargetPosition(HOOK_CAPSTONE_POS);
+        slideRun = SlideRun.RUNNING;
+    }
+
+    public void extendRightHook() {
+        rightFlap.setPosition(FLAP_HOOK);
+        bucketState = BucketState.HOOKING;
+        rightFlapOpen = true;
+    }
+
+    public void extendLeftHook() {
+        leftFlap.setPosition(FLAP_HOOK);
+        bucketState = BucketState.HOOKING;
+        leftFlapOpen = true;
+    }
+
     public void autoRun() {
         while (true) {
             if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
                 slideMotor.set(SLIDE_STOPPED);
+                slideRun = SlideRun.HOLDING;
                 return;
             } else {
                 if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
                     slideMotor.set(RETRACT_SPEED);
                 } else {
-                    slideMotor.setPositionCoefficient(0.05);
+                    slideMotor.setPositionCoefficient(0.03);
                     slideMotor.set(SLIDE_SPEED);
                 }
+                slideRun = SlideRun.RUNNING;
             }
         }
     }
@@ -236,6 +262,7 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic() {
         if (!slideMotor.atTargetPosition()) {
+            slideRun = SlideRun.RUNNING;
             if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
                 slideMotor.set(RETRACT_SPEED);
             } else {
@@ -247,8 +274,15 @@ public class Outtake extends SubsystemBase {
         } else {
             if (slideState == SlideState.RETRACTED) {
                 slideMotor.stopMotor();
-            } else
+            } else {
                 slideMotor.set(SLIDE_STOPPED);
+            }
+
+            if (slideRun == SlideRun.RUNNING && slideState != SlideState.RETRACTED && slideState != SlideState.AT_CAPSTONE) {
+                flipBucket();
+            }
+
+            slideRun = SlideRun.HOLDING;
             opMode.telemetry.addData("atPosition", "yes");
         }
     }
@@ -256,7 +290,8 @@ public class Outtake extends SubsystemBase {
     public void toggleBucket() {
         if (bucketState == BucketState.UNFLIPPED) {
             flipBucket();
-        } else if (bucketState == BucketState.FLIPPED) {
+        }
+        else if (bucketState == BucketState.FLIPPED) {
             unFlipBucket();
         }
     }
@@ -270,16 +305,17 @@ public class Outtake extends SubsystemBase {
 
     public void unFlipBucket() {
         bucket.setPosition(UNFLIPPED);
+
         if (GlobalConfig.alliance == GlobalConfig.Alliance.BLUE) {
             openLeftFlap();
             closeRightFlap();
-        } else if (GlobalConfig.alliance == GlobalConfig.Alliance.RED) {
+        }
+
+        else {
             closeLeftFlap();
             openRightFlap();
-        } else {
-            openLeftFlap();
-            openRightFlap();
         }
+
         bucketState = BucketState.UNFLIPPED;
     }
 
@@ -340,7 +376,10 @@ public class Outtake extends SubsystemBase {
     }
 
     public void toggleLeftFlap() {
-        if (leftFlapOpen) {
+        if (slideState == SlideState.AT_CAPSTONE){
+            extendLeftHook();
+        }
+        else if (leftFlapOpen) {
             closeLeftFlap();
         } else {
             openLeftFlap();
@@ -348,7 +387,10 @@ public class Outtake extends SubsystemBase {
     }
 
     public void toggleRightFlap() {
-        if (rightFlapOpen) {
+        if (slideState == SlideState.AT_CAPSTONE){
+           extendRightHook();
+        }
+        else if (rightFlapOpen) {
             closeRightFlap();
         } else {
             openRightFlap();
