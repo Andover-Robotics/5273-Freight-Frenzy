@@ -152,6 +152,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
 
   private void drive(){//Driving ===================================================================================
+
+    final double gyroTolerance = 0.05;
+
     final double gyroAngle0 =
             bot.imu0.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle
                     - fieldCentricOffset0;
@@ -180,10 +183,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                 driveVector.getY() * driveSpeed,
                 driveVector.getX() * -driveSpeed,
                 turnVector.getX() * driveSpeed,
-                        (  avgGyroAngle > gyroAngle0 + 0.5
-                        || avgGyroAngle > gyroAngle1 + 0.5
-                        || avgGyroAngle < gyroAngle0 - 0.5
-                        || avgGyroAngle < gyroAngle1 - 0.5) ?
+                        (  Math.abs(avgGyroAngle - gyroAngle0) < gyroTolerance
+                        || Math.abs(avgGyroAngle - gyroAngle1) < gyroTolerance) ?
                                 Math.abs(gyroAngle0 - avgGyroAngle) <
                                         Math.abs(gyroAngle1 - avgGyroAngle) ?
                                         gyroAngle0 : gyroAngle1 : avgGyroAngle
