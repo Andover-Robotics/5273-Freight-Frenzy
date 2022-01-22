@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -16,6 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.GlobalConfig;
+import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.concurrent.ExecutorService;
@@ -97,17 +99,17 @@ public class Outtake extends SubsystemBase {
 
     private FlapState flapState = FlapState.OPEN;
 
-    private static final double SLIDE_SPEED = 0.7;
+    private static final double SLIDE_SPEED = 0.2;
 
     private static final double SLIDE_STOPPED = 0.15;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 44;
     public static final int RETRACTED = 0;
-    public static final int LOW_GOAL_POS = -226; // ticks
-    public static final int MID_GOAL_POS = -377;
-    public static final int TOP_GOAL_POS = -690;
-    private static final int CAPSTONE_POS = -650; //TODO: tune these values
+    public static final int LOW_GOAL_POS = 226; // ticks
+    public static final int MID_GOAL_POS = 377;
+    public static final int TOP_GOAL_POS = 690;
+    private static final int CAPSTONE_POS = 650; //TODO: tune these values
 
     private static int targetPosition;
 
@@ -171,7 +173,7 @@ public class Outtake extends SubsystemBase {
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
-        slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        slideMotor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         slideMotor.setPositionTolerance(40);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
@@ -242,13 +244,16 @@ public class Outtake extends SubsystemBase {
         }
     }
 
+
     @Override
     public void periodic() {
         if (!slideMotor.atTargetPosition()) {
             if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
                 slideMotor.set(RETRACT_SPEED);
             } else {
-                slideMotor.setPositionCoefficient(0.05);
+                slideMotor.setPositionCoefficient((slideState == SlideState.AT_TOP_GOAL) ? 0.015 :
+                        (slideState == SlideState.AT_MID_GOAL) ? 0.017 :
+                                (slideState == SlideState.AT_CAPSTONE) ? 0.25 : 0.025 );
                 slideMotor.set(SLIDE_SPEED);
                 //slideMotor.set((SLIDE_SPEED) * (((Math.abs(slideMotor.getCurrentPosition() - targetPosition)) / (double)Math.abs(targetPosition))));
             }
