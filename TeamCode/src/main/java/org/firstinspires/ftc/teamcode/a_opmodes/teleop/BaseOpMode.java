@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.util.Direction;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.b_hardware.Bot;
+import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
 import java.util.function.Function;
 
@@ -17,6 +18,7 @@ public abstract class BaseOpMode extends OpMode {
   protected Bot bot;
   protected double driveSpeed;
   protected GamepadEx gamepadEx1, gamepadEx2;
+  TimingScheduler timingScheduler;
 
   //button reader syntax
   // (g1 or g2)  (a, b, lt, lb, etc)
@@ -26,6 +28,7 @@ public abstract class BaseOpMode extends OpMode {
     bot = Bot.getInstance(this);
     gamepadEx2 = new GamepadEx(gamepad2);
     gamepadEx1 = new GamepadEx(gamepad1);
+    timingScheduler = new TimingScheduler(this);
     subInit();
     telemetry.addLine("Init done");
     telemetry.update();
