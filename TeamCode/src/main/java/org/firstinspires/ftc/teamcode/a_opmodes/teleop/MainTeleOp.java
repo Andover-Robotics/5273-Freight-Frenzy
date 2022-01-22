@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 public class MainTeleOp extends BaseOpMode {//required vars here
   private double cycle = 0;
   private double prevRead = 0;
-  private TimingScheduler timingScheduler;
   private boolean centricity = false;
   private final double TRIGGER_CONSTANT = 0.15;
   private final double SLOW_MODE_PERCENT = 0.4;
@@ -28,7 +27,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
   //opmode vars here ==============================================================================================
   public void subInit() {
-    timingScheduler = new TimingScheduler(this);
     driveSpeed = 1.0;
   }
 
@@ -51,9 +49,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT){
       bot.intake.runLeft();
+      bot.outtake.openLeftFlap();
     }
     else {
       bot.intake.stopLeft();
+      bot.outtake.closeLeftFlap();
     }
 
     if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
@@ -61,9 +61,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.intake.runRight();
+      bot.outtake.openRightFlap();
     }
     else {
       bot.intake.stopRight();
+      bot.outtake.closeRightFlap();
     }
 
 
@@ -82,21 +84,41 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.goToCapstone();
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToLowGoal();
+      timingScheduler.defer(0.05, () -> { bot.outtake.flipBucket();
+        timingScheduler.defer(0.5, () -> {
+          bot.outtake.unFlipBucket();
+          bot.outtake.fullyRetract();
+        });
+      });
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
       bot.outtake.goToMidGoal();
+      timingScheduler.defer(0.15, () -> { bot.outtake.flipBucket();
+        timingScheduler.defer(0.5, () -> {
+          bot.outtake.unFlipBucket();
+          bot.outtake.fullyRetract();
+        });
+      });
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
+      timingScheduler.defer(0.25, () -> { bot.outtake.flipBucket();
+        timingScheduler.defer(0.5, () -> {
+          bot.outtake.unFlipBucket();
+          bot.outtake.fullyRetract();
+        });
+      });
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
+      timingScheduler.clearAll();
       bot.outtake.fullyRetract();
 
     }
-    else if (gamepadEx2.wasJustPressed(Button.Y)){
-      bot.outtake.toggleBucket();
+
+    if (gamepadEx2.wasJustPressed(Button.Y)){
+      timingScheduler.clearAll();
     }
 
     // carousel controls
