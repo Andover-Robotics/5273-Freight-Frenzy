@@ -10,7 +10,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 
@@ -58,7 +58,7 @@ public class Intake extends SubsystemBase {
     private double timeWhenIntake = -1; //timeWhenReverse;
     public boolean elementIntook = false;
     public boolean intookLeft = false, intookRight = false;
-    public boolean reverseLeft = false, reverseRight = false;
+    public boolean isReversingLeft = false, isReversingRight = false;
 
     double currentTimeMillis;
 
@@ -134,7 +134,7 @@ public class Intake extends SubsystemBase {
                 reverseLeft();
             }
             else if (intookRight) {
-                reverseRight();
+                isReversingRight();
             }
         }
 
@@ -182,25 +182,25 @@ public class Intake extends SubsystemBase {
 
     public void reverseLeft() {
         leftIntake.set(-OUTTAKE_SPEED);
-        reverseLeft = true;
+        isReversingLeft = true;
     }
 
     public void reverseRight() {
         rightIntake.set(-OUTTAKE_SPEED);
-        reverseRight = true;
+        isReversingRight = true;
     }
 
     public void runLeft(){
         if (!elementIntook)
             leftIntake.set(INTAKE_SPEED);
-            reverseLeft = false;
+            isReversingLeft = false;
             //leftRunning = true;
     }
 
     public void runRight(){
         if (!elementIntook)
             rightIntake.set(INTAKE_SPEED);
-            reverseRight = false;
+            isReversingRight = false;
             //rightRunning = true;
     }
 
@@ -262,12 +262,12 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean wasIntakedLeft() {
-        return curLeftAmps > LEFT_INTAKE_DETECT_CONST_AMPS && !reverseLeft;
+        return curLeftAmps > LEFT_INTAKE_DETECT_CONST_AMPS && !isReversingLeft;
                 //(curLeftVelo < INTAKE_DETECT_CONST_RPM && isLeftIntaking())
     }
 
     public boolean wasIntakedRight() {
-        return curRightAmps > RIGHT_INTAKE_DETECT_CONST_AMPS && !reverseRight;
+        return curRightAmps > RIGHT_INTAKE_DETECT_CONST_AMPS && !isReversingRight;
                 //(curRightVelo < INTAKE_DETECT_CONST_RPM && isRightIntaking()) || rightIntakeCurrentDraw() > INTAKE_DETECT_CONST_AMPS;
     }
 
@@ -282,11 +282,11 @@ public class Intake extends SubsystemBase {
      */
 
     public boolean isLeftIntaking() {
-        return leftIntake.getVelocity() > IS_RUNNING_CONST_RPM || leftIntakeCurrentDraw() > IS_RUNNING_CONST_AMPS;
+        return leftIntake.getVelocity() > IS_RUNNING_CONST_RPM || leftIntakeCurrentDraw() > GlobalConfig.leftIntakeThreshold;
     }
 
     public boolean isRightIntaking() {
-        return rightIntake.getVelocity() > IS_RUNNING_CONST_RPM || rightIntakeCurrentDraw() > IS_RUNNING_CONST_AMPS;
+        return rightIntake.getVelocity() > IS_RUNNING_CONST_RPM || rightIntakeCurrentDraw() > GlobalConfig.rightIntakeThreshold;
     }
 
 }

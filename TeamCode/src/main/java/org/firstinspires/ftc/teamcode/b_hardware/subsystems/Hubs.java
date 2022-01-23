@@ -29,14 +29,14 @@ public class Hubs extends SubsystemBase {
     private static final double MEDIUM_WEIGHT_CUBE_MILLIAMP_DRAW = 0.0;
     private static final double HEAVY_WEIGHT_CUBE_MILLIAMP_DRAW = 0.0;
 
-    private static final double velocity = 0.6;
+    private static final double velocity = 1.0;
 
     private static boolean partyMode = false;
     private static final int[] rgb = {0, 0, 0};
 
     private MotorEx slideMotor;
-    private MotorEx rightIntake;
-    private MotorEx leftIntake;
+    public MotorEx rightIntake;
+    public MotorEx leftIntake;
 
     //ShippingElement shippingElement = ShippingElement.NO_ELEMENT;
 

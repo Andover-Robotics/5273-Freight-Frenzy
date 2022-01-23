@@ -40,9 +40,8 @@ public class GlobalConfig {//make all fields final
   public static Boolean outtakeCube = true;
   public static Integer cycles = 2;
   public static boolean parking = true;
-
-
-
+  public static double leftIntakeThreshold = 700.0;
+  public static double rightIntakeThreshold = 400.0;
 
   public static class SensorFusionValues{
     public static final double[] sensorFusionHeadingWeights = {0.225, 0.225, 0.225, 0.225, 0},

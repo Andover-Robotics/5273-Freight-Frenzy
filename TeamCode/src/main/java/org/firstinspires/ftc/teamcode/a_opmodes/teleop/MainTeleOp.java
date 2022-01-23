@@ -114,15 +114,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.intake.stop();
     }
 
-    if (bot.intake.elementIntook) {
-      if (bot.intake.reverseLeft) {
-        bot.outtake.closeLeftFlap();
-      }
-      else {
-        bot.outtake.closeRightFlap();
-      }
-    }
-
     // driver 2
 
     // toggling flaps to hold freight in bucket

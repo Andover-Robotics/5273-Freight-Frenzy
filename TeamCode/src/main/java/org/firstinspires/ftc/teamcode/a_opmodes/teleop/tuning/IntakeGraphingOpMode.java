@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
@@ -17,6 +18,8 @@ public class IntakeGraphingOpMode extends BaseOpMode {
     private static final double TRIGGER_TOLERANCE = 0.05;
 
     private static double lastRightAmperage, lastLeftAmperage;
+
+    private MotorEx leftIntake, rightIntake;
 
     private Hubs hubs;
 
