@@ -183,7 +183,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("y", bot.roadRunner.getPoseEstimate().getY());
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
     telemetry.addData("driver left stick", "left X" + gamepadEx1.getLeftX() + ": " + gamepadEx1.getLeftY());
-
+    telemetry.addLine("isFreightIn : " + bot.outtake.isFreightIn());
+    telemetry.addLine("Color sensor RGBA : " + bot.outtake.bucketSensor.red() + " " + bot.outtake.bucketSensor.blue() + " " + bot.outtake.bucketSensor.green() + " " + bot.outtake.bucketSensor.alpha());
   }
 
 
