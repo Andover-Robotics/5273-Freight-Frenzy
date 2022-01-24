@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
+import org.firstinspires.ftc.teamcode.d_util.utilclasses.Task;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
 @TeleOp(name = "Main TeleOp", group = "Competition")
@@ -86,35 +87,48 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToLowGoal();
-      timingScheduler.defer(0.05, () -> { bot.outtake.flipBucket();
-        timingScheduler.defer(0.5, () -> {
-          bot.outtake.unFlipBucket();
-          bot.outtake.fullyRetract();
-        });
-      });
+      timingScheduler.defer(0.05, new Task (
+              "Outtake",
+              () -> { bot.outtake.flipBucket();
+                timingScheduler.defer(0.5, new Task (
+                                "Outtake",
+                                () -> { bot.outtake.unFlipBucket();
+                                  bot.outtake.fullyRetract(); }
+                        )
+                );
+              })
+      );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
       bot.outtake.goToMidGoal();
-      timingScheduler.defer(0.15, () -> { bot.outtake.flipBucket();
-        timingScheduler.defer(0.5, () -> {
-          bot.outtake.unFlipBucket();
-          bot.outtake.fullyRetract();
-        });
-      });
+      timingScheduler.defer(0.15, new Task (
+              "Outtake",
+              () -> { bot.outtake.flipBucket();
+                timingScheduler.defer(0.5, new Task (
+                                "Outtake",
+                                () -> { bot.outtake.unFlipBucket();
+                                  bot.outtake.fullyRetract(); }
+                        )
+                );
+              })
+      );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
-      timingScheduler.defer(0.25, () -> { bot.outtake.flipBucket();
-        timingScheduler.defer(0.5, () -> {
-          bot.outtake.unFlipBucket();
-          bot.outtake.fullyRetract();
-        });
-      });
+      timingScheduler.defer(0.25, new Task (
+              "Outtake",
+              () -> { bot.outtake.flipBucket();
+                timingScheduler.defer(0.5, new Task (
+                                "Outtake",
+                                () -> { bot.outtake.unFlipBucket();
+                                  bot.outtake.fullyRetract(); }
+                        )
+                );
+              })
+      );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
-      timingScheduler.clearAll();
       bot.outtake.fullyRetract();
-
     }
 
     if (gamepadEx2.wasJustPressed(Button.Y)){
@@ -210,14 +224,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                                 Math.abs(gyroAngle0 - avgGyroAngle) <
                                         Math.abs(gyroAngle1 - avgGyroAngle) ?
                                         gyroAngle0 : gyroAngle1 : avgGyroAngle
-                // Epic Java Syntax here
-                /*
-                 * In theory, this check ensures that when the avgGyroAngle is VERY off
-                 * due to one IMU giving ~0.01, and the second giving ~1.99 which SHOULD be considered an angle of 2 or 0
-                 * This problem was encountered while first testing the dual IMU dependant field centric drive
-                 * the robot would run two motors on the corners of the robot in opposite directions, causing negligible movement
-                 * Because I believe the rarer incorrect averages, these ternary statements, should correct this.
-                 */
         );
       }
       else if (dpadPressed || buttonPressed) {
