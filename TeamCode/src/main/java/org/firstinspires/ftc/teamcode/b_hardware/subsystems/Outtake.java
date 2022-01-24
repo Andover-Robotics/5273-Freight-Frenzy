@@ -68,7 +68,7 @@ public class Outtake extends SubsystemBase {
 
     // Servo positions for the arms and the bucket
     private static final double FLAP_OPEN = 0.26;
-    private static final double FLAP_CLOSED = 0.0;
+    private static final double FLAP_CLOSED = 0.02;
     private static final double FLAP_DEPOSIT = 0.5;
     private static final double FLAP_HOOK = 0.85;
 
@@ -90,7 +90,7 @@ public class Outtake extends SubsystemBase {
 
     private FlapState flapState = FlapState.OPEN;
 
-    private static final double SLIDE_SPEED = 0.2;
+    private static final double SLIDE_SPEED = 0.3;
 
     private static final double SLIDE_STOPPED = 0.15;
     private static final double RETRACT_SPEED = 0.015;
@@ -101,7 +101,7 @@ public class Outtake extends SubsystemBase {
     public static final int MID_GOAL_POS = 377;
     public static final int TOP_GOAL_POS = 690;
     private static final int CAPSTONE_POS = 650; //TODO: tune these values
-    public static final int HOOK_CAPSTONE_POS = -176;
+    public static final int HOOK_CAPSTONE_POS = 176;
 
     private static int targetPosition;
 
@@ -125,33 +125,18 @@ public class Outtake extends SubsystemBase {
     private static boolean rightFlapOpen = true;
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
-    // Color sensing vars for balls
-    private static final int RED_WHITE = 255;
-    private static final int GREEN_WHITE = 255;
-    private static final int BLUE_WHITE = 255;
-    private static int[] white = new int[]{RED_WHITE, GREEN_WHITE, BLUE_WHITE};
-
-    //color sensing vars for cubes
-    private static final int RED_YELLOW = 0;
-    private static final int GREEN_YELLOW = 255;
-    private static final int BLUE_YELLOW = 255;
-    private static int[] yellow = new int[]{RED_YELLOW, GREEN_YELLOW, BLUE_YELLOW};
-
-    private static int[][] colors = new int[][]{white, yellow};
 
     private static final double MARGIN = 0.15;
 
     private Servo leftFlap, rightFlap, bucket;
     private MotorEx slideMotor;
-    private ColorSensor leftSensor, rightSensor;
-    private ExecutorService executorService;
+    private ColorSensor bucketSensor;
     private OpMode opMode;
 
 
     public Outtake(@NonNull OpMode opMode) {
         this.opMode = opMode;
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
-//        this.executorService = executorService;
         leftFlap.setDirection(Servo.Direction.FORWARD);
         leftFlap.setPosition(FLAP_OPEN);
 
@@ -163,18 +148,17 @@ public class Outtake extends SubsystemBase {
         bucket.setDirection(Servo.Direction.FORWARD);
         bucket.setPosition(UNFLIPPED);
 
+        bucketSensor = opMode.hardwareMap.colorSensor.get("bucketSensor");
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
-        slideMotor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        slideMotor.setPositionTolerance(40);
+        slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        slideMotor.setPositionTolerance(30);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-
-        //leftSensor = opMode.hardwareMap.colorSensor.get("leftBucketSensor");
-        //rightSensor = opMode.hardwareMap.colorSensor.get("rightBucketSensor");
-
-        //closeBucket();
+        unFlipBucket();
+        closeLeftFlap();
+        closeRightFlap();
     }
 
     public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
@@ -262,13 +246,23 @@ public class Outtake extends SubsystemBase {
         if (!slideMotor.atTargetPosition()) {
             slideRun = SlideRun.RUNNING;
             if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+                slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(RETRACT_SPEED);
             } else {
-                slideMotor.setPositionCoefficient((slideState == SlideState.AT_TOP_GOAL) ? 0.015 :
-                        (slideState == SlideState.AT_MID_GOAL) ? 0.017 :
-                                (slideState == SlideState.AT_CAPSTONE) ? 0.25 : 0.025 );
+                switch (slideState) {
+                    case AT_TOP_GOAL:
+                        slideMotor.setPositionCoefficient(0.015);
+                        break;
+                    case AT_MID_GOAL:
+                        slideMotor.setPositionCoefficient(0.017);
+                        break;
+                    case AT_CAPSTONE:
+                        slideMotor.setPositionCoefficient(0.15);
+                        break;
+                    case AT_LOW_GOAL:
+                        slideMotor.setPositionCoefficient(0.25);
+                }
                 slideMotor.set(SLIDE_SPEED);
-                //slideMotor.set((SLIDE_SPEED) * (((Math.abs(slideMotor.getCurrentPosition() - targetPosition)) / (double)Math.abs(targetPosition))));
             }
             opMode.telemetry.addData("atPosition", "no");
         } else {
@@ -277,10 +271,6 @@ public class Outtake extends SubsystemBase {
             }
             else {
                 slideMotor.set(SLIDE_STOPPED);
-            }
-
-            if (slideRun == SlideRun.RUNNING && slideState != SlideState.RETRACTED && slideState != SlideState.AT_CAPSTONE) {
-                flipBucket();
             }
 
             slideRun = SlideRun.HOLDING;
