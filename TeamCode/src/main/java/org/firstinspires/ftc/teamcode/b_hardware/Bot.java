@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.b_hardware;
 
+import androidx.annotation.NonNull;
+
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -12,8 +14,6 @@ import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Carousel;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
-
-import java.util.concurrent.Executors;
 
 public class Bot {
   // in TeleOp and Autonomous we should be able to call "new Bot(this)"
@@ -32,7 +32,8 @@ public class Bot {
   //required subsystems
   public final MecanumDrive drive;
   public final RRMecanumDrive roadRunner;
-  public final BNO055IMU imu;
+  public final BNO055IMU imu0;
+  public final BNO055IMU imu1;
 //  public final Cosmetics cosmetics;
 //  public Pair<ExpansionHubEx, ExpansionHubEx> hubs = null;
   public OpMode opMode;
@@ -85,13 +86,14 @@ public class Bot {
         new MotorEx(opMode.hardwareMap, GlobalConfig.motorBR));
     this.roadRunner = new RRMecanumDrive(opMode.hardwareMap);
 //    this.cosmetics = new Cosmetics(opMode);
-    imu = roadRunner.imu;
+    imu0 = roadRunner.imu;
+    imu1 = (roadRunner.imu2 != null) ? roadRunner.imu2 : null;
   }
 
 //  private void initializeImu() {
 //    final Parameters params = new Parameters();
 //    params.angleUnit = AngleUnit.RADIANS;
-//    imu.initialize(params);
+//    imu00.initialize(params);
 //  }
 
   private void enableAutoBulkRead() {
