@@ -8,21 +8,21 @@ import java.util.TreeMap;
 
 public class TimingScheduler {
   private OpMode opMode;
-  private SortedMap<Double, Runnable> tasks = new TreeMap<>();
+  private SortedMap<Double, Task> tasks = new TreeMap<>();
 
   public TimingScheduler(OpMode opMode) {
     this.opMode = opMode;
   }
 
-  public void defer(double seconds, Runnable task) {
+  public void defer(double seconds, Task task) {
     tasks.put(opMode.getRuntime() + seconds, task);
   }
 
   public void run() {
     LinkedList<Double> toDelete = new LinkedList<>();
-    for (SortedMap.Entry<Double, Runnable> entry : tasks.entrySet()) {
+    for (SortedMap.Entry<Double, Task> entry : tasks.entrySet()) {
       if (opMode.getRuntime() >= entry.getKey()) {
-        entry.getValue().run();
+        entry.getValue().getTask().run();
         toDelete.add(entry.getKey());
       }
     }
@@ -34,5 +34,6 @@ public class TimingScheduler {
   public void clearAll() {
     tasks.clear();
   }
+  public void clear(String id) {
+  }
 }
-
