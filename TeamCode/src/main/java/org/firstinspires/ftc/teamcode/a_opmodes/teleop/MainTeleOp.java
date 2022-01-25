@@ -75,19 +75,19 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       // driver 2
 
     // toggling flaps to hold freight in bucket
-    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
-      bot.outtake.toggleLeftFlap();
-    }
-
-    else if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)){
-      bot.outtake.toggleRightFlap();
-    }
+//    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
+//      bot.outtake.toggleLeftFlap();
+//    }
+//
+//    else if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)){
+//      bot.outtake.toggleRightFlap();
+//    }
 
     // all slides controls
-    if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
+    if(gamepadEx1.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.goToCapstone();
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToLowGoal();
       timingScheduler.defer(0.06, new Task (
               "Outtake",
@@ -103,7 +103,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
               })
       );
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_LEFT)) {
       bot.outtake.goToMidGoal();
       timingScheduler.defer(0.16, new Task (
               "Outtake",
@@ -119,7 +119,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
               })
       );
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
       timingScheduler.defer(0.26, new Task (
               "Outtake",
@@ -135,7 +135,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
               })
       );
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_DOWN)) {
       bot.outtake.fullyRetract();
     }
 
@@ -144,13 +144,13 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     // carousel controls
-    if (gamepadEx2.wasJustPressed(Button.A)){
+    if (gamepadEx1.wasJustPressed(Button.A)){
       bot.carousel.toggleBlue();
     }
-    else if (gamepadEx2.wasJustPressed(Button.B)) {
+    else if (gamepadEx1.wasJustPressed(Button.B)) {
       bot.carousel.toggleRed();
     }
-    else if (gamepadEx2.wasJustPressed(Button.X)) {
+    else if (gamepadEx1.wasJustPressed(Button.X)) {
       bot.carousel.stop();
     }
 
@@ -257,15 +257,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       }
 
     }
-    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
-      fieldCentricOffset0 = bot.imu0.getAngularOrientation()
-              .toAngleUnit(AngleUnit.DEGREES).firstAngle;
-      fieldCentricOffset1 = bot.imu1.getAngularOrientation()
-              .toAngleUnit(AngleUnit.DEGREES).firstAngle;
-    }
-    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)){
-      centricity = !centricity;
-    }
+//    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+//      fieldCentricOffset0 = bot.imu0.getAngularOrientation()
+//              .toAngleUnit(AngleUnit.DEGREES).firstAngle;
+//      fieldCentricOffset1 = bot.imu1.getAngularOrientation()
+//              .toAngleUnit(AngleUnit.DEGREES).firstAngle;
+//    }
+//    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)){
+//      centricity = !centricity;
+//    }
 
   }
 }
