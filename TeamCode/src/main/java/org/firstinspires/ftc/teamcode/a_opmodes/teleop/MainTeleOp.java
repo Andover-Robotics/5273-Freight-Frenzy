@@ -38,8 +38,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     prevRead = time;
     timingScheduler.run();
 
-    //Movement =================================================================================================
+    //Movement ==================================================================================================
     drive();
+
+    //Sensors ===================================================================================================
 
 
     //Subsystem control =========================================================================================
@@ -87,13 +89,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToLowGoal();
-      timingScheduler.defer(0.05, new Task (
+      timingScheduler.defer(0.06, new Task (
               "Outtake",
               () -> { bot.outtake.flipBucket();
                 timingScheduler.defer(0.5, new Task (
                                 "Outtake",
-                                () -> { bot.outtake.unFlipBucket();
-                                  bot.outtake.fullyRetract(); }
+                                () -> {
+                                  bot.outtake.unFlipBucket();
+                                  bot.outtake.fullyRetract();
+                                }
                         )
                 );
               })
@@ -101,13 +105,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
       bot.outtake.goToMidGoal();
-      timingScheduler.defer(0.15, new Task (
+      timingScheduler.defer(0.16, new Task (
               "Outtake",
               () -> { bot.outtake.flipBucket();
                 timingScheduler.defer(0.5, new Task (
                                 "Outtake",
-                                () -> { bot.outtake.unFlipBucket();
-                                  bot.outtake.fullyRetract(); }
+                                () -> {
+                                  bot.outtake.unFlipBucket();
+                                  bot.outtake.fullyRetract();
+                                }
                         )
                 );
               })
@@ -115,13 +121,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
-      timingScheduler.defer(0.25, new Task (
+      timingScheduler.defer(0.26, new Task (
               "Outtake",
               () -> { bot.outtake.flipBucket();
                 timingScheduler.defer(0.5, new Task (
                                 "Outtake",
-                                () -> { bot.outtake.unFlipBucket();
-                                  bot.outtake.fullyRetract(); }
+                                () -> {
+                                  bot.outtake.unFlipBucket();
+                                  bot.outtake.fullyRetract();
+                                }
                         )
                 );
               })
@@ -184,7 +192,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
     telemetry.addData("driver left stick", "left X" + gamepadEx1.getLeftX() + ": " + gamepadEx1.getLeftY());
     telemetry.addLine("isFreightIn : " + bot.outtake.isFreightIn());
-    telemetry.addLine("Color sensor RGBA : " + bot.outtake.bucketSensor.red() + " " + bot.outtake.bucketSensor.blue() + " " + bot.outtake.bucketSensor.green() + " " + bot.outtake.bucketSensor.alpha());
+    telemetry.addLine("Color sensor RGBA : "
+            + bot.outtake.bucketSensor.red() + " "
+            + bot.outtake.bucketSensor.blue() + " "
+            + bot.outtake.bucketSensor.green() + " "
+            + bot.outtake.bucketSensor.alpha());
   }
 
 

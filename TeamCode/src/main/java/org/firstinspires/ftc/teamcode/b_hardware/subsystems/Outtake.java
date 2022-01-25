@@ -126,13 +126,12 @@ public class Outtake extends SubsystemBase {
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
 
-    private static final double MARGIN = 0.15;
-
     private Servo leftFlap, rightFlap, bucket;
     private MotorEx slideMotor;
     public ColorSensor bucketSensor;
     private OpMode opMode;
 
+    private boolean ledOn = true;
 
     public Outtake(@NonNull OpMode opMode) {
         this.opMode = opMode;
@@ -149,6 +148,7 @@ public class Outtake extends SubsystemBase {
         bucket.setPosition(UNFLIPPED);
 
         bucketSensor = opMode.hardwareMap.colorSensor.get("bucketSensor");
+        bucketSensor.enableLed(ledOn);
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
@@ -160,6 +160,8 @@ public class Outtake extends SubsystemBase {
         closeLeftFlap();
         closeRightFlap();
     }
+
+    private double blinkTime = opMode.time;
 
     public boolean isFreightIn() {
         opMode.telemetry.addData("bucketSensor alpha value", bucketSensor.alpha());
@@ -281,6 +283,12 @@ public class Outtake extends SubsystemBase {
             slideRun = SlideRun.HOLDING;
             opMode.telemetry.addData("atPosition", "yes");
         }
+
+        if(opMode.time - blinkTime % 2 == 0) {
+            ledOn = !ledOn;
+            bucketSensor.enableLed(ledOn);
+        }
+
     }
 
     public void toggleBucket() {
