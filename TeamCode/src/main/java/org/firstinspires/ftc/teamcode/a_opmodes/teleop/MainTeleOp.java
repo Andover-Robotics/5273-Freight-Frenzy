@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
-import org.firstinspires.ftc.teamcode.d_util.utilclasses.Task;
-import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
 @TeleOp(name = "Main TeleOp", group = "Competition")
 public class MainTeleOp extends BaseOpMode {//required vars here
@@ -89,50 +87,44 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToLowGoal();
-      timingScheduler.defer(0.06, new Task (
-              "Outtake",
+      timingScheduler.defer(0.06,
               () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5, new Task (
-                                "Outtake",
+                timingScheduler.defer(0.5,
                                 () -> {
                                   bot.outtake.unFlipBucket();
                                   bot.outtake.fullyRetract();
                                 }
-                        )
+
                 );
-              })
+              }
       );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
       bot.outtake.goToMidGoal();
-      timingScheduler.defer(0.16, new Task (
-              "Outtake",
+      timingScheduler.defer(0.16,
               () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5, new Task (
-                                "Outtake",
+                timingScheduler.defer(0.5,
                                 () -> {
                                   bot.outtake.unFlipBucket();
                                   bot.outtake.fullyRetract();
                                 }
-                        )
+
                 );
-              })
+              }
       );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
-      timingScheduler.defer(0.26, new Task (
-              "Outtake",
+      timingScheduler.defer(0.26,
+
               () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5, new Task (
-                                "Outtake",
+                timingScheduler.defer(0.5,
                                 () -> {
                                   bot.outtake.unFlipBucket();
                                   bot.outtake.fullyRetract();
                                 }
-                        )
                 );
-              })
+              }
       );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
