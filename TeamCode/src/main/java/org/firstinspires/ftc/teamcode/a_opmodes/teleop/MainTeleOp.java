@@ -54,7 +54,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else {
       bot.intake.stopLeft();
-      bot.outtake.closeLeftFlap();
+      if ((!gamepadEx2.isDown(Button.LEFT_BUMPER))) {
+        bot.outtake.closeLeftFlap();
+      }
+      else {
+        bot.outtake.openLeftFlap();
+      }
     }
 
     if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
@@ -66,24 +71,40 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else {
       bot.intake.stopRight();
-      bot.outtake.closeRightFlap();
+      if ((!gamepadEx2.isDown(Button.LEFT_BUMPER))) {
+        bot.outtake.closeRightFlap();
+      }
+      else {
+        bot.outtake.openRightFlap();
+      }
     }
 
 
-      // driver 2
 
-    // toggling flaps to hold freight in bucket
-    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
-      bot.outtake.toggleLeftFlap();
+    if (gamepadEx2.isDown(Button.LEFT_BUMPER)) {
+      bot.outtake.openLeftFlap();
     }
 
-    else if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)){
-      bot.outtake.toggleRightFlap();
+    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+      bot.outtake.openRightFlap();
     }
 
     // all slides controls
     if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.goToCapstone();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
+      bot.outtake.goToTopGoal();
+      timingScheduler.defer(0.26,
+              () -> { bot.outtake.flipBucket();
+                timingScheduler.defer(0.5,
+                        () -> {
+                          bot.outtake.unFlipBucket();
+                          bot.outtake.fullyRetract();
+                        }
+                );
+              }
+      );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToLowGoal();
@@ -113,25 +134,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
               }
       );
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
-      bot.outtake.goToTopGoal();
-      timingScheduler.defer(0.26,
-
-              () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5,
-                                () -> {
-                                  bot.outtake.unFlipBucket();
-                                  bot.outtake.fullyRetract();
-                                }
-                );
-              }
-      );
-    }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
       bot.outtake.fullyRetract();
     }
 
-    if (gamepadEx2.wasJustPressed(Button.Y)){
+    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
       timingScheduler.clearAll();
     }
 
@@ -151,28 +158,28 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     Controller 1
     A:      B:      X:      Y:
     DPAD
-    L: Unflip BucketD:     U: Flip Bucket R:
+    L:      D:      U:      R:
     Joystick
-    L:Field centric movement
-    R:Set orientation / Rotation (Determine through practice)
-    Trigger L/R: left intake -- right intake
+    L:
+    R:
+    Trigger L/R:
     Bumper:
-    L:none/switch to previous path      R:none/switch to next path
+    L:      R:
     Other
-    Start:  Back:switch between automation and driving
+    Start:  Back:
 
     Controller 2
     A:      B:      X:      Y:
     DPAD
-    L:      D: Unflip Bucket    U: Flip Bucket     R:
+    L:      D:      U:      R:
     Joystick
-    L:movement/reset field centric or progress automation
-    R:movement/switch robotfield centric or none
-    Trigger L/R: slow driving
+    L:
+    R:
+    Trigger L/R:
     Bumper
-    L: Open Left Flap, Close Right Flap      R: Open Right Flap, Close Left Flap
+    L:      R:
     Other
-    Start:  Back:switch between automation and driving
+    Start:  Back:
      */
 
     CommandScheduler.getInstance().run();
