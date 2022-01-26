@@ -239,15 +239,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                                         gyroAngle0 : gyroAngle1 : avgGyroAngle
         );
       }
-      else if (dpadPressed || buttonPressed) {
-        double tempDriveSpeed = driveSpeed *= SLOW_MODE_PERCENT;
-        bot.drive.driveRobotCentric(
-                strafeSpeed * tempDriveSpeed,
-                forwardSpeed * -tempDriveSpeed,
-                turnSpeed * tempDriveSpeed
-        );
-      }
-
       else {
         bot.drive.driveRobotCentric(
                 driveVector.getY() * driveSpeed,
