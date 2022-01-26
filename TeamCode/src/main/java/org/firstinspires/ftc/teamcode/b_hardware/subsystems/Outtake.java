@@ -161,11 +161,10 @@ public class Outtake extends SubsystemBase {
         closeRightFlap();
     }
 
-    private double blinkTime = opMode.time;
 
     public boolean isFreightIn() {
         opMode.telemetry.addData("bucketSensor alpha value", bucketSensor.alpha());
-        return bucketSensor.alpha() > 200;
+        return bucketSensor.alpha() > 2000;
     }
 
     public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
@@ -282,11 +281,6 @@ public class Outtake extends SubsystemBase {
 
             slideRun = SlideRun.HOLDING;
             opMode.telemetry.addData("atPosition", "yes");
-        }
-
-        if(opMode.time - blinkTime % 2 == 0) {
-            ledOn = !ledOn;
-            bucketSensor.enableLed(ledOn);
         }
 
     }
