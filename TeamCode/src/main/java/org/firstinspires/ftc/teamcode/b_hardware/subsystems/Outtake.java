@@ -121,20 +121,20 @@ public class Outtake extends SubsystemBase {
 
     private SlideState slideState = SlideState.AT_LOW_GOAL;
     private SlideRun slideRun = SlideRun.HOLDING;
-    private static boolean leftFlapOpen = true;
-    private static boolean rightFlapOpen = true;
+    private boolean leftFlapOpen = true;
+    private boolean rightFlapOpen = true;
+    private boolean autoFlap = true;
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
 
-    private Servo leftFlap, rightFlap, bucket;
-    private MotorEx slideMotor;
-    public ColorSensor bucketSensor;
-    private OpMode opMode;
+    private final Servo leftFlap;
+    private final Servo rightFlap;
+    private final Servo bucket;
+    private final MotorEx slideMotor;
+    private final ColorSensor bucketSensor;
 
-    private boolean ledOn = true;
 
     public Outtake(@NonNull OpMode opMode) {
-        this.opMode = opMode;
         leftFlap = opMode.hardwareMap.servo.get("leftFlap");
         leftFlap.setDirection(Servo.Direction.FORWARD);
         leftFlap.setPosition(FLAP_OPEN);
@@ -148,7 +148,7 @@ public class Outtake extends SubsystemBase {
         bucket.setPosition(UNFLIPPED);
 
         bucketSensor = opMode.hardwareMap.colorSensor.get("bucketSensor");
-        bucketSensor.enableLed(ledOn);
+        bucketSensor.enableLed(true);
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
@@ -161,11 +161,57 @@ public class Outtake extends SubsystemBase {
         closeRightFlap();
     }
 
-    private double blinkTime = opMode.time;
+    @Override
+    public void periodic() {
+        if (!slideMotor.atTargetPosition()) {
+            slideRun = SlideRun.RUNNING;
+            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+                slideMotor.setPositionCoefficient(0.05);
+                slideMotor.set(RETRACT_SPEED);
+            } else {
+                switch (slideState) {
+                    case AT_TOP_GOAL:
+                        slideMotor.setPositionCoefficient(0.015);
+                        break;
+                    case AT_MID_GOAL:
+                        slideMotor.setPositionCoefficient(0.017);
+                        break;
+                    case AT_CAPSTONE:
+                        slideMotor.setPositionCoefficient(0.15);
+                        break;
+                    case AT_LOW_GOAL:
+                        slideMotor.setPositionCoefficient(0.25);
+                }
+                slideMotor.set(SLIDE_SPEED);
+            }
+        } else {
+            if (slideState == SlideState.RETRACTED) {
+                slideMotor.stopMotor();
+            }
+            else {
+                slideMotor.set(SLIDE_STOPPED);
+            }
+
+            slideRun = SlideRun.HOLDING;
+        }
+
+        if(autoFlap && isFreightIn()) {
+            closeRightFlap();
+            closeLeftFlap();
+        }
+    }
+
+    public void toggleBucket() {
+        if (bucketState == BucketState.UNFLIPPED) {
+            flipBucket();
+        }
+        else if (bucketState == BucketState.FLIPPED) {
+            unFlipBucket();
+        }
+    }
 
     public boolean isFreightIn() {
-        opMode.telemetry.addData("bucketSensor alpha value", bucketSensor.alpha());
-        return bucketSensor.alpha() > 200;
+        return bucketSensor.alpha() > 2500;
     }
 
     public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
@@ -248,58 +294,6 @@ public class Outtake extends SubsystemBase {
         }
     }
 
-    @Override
-    public void periodic() {
-        if (!slideMotor.atTargetPosition()) {
-            slideRun = SlideRun.RUNNING;
-            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
-                slideMotor.setPositionCoefficient(0.05);
-                slideMotor.set(RETRACT_SPEED);
-            } else {
-                switch (slideState) {
-                    case AT_TOP_GOAL:
-                        slideMotor.setPositionCoefficient(0.015);
-                        break;
-                    case AT_MID_GOAL:
-                        slideMotor.setPositionCoefficient(0.017);
-                        break;
-                    case AT_CAPSTONE:
-                        slideMotor.setPositionCoefficient(0.15);
-                        break;
-                    case AT_LOW_GOAL:
-                        slideMotor.setPositionCoefficient(0.25);
-                }
-                slideMotor.set(SLIDE_SPEED);
-            }
-            opMode.telemetry.addData("atPosition", "no");
-        } else {
-            if (slideState == SlideState.RETRACTED) {
-                slideMotor.stopMotor();
-            }
-            else {
-                slideMotor.set(SLIDE_STOPPED);
-            }
-
-            slideRun = SlideRun.HOLDING;
-            opMode.telemetry.addData("atPosition", "yes");
-        }
-
-        if(opMode.time - blinkTime % 2 == 0) {
-            ledOn = !ledOn;
-            bucketSensor.enableLed(ledOn);
-        }
-
-    }
-
-    public void toggleBucket() {
-        if (bucketState == BucketState.UNFLIPPED) {
-            flipBucket();
-        }
-        else if (bucketState == BucketState.FLIPPED) {
-            unFlipBucket();
-        }
-    }
-
     public void flipBucket() {
         bucket.setPosition(FLIPPED);
         rightFlap.setPosition(FLAP_DEPOSIT);
@@ -321,42 +315,6 @@ public class Outtake extends SubsystemBase {
 
         bucketState = BucketState.UNFLIPPED;
     }
-
-    //TODO: add sensors to auto detect when minerals enter the bucket - auto close the flaps then
-    // can start coding now - sensors will be REV color sensors
-     /*
-    public void closeBucket() {
-        Future<?> closeFlaps = executorService.submit(() -> {
-            while (true) {
-                for (int[] color : colors) {
-
-                    int red = color[0];
-                    int green = color[1];
-                    int blue = color[2];
-
-                    double redVal = (double) (rightSensor.red());
-                    double greenVal = (double) (rightSensor.green());
-                    double blueVal = (double) (rightSensor.blue());
-
-                    boolean isRed = red * (1 - MARGIN) <= redVal && redVal <= red * (1 + MARGIN);
-                    boolean isGreen = green * (1 - MARGIN) <= greenVal && greenVal <= green * (1 + MARGIN);
-                    boolean isBlue = blue * (1 - MARGIN) <= blueVal && blueVal <= blue * (1 + MARGIN);
-
-                    if (isRed && isGreen && isBlue) {
-                        closeLeftFlap();
-                        closeRightFlap();
-                    }
-                }
-            }
-        });
-    }
-    public boolean freightInBucket() {
-        if((leftSensor.alpha() < 50 || rightSensor.alpha() < 50)) {
-            return true;
-        }
-        return false;
-    }
-     */
 
     public void openLeftFlap() {
         leftFlap.setPosition(FLAP_OPEN);
@@ -394,18 +352,13 @@ public class Outtake extends SubsystemBase {
         }
     }
 
-    /* DEPRECATED
-    public void runSlides(){
-        //
-        slideMotor.resetEncoder();
-        while (slideMotor.encoder.getRevolutions() < ROTATIONS) {
-            slideMotor.set(SLIDE_SPEED);
-            eState = extensionState.EXTENDED;
-        }
-        slideMotor.set(SLIDE_STOPPED);
-        eState = extensionState.RETRACTED;
+    public void toggleAutoFlap() {
+        autoFlap = !autoFlap;
     }
 
-     */
+    public boolean isAutoFlap() {
+        return autoFlap;
+    }
+
 
 }

@@ -54,11 +54,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else {
       bot.intake.stopLeft();
-      if ((!gamepadEx2.isDown(Button.LEFT_BUMPER))) {
+      if(!bot.outtake.isAutoFlap()) {
         bot.outtake.closeLeftFlap();
-      }
-      else {
-        bot.outtake.openLeftFlap();
       }
     }
 
@@ -71,12 +68,19 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else {
       bot.intake.stopRight();
-      if ((!gamepadEx2.isDown(Button.LEFT_BUMPER))) {
+      if(!bot.outtake.isAutoFlap()) {
         bot.outtake.closeRightFlap();
       }
-      else {
-        bot.outtake.openRightFlap();
-      }
+    }
+
+    if(gamepadEx1.wasJustPressed(Button.DPAD_LEFT)) {
+      bot.outtake.closeLeftFlap();
+    }
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_RIGHT)) {
+      bot.outtake.closeRightFlap();
+    }
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_UP)) {
+      bot.outtake.toggleAutoFlap();
     }
 
 
@@ -153,35 +157,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.carousel.stop();
     }
 
-
-    /*
-    Controller 1
-    A:      B:      X:      Y:
-    DPAD
-    L:      D:      U:      R:
-    Joystick
-    L:
-    R:
-    Trigger L/R:
-    Bumper:
-    L:      R:
-    Other
-    Start:  Back:
-
-    Controller 2
-    A:      B:      X:      Y:
-    DPAD
-    L:      D:      U:      R:
-    Joystick
-    L:
-    R:
-    Trigger L/R:
-    Bumper
-    L:      R:
-    Other
-    Start:  Back:
-     */
-
     CommandScheduler.getInstance().run();
 
     telemetry.addData("Centricity", centricity);
@@ -191,11 +166,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
     telemetry.addData("driver left stick", "left X" + gamepadEx1.getLeftX() + ": " + gamepadEx1.getLeftY());
     telemetry.addLine("isFreightIn : " + bot.outtake.isFreightIn());
-    telemetry.addLine("Color sensor RGBA : "
-            + bot.outtake.bucketSensor.red() + " "
-            + bot.outtake.bucketSensor.blue() + " "
-            + bot.outtake.bucketSensor.green() + " "
-            + bot.outtake.bucketSensor.alpha());
   }
 
 
