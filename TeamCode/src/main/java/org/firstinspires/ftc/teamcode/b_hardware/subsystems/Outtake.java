@@ -180,7 +180,7 @@ public class Outtake extends SubsystemBase {
                         slideMotor.setPositionCoefficient(0.15);
                         break;
                     case AT_LOW_GOAL:
-                        slideMotor.setPositionCoefficient(0.25);
+                        slideMotor.setPositionCoefficient(0.35);
                 }
                 slideMotor.set(SLIDE_SPEED);
             }
@@ -303,16 +303,8 @@ public class Outtake extends SubsystemBase {
 
     public void unFlipBucket() {
         bucket.setPosition(UNFLIPPED);
-
-        if (GlobalConfig.alliance == GlobalConfig.Alliance.BLUE) {
-            openLeftFlap();
-            closeRightFlap();
-        }
-        else {
-            closeLeftFlap();
-            openRightFlap();
-        }
-
+        closeLeftFlap();
+        closeRightFlap();
         bucketState = BucketState.UNFLIPPED;
     }
 

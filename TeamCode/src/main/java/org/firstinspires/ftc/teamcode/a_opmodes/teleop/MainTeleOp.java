@@ -19,6 +19,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private final double SLOW_MODE_PERCENT = 0.4;
   private double fieldCentricOffset0 = 0.0;
   private double fieldCentricOffset1 = 0.0;
+  private boolean inSlowMode = false;
 
   //config? stuff here =========================================================================
 
@@ -50,7 +51,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT){
       bot.intake.runLeft();
-      bot.outtake.openLeftFlap();
+      if(!bot.outtake.isFreightIn() || !bot.outtake.isAutoFlap()) {
+        bot.outtake.openLeftFlap();
+        bot.outtake.closeRightFlap();
+      }
     }
     else {
       bot.intake.stopLeft();
@@ -64,7 +68,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.intake.runRight();
-      bot.outtake.openRightFlap();
+      if(!bot.outtake.isFreightIn() || !bot.outtake.isAutoFlap()) {
+        bot.outtake.openRightFlap();
+        bot.outtake.closeLeftFlap();
+      }
     }
     else {
       bot.intake.stopRight();
@@ -171,6 +178,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
   private void drive(){//Driving ===================================================================================
 
+    if(inSlowMode) driveSpeed = SLOW_MODE_PERCENT;
+    else driveSpeed = 1;
+
     final double gyroTolerance = 0.05;
 
     final double gyroAngle0 =
@@ -196,6 +206,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       double strafeSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : -1) : 0;
       double turnSpeed = (gamepadEx1.getButton(GamepadKeys.Button.X) || gamepadEx1.getButton(GamepadKeys.Button.B)) ? (gamepadEx1.getButton(GamepadKeys.Button.B) ? 1 : -1) : 0;
 
+
+
       if (centricity) {//epic java syntax
         bot.drive.driveFieldCentric(
                 driveVector.getY() * driveSpeed,
@@ -208,15 +220,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                                         gyroAngle0 : gyroAngle1 : avgGyroAngle
         );
       }
-      else if (dpadPressed || buttonPressed) {
-        double tempDriveSpeed = driveSpeed *= SLOW_MODE_PERCENT;
-        bot.drive.driveRobotCentric(
-                strafeSpeed * tempDriveSpeed,
-                forwardSpeed * -tempDriveSpeed,
-                turnSpeed * tempDriveSpeed
-        );
-      }
-
       else {
         bot.drive.driveRobotCentric(
                 driveVector.getY() * driveSpeed,
@@ -226,14 +229,18 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       }
 
     }
-    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+    if (gamepadEx1.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       fieldCentricOffset0 = bot.imu0.getAngularOrientation()
               .toAngleUnit(AngleUnit.DEGREES).firstAngle;
       fieldCentricOffset1 = bot.imu1.getAngularOrientation()
               .toAngleUnit(AngleUnit.DEGREES).firstAngle;
     }
-    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)){
+    if (gamepadEx1.wasJustPressed(Button.RIGHT_STICK_BUTTON)){
       centricity = !centricity;
+    }
+
+    if(gamepadEx1.wasJustPressed(Button.BACK)) {
+      inSlowMode = !inSlowMode;
     }
 
   }
