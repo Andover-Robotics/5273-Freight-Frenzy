@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.a_opmodes;
+package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -6,17 +6,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 
-@Autonomous(name = "Swap Alliance", group = "Competition")
-public class SwapAlliance extends LinearOpMode {
+@Autonomous(name = "Swap Side", group = "Competition")
+public class SwapSide extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
         waitForStart();
 
-        GlobalConfig.alliance = GlobalConfig.alliance == GlobalConfig.Alliance.RED ? GlobalConfig.Alliance.BLUE : GlobalConfig.Alliance.RED;
+        GlobalConfig.side = (GlobalConfig.side == GlobalConfig.Side.DEPOT) ? GlobalConfig.Side.WAREHOUSE : GlobalConfig.Side.DEPOT;
         Bot.instance = null;
 
-        telemetry.addLine(GlobalConfig.alliance.toString() + " is the current Alliance!");
+        telemetry.addLine(GlobalConfig.side.toString() + " is the current Side!");
         telemetry.update();
     }
 }

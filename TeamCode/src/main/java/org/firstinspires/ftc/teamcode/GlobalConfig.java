@@ -22,11 +22,26 @@ public class GlobalConfig {//make all fields final
     }
   }
 
+  public enum Side {
+    DEPOT,
+    WAREHOUSE;
+
+    @NonNull
+    @Override
+    public String toString() { return super.toString(); }
+  }
+
   //TODO add more config stuff
   public static final String motorFL = "motorFL", motorFR = "motorFR", motorBL = "motorBL", motorBR = "motorBR";
   public static Alliance alliance = Alliance.RED;
+  public static Side side = Side.DEPOT;
 
-
+  public static Boolean carousel = true;
+  public static Boolean outtakeCube = true;
+  public static Integer cycles = 2;
+  public static boolean parking = true;
+  public static double leftIntakeThreshold = 700.0;
+  public static double rightIntakeThreshold = 400.0;
 
   public static class SensorFusionValues{
     public static final double[] sensorFusionHeadingWeights = {0.225, 0.225, 0.225, 0.225, 0},

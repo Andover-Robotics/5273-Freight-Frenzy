@@ -3,23 +3,20 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Hubs;
 
 
-@TeleOp(name = "IntakeTuningGraphing", group = "ZDashBoard graphing tool")
-public class IntakeGraphingOpMode extends BaseOpMode {
+@TeleOp(name = "IntakeTuning", group = "Tuning")
+public class IntakeTuningOpMode extends BaseOpMode {
 
     TelemetryPacket packet = new TelemetryPacket();
 
     private static final double TRIGGER_TOLERANCE = 0.05;
 
     private static double lastRightAmperage, lastLeftAmperage;
-
-    private MotorEx leftIntake, rightIntake;
 
     private Hubs hubs;
 
