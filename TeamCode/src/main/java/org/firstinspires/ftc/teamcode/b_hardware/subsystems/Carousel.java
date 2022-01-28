@@ -53,7 +53,7 @@ public class Carousel extends SubsystemBase {
     }
 
     public void runBlue() {
-        servo.setPower(1);
+        motor.set(SPEED_PERCENT);
         runState = State.BLUE_ON;
     }
 
