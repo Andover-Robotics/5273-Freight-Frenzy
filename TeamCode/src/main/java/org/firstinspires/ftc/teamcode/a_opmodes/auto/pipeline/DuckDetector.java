@@ -86,8 +86,8 @@ public class DuckDetector {
 
   class RingDetectionPipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(45, 40, 15);
-    final Scalar upperRange = new Scalar(60, 255, 255);
+    final Scalar lowerRange = new Scalar(0, 200, 60);
+    final Scalar upperRange = new Scalar(180, 255, 255);
 
     /*
 
@@ -105,11 +105,11 @@ public class DuckDetector {
 
     //TEAM SHIPPING ELEMENT CONSTANTS
 
-    static final double TEAM_SHIPPING_ELEMENT_AREA = 3500;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 10000;
 
-    final double MIDDLE_RIGHT_X = 640;
-    final double MIDDLE_LEFT_X = 240;
-    final double MIN_Y = 40;
+    final double MIDDLE_RIGHT_X = 600;
+    final double MIDDLE_LEFT_X = 250;
+    final double MIN_Y = 10;
 
     final Mat test = new Mat(),
             edgeDetector = new Mat(),

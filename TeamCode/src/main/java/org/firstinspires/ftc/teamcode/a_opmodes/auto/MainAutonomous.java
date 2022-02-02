@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto;
 
-import android.util.Pair;
-import android.widget.Button;
+import static org.firstinspires.ftc.teamcode.GlobalConfig.poseEstimate;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -111,5 +110,7 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
       if (isStopRequested())
         return;
     }
+
+    poseEstimate = bot.roadRunner.getPoseEstimate();
   }
 }

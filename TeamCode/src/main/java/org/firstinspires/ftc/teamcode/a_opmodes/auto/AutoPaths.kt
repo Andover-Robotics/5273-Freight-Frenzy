@@ -118,12 +118,12 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun initialOuttakePosition(): Pose2d {
-        return Pose2d(multiplier * 40.0, if (depotSide) -25.0 else -1.0, (if (redAlliance) 1 else -1) * (5 * (PI / 4)))
+        return Pose2d(multiplier * 40.0, if (depotSide) -25.0 else -7.0, (5 * (PI / 4)) + (if (depotSide) 0.0 else PI / 2 ) - if (redAlliance) 0.0 else PI)
     }
 
     private fun intakePosition(n: Int): Pose2d {
-        var offset = 7.0
-        return Pose2d( multiplier * 68.0, 51.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        var offset = 3.0
+        return Pose2d( multiplier * 68.0, 57.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun intermediateWaypoint(): Pose2d {
@@ -131,26 +131,26 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun outtakePosition(): Pose2d {
-        return Pose2d(multiplier * 53.0,- 15.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 50.0,- 15.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingPosition(): Pose2d {
-        return if (depotSide) Pose2d( multiplier * 36.0, -60.0, multiplier * 3 * PI / 2) else Pose2d(multiplier * 78.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return if (depotSide) Pose2d( multiplier * 36.0, -60.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(78.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakeTangents(): List<Double> {
         val blueAllianceStartTangent = 1 * PI / 4
         val redAllianceStartTangent = 7 * PI / 4
         val blueAllianceEndTangent = 3 * PI / 4
-        val redAllianceEndTangent = 5 * PI / 4
+        val redAllianceEndTangent = 4 * PI / 4
         return listOf( if (redAlliance) redAllianceStartTangent else blueAllianceStartTangent - if (redAlliance) 0.0 else PI, if (redAlliance) redAllianceEndTangent else blueAllianceEndTangent - if (redAlliance) 0.0 else PI);
     }
 
     private fun intakeTangents(initialIntake: Boolean): List<Double> {
-        val warehouseSideStartTangent = if (redAlliance) if (initialIntake) 2 * PI else 2 * PI else if (initialIntake) 2 * PI else 2 * PI
-        val depotSideStartTangent =  if (redAlliance) if (initialIntake) PI / 2 else 2 * PI else if (initialIntake) 2 * PI else 2 * PI
+        val warehouseSideStartTangent = if (redAlliance) if (initialIntake) PI / 4 else PI / 4 else if (initialIntake) 2 * PI else 2 * PI
+        val depotSideStartTangent =  if (redAlliance) if (initialIntake) 3 * PI / 4 else 2 * PI else if (initialIntake) 2 * PI else 2 * PI
         val warehouseSideEndTangent = if (redAlliance) if (initialIntake) 3 * PI / 4 else PI / 2 else if (initialIntake) 4 * PI / 4 else 3 * PI / 2
-        val depotSideEndTangent =  if (redAlliance) if (initialIntake) PI / 2 else PI / 2 else if (initialIntake) PI / 2 else PI / 2
+        val depotSideEndTangent =  if (redAlliance) if (initialIntake) PI else PI / 2 else if (initialIntake) PI / 2 else PI / 2
         return listOf((if (depotSide) depotSideStartTangent else warehouseSideStartTangent) - if (redAlliance) 0.0 else PI, if (depotSide) depotSideEndTangent else warehouseSideEndTangent - if (redAlliance) 0.0 else PI)
     }
 
@@ -164,10 +164,14 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun intakeTrajectory(n: Int, initialIntake: Boolean): AutoPathElement.Path {
-        var startingPose = if (n > 1) intakePosition(n - 1)
-                            else if (carousel) carouselPosition()
-                            else if (outtakeCube) initialOuttakePosition()
-                            else initialPosition()
+        var startingPose = if (carousel && n == 1)
+            carouselPosition()
+        else if (outtakeCube && n == 1)
+            initialOuttakePosition().plus(Pose2d(0.0, 0.0, PI / 4))
+        else if (n == 1 && (!outtakeCube && !carousel))
+            initialPosition()
+        else
+            outtakePosition()
 
         return makePath("Intake Trajectory #$n",
             bot.roadRunner.trajectoryBuilder(startingPose)
@@ -322,6 +326,8 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         for (n in IntRange(1, cycles)) {
             paths.add(intakeStart)
             paths.add(if ( n == 1) intakeTrajectory(n, true) else intakeTrajectory(n, false))
+            if (n == 1)
+                paths.add(AutoPathElement.Action("Turn", { bot.roadRunner.turn(PI / 4) }))
             paths.add(intakeStop)
             paths.add(outtakeTrajectory(n))
             paths.add(outtakeHigh)

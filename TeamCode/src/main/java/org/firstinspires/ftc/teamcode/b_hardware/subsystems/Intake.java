@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
 
     double currentTimeMillis;
 
-    private enum state {
+    public enum state {
         ON,
         OFF,
         REVERSE,

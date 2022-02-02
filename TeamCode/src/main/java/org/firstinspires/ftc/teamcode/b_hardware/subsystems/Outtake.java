@@ -152,7 +152,7 @@ public class Outtake extends SubsystemBase {
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
-        slideMotor.motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        slideMotor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         slideMotor.setPositionTolerance(30);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
@@ -169,6 +169,7 @@ public class Outtake extends SubsystemBase {
                 slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(RETRACT_SPEED);
             } else {
+
                 switch (slideState) {
                     case AT_TOP_GOAL:
                         slideMotor.setPositionCoefficient(0.015);
@@ -182,7 +183,16 @@ public class Outtake extends SubsystemBase {
                     case AT_LOW_GOAL:
                         slideMotor.setPositionCoefficient(0.35);
                 }
+
+
+                /*
+
+                int ticks =Math.abs(targetPosition - slideMotor.getCurrentPosition());
+                double kP = (ticks >= 378) ? (1.0 - 0.00261 * Math.abs(ticks)) : 0.015;
+                slideMotor.setPositionCoefficient(kP);
                 slideMotor.set(SLIDE_SPEED);
+
+                 */
             }
         } else {
             if (slideState == SlideState.RETRACTED) {

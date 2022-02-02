@@ -35,6 +35,7 @@ public class GlobalConfig {//make all fields final
   public static final String motorFL = "motorFL", motorFR = "motorFR", motorBL = "motorBL", motorBR = "motorBR";
   public static Alliance alliance = Alliance.RED;
   public static Side side = Side.DEPOT;
+  public static Pose2d poseEstimate = new Pose2d();
 
   public static Boolean carousel = true;
   public static Boolean outtakeCube = true;
