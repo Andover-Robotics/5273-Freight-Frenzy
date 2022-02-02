@@ -182,8 +182,12 @@ public class FtcRobotControllerActivity extends Activity
 
   protected class RobotRestarter implements Restarter {
 
-    public void requestRestart() throws FileNotFoundException, XmlPullParserException {
-      requestRobotRestart();
+    public void requestRestart() {
+      try {
+        requestRobotRestart();
+      } catch (FileNotFoundException | XmlPullParserException e) {
+        e.printStackTrace();
+      }
     }
 
   }
@@ -195,9 +199,7 @@ public class FtcRobotControllerActivity extends Activity
       FtcRobotControllerBinder binder = (FtcRobotControllerBinder) service;
       try {
         onServiceBind(binder.getService());
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      } catch (XmlPullParserException e) {
+      } catch (FileNotFoundException | XmlPullParserException e) {
         e.printStackTrace();
       }
     }

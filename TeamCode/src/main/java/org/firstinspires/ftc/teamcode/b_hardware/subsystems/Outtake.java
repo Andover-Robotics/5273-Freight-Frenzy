@@ -152,7 +152,7 @@ public class Outtake extends SubsystemBase {
 
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
-        slideMotor.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        slideMotor.setInverted(true);
         slideMotor.setPositionTolerance(30);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
@@ -169,7 +169,6 @@ public class Outtake extends SubsystemBase {
                 slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(RETRACT_SPEED);
             } else {
-
                 switch (slideState) {
                     case AT_TOP_GOAL:
                         slideMotor.setPositionCoefficient(0.015);
