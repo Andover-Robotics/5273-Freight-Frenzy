@@ -118,12 +118,12 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun initialOuttakePosition(): Pose2d {
-        return Pose2d(multiplier * 40.0, if (depotSide) -25.0 else -7.0, (5 * (PI / 4)) + (if (depotSide) 0.0 else PI / 2 ) - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 7.0, (5 * (PI / 4)) + (if (depotSide) 0.0 else PI / 2 ) - if (redAlliance) 0.0 else PI)
     }
 
     private fun intakePosition(n: Int): Pose2d {
         var offset = 3.0
-        return Pose2d( multiplier * 68.0, 57.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d( multiplier * 68.0, 59.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun intermediateWaypoint(): Pose2d {
@@ -131,7 +131,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun outtakePosition(): Pose2d {
-        return Pose2d(multiplier * 50.0,- 15.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 50.0,0.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingPosition(): Pose2d {
@@ -147,18 +147,18 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun intakeTangents(initialIntake: Boolean): List<Double> {
-        val warehouseSideStartTangent = if (redAlliance) if (initialIntake) PI / 4 else PI / 4 else if (initialIntake) 2 * PI else 2 * PI
+        val warehouseSideStartTangent = if (redAlliance) if (initialIntake) 2 * PI else PI / 4 else if (initialIntake) 2 * PI else 2 * PI
         val depotSideStartTangent =  if (redAlliance) if (initialIntake) 3 * PI / 4 else 2 * PI else if (initialIntake) 2 * PI else 2 * PI
-        val warehouseSideEndTangent = if (redAlliance) if (initialIntake) 3 * PI / 4 else PI / 2 else if (initialIntake) 4 * PI / 4 else 3 * PI / 2
+        val warehouseSideEndTangent = if (redAlliance) if (initialIntake) PI else PI / 2 else if (initialIntake) 4 * PI / 4 else 3 * PI / 2
         val depotSideEndTangent =  if (redAlliance) if (initialIntake) PI else PI / 2 else if (initialIntake) PI / 2 else PI / 2
         return listOf((if (depotSide) depotSideStartTangent else warehouseSideStartTangent) - if (redAlliance) 0.0 else PI, if (depotSide) depotSideEndTangent else warehouseSideEndTangent - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingTangents(): List<Double> {
-        val depotSideStartTangent = 7 * PI / 4
-        val depotSideEndTangent = 3 * PI / 2
-        val warehouseSideStartTangent = 0 * PI / 4
-        val warehouseSideEndTangent = 3 * PI / 2
+        val warehouseSideStartTangent = if (redAlliance) 2 * PI else  2 * PI
+        val depotSideStartTangent =  if (redAlliance) 2 * PI else 2 * PI
+        val warehouseSideEndTangent = if (redAlliance) PI else PI
+        val depotSideEndTangent =  if (redAlliance) PI else PI / 2
 
         return listOf(if (depotSide) depotSideStartTangent else warehouseSideStartTangent - if (redAlliance) 0.0 else PI, if (depotSide) depotSideEndTangent else warehouseSideEndTangent - if (redAlliance) 0.0 else PI)
     }
