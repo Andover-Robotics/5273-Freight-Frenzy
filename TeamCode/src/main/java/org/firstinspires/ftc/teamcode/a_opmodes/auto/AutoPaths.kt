@@ -41,7 +41,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     private var multiplier = if (redAlliance) 1 else -1
 
-    private var intakeDelay = 375
+    private var intakeDelay = 1
     private var carouselDelay = 1250
     private var reverseDelay = 500
     private var bucketDelay = 750
@@ -59,8 +59,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         if (redAlliance) bot.intake.runRight() else bot.intake.runLeft()
     }
     private val intakeStop = AutoPathElement.Action("stop intake") {
-        //while (if (redAlliance) ! bot.intake.wasIntakedRight() else ! bot.intake.wasIntakedLeft()) {Thread.sleep(intakeDelay.toLong())}
-        Thread.sleep(intakeDelay.toLong())
+        while (! bot.outtake.isFreightIn()) {}
         if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
         if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
         Thread.sleep(reverseDelay.toLong())
@@ -109,8 +108,10 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
     //TODO: Insert pose/vector values here
 
+    //TODO: Edit
     fun initialPosition(): Pose2d {
-        return Pose2d(  multiplier * 65.0, (if (redAlliance)  -31.0 else -41.0) + (if (depotSide) 0.0 else 48.0),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        val initialY = (if (redAlliance)  -31.0 else -41.0)
+        return Pose2d(  multiplier * 65.0, initialY + (if (depotSide) 0.0 else 48.0),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun carouselPosition(): Pose2d {
@@ -118,72 +119,75 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun initialOuttakePosition(): Pose2d {
-        return Pose2d(multiplier * 40.0, if (depotSide) -25.0 else -7.0, (5 * (PI / 4)) + (if (depotSide) 0.0 else PI / 2 ) - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 0.0, (5 * (PI / 4)) - if (redAlliance) 3 * PI / 2 else PI)
     }
 
     private fun intakePosition(n: Int): Pose2d {
         var offset = 3.0
-        return Pose2d( multiplier * 68.0, 57.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d( multiplier * 72.0, 60.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun intermediateWaypoint(): Pose2d {
-        return Pose2d(12.0, multiplier * 64.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 72.0, 12.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakePosition(): Pose2d {
-        return Pose2d(multiplier * 50.0,- 15.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 46.0,- 3.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingPosition(): Pose2d {
-        return if (depotSide) Pose2d( multiplier * 36.0, -60.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(78.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return if (depotSide) Pose2d( multiplier * 36.0, -60.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(72.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakeTangents(): List<Double> {
-        val blueAllianceStartTangent = 1 * PI / 4
-        val redAllianceStartTangent = 7 * PI / 4
-        val blueAllianceEndTangent = 3 * PI / 4
-        val redAllianceEndTangent = 4 * PI / 4
-        return listOf( if (redAlliance) redAllianceStartTangent else blueAllianceStartTangent - if (redAlliance) 0.0 else PI, if (redAlliance) redAllianceEndTangent else blueAllianceEndTangent - if (redAlliance) 0.0 else PI);
+        val startTangent = PI / 2
+        val endTangent = PI
+        return listOf( startTangent - if (redAlliance) 0.0 else PI, endTangent - if (redAlliance) 0.0 else PI);
     }
 
     private fun intakeTangents(initialIntake: Boolean): List<Double> {
-        val warehouseSideStartTangent = if (redAlliance) if (initialIntake) PI / 4 else PI / 4 else if (initialIntake) 2 * PI else 2 * PI
-        val depotSideStartTangent =  if (redAlliance) if (initialIntake) 3 * PI / 4 else 2 * PI else if (initialIntake) 2 * PI else 2 * PI
-        val warehouseSideEndTangent = if (redAlliance) if (initialIntake) 3 * PI / 4 else PI / 2 else if (initialIntake) 4 * PI / 4 else 3 * PI / 2
-        val depotSideEndTangent =  if (redAlliance) if (initialIntake) PI else PI / 2 else if (initialIntake) PI / 2 else PI / 2
-        return listOf((if (depotSide) depotSideStartTangent else warehouseSideStartTangent) - if (redAlliance) 0.0 else PI, if (depotSide) depotSideEndTangent else warehouseSideEndTangent - if (redAlliance) 0.0 else PI)
+        val startTangent = 2 * PI
+        val endTangent =  PI / 2
+        return listOf(startTangent - if (redAlliance) 0.0 else PI, endTangent /*- if (redAlliance) 0.0 else PI*/)
     }
 
     private fun parkingTangents(): List<Double> {
-        val depotSideStartTangent = 7 * PI / 4
-        val depotSideEndTangent = 3 * PI / 2
-        val warehouseSideStartTangent = 0 * PI / 4
-        val warehouseSideEndTangent = 3 * PI / 2
+        val startTangent = if (depotSide) 3 * PI / 2 else 2 * PI
+        val endTangent = if (depotSide) 3 * PI / 2 else PI / 2
 
-        return listOf(if (depotSide) depotSideStartTangent else warehouseSideStartTangent - if (redAlliance) 0.0 else PI, if (depotSide) depotSideEndTangent else warehouseSideEndTangent - if (redAlliance) 0.0 else PI)
+        return listOf(startTangent - if (redAlliance) 0.0 else PI, endTangent - if (redAlliance) 0.0 else PI)
     }
 
     private fun intakeTrajectory(n: Int, initialIntake: Boolean): AutoPathElement.Path {
+
         var startingPose = if (carousel && n == 1)
             carouselPosition()
         else if (outtakeCube && n == 1)
-            initialOuttakePosition().plus(Pose2d(0.0, 0.0, PI / 4))
-        else if (n == 1 && (!outtakeCube && !carousel))
+            initialOuttakePosition().plus(Pose2d(0.0, 0.0, (if (redAlliance) -1 else 1) * PI / 4))
+        else if (n == 1)
             initialPosition()
         else
             outtakePosition()
 
-        return makePath("Intake Trajectory #$n",
-            bot.roadRunner.trajectoryBuilder(startingPose)
-                .splineToLinearHeading(intakePosition(n), intakeTangents(initialIntake)[1])
-                .build())
+        return AutoPathElement.Path("Intake $n", bot.roadRunner.trajectoryBuilder(startingPose, intakeTangents(initialIntake)[0])
+            .splineToLinearHeading(intermediateWaypoint(), intakeTangents(initialIntake)[1])
+            .lineToConstantHeading(asVector2D(intakePosition(n)))
+            .build())
     }
 
     private fun outtakeTrajectory(n: Int): AutoPathElement.Path {
-        return makePath("Following Outtake Trajectory",
-            bot.roadRunner.trajectoryBuilder(intakePosition(n), outtakeTangents()[0])
-                .splineToLinearHeading(outtakePosition(), outtakeTangents()[1])
-                .build())
+        return AutoPathElement.Path("Outtake $n", bot.roadRunner.trajectoryBuilder(/*intakePosition(n)*/ bot.roadRunner.poseEstimate)
+            .lineToConstantHeading(asVector2D(intermediateWaypoint()))
+            .splineToLinearHeading(outtakePosition(), outtakeTangents()[1])
+            .build())
+    }
+
+    private fun parkingTrajectory(): AutoPathElement.Path {
+        val parkingTrajectory = bot.roadRunner.trajectoryBuilder(outtakePosition(), parkingTangents()[0])
+                .splineToLinearHeading(parkingPosition(), parkingTangents()[1])
+                .build()
+
+        return if (depotSide) AutoPathElement.Path("Parking", parkingTrajectory) else intakeTrajectory(2, false)
     }
 
     //TODO: Implement a flag system, like this position is for spline to spline and so on so forth
@@ -312,7 +316,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
                 paths.add(outtakeLow)
             paths.add(outtakeEnd)
         }
-
+        //TODO: change initial position
         if (carousel) {
             paths.add(runCarousel)
             paths.add(carouselTrajectory)
