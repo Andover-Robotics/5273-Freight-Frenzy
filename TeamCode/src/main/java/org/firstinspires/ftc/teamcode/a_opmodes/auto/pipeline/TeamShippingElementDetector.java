@@ -105,8 +105,6 @@ public class TeamShippingElementDetector {
 
         //TEAM SHIPPING ELEMENT CONSTANTS
 
-        static final double TEAM_SHIPPING_ELEMENT_AREA = 10000;
-
         final double MIDDLE_RIGHT_X = 600;
         final double MIDDLE_LEFT_X = 250;
         final double MIN_Y = 10;
@@ -114,28 +112,55 @@ public class TeamShippingElementDetector {
         final Mat test = new Mat(),
                 edgeDetector = new Mat(),
                 smoothEdges = new Mat(),
-                contourDetector = new Mat();
+                greenMat = new Mat(),
+                redMat = new Mat(),
+                blueMat = new Mat();
         final MatOfPoint2f polyDpResult = new MatOfPoint2f();
         final List<Rect> bounds = new ArrayList<>();
         final Size gaussianKernelSize = new Size(9, 9);
 
+        private ArrayList rgb = new ArrayList<Mat>();
+
         @SuppressLint("SdCardPath")
         @Override
         public Mat processFrame(Mat input) {
-            Rect potentialDuckArea = new Rect(0, 0, input.width(), input.height());
-            Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
-            Imgproc.cvtColor(input, test, Imgproc.COLOR_RGB2HLS);
-            Core.inRange(test, lowerRange, upperRange, edgeDetector);
+            Rect leftArea = new Rect(0, 0, input.width() / 3, input.height());
+            Rect middleArea = new Rect(input.width() / 3, 0, 2 * input.width() / 3, input.height());
+            Rect rightArea = new Rect(input.width() / 3, 0, input.width(), input.height());
+
+            rgb.add(greenMat); rgb.add(blueMat); rgb.add(redMat);
+
+            Imgproc.rectangle(input, leftArea, new Scalar(255, 255, 255));
             Imgproc.GaussianBlur(edgeDetector, smoothEdges, gaussianKernelSize, 0, 0);
 
-            for (Rect t : bounds) {
-                Imgproc.rectangle(input, t, lowerRange, 2);
-            }
+            Core.split(input, rgb);
+            double greenValueLeft = Core.mean(greenMat).val[-1];
 
-            result = identifyDuckFromBounds().orElse(null);
+            Imgproc.rectangle(input, rightArea, new Scalar(255, 255, 255));
+            Imgproc.GaussianBlur(edgeDetector, smoothEdges, gaussianKernelSize, 0, 0);
+
+            Core.split(input, rgb);
+            double greenValueRight = Core.mean(greenMat).val[-1];
+
+            Imgproc.rectangle(input, middleArea, new Scalar(255, 255, 255));
+            Imgproc.GaussianBlur(edgeDetector, smoothEdges, gaussianKernelSize, 0, 0);
+
+            Core.split(input, rgb);
+            double greenValueMiddle = Core.mean(greenMat).val[-1];
+
+            final double max = Math.max(greenValueLeft, Math.max(greenValueMiddle, greenValueRight));
+
+            if (max == greenValueLeft)
+                result = Optional.of(Pair.create(PipelineResult.LEFT, 0.8)).orElse(null);
+
+            else if (max == greenValueRight)
+                result = Optional.of(Pair.create(PipelineResult.RIGHT, 0.8)).orElse(null);
+
+            else
+                result = Optional.of(Pair.create(PipelineResult.MIDDLE, 0.7)).orElse(null);
+
             if (saveImageNext) {
                 Mat cvt = new Mat();
-                Imgproc.cvtColor(input, cvt, COLOR_RGB2HLS);
                 Log.i("RingStackDetector", "saving current pipeline image");
                 for (Rect r : bounds) {
                     Log.i("RingStackDetector", String.format("result x=%d y=%d width=%d height=%d area=%.2f", r.x, r.y, r.width, r.height, r.area()));
@@ -148,69 +173,5 @@ public class TeamShippingElementDetector {
             return input;
         }
 
-        private Optional<Pair<PipelineResult, Double>> identifyDuckFromBounds() {
-            if (bounds.size() == 0) {
-                return Optional.of(Pair.create(PipelineResult.NONE, 0.7));
-            }
-
-            double minError = bounds.stream().map(Rect::area).max(Comparator.naturalOrder()).get();
-            Rect boundingBox = null;
-
-            for (Rect t: bounds) {
-                if (Math.abs(TEAM_SHIPPING_ELEMENT_AREA - t.area()) <= minError){
-                    boundingBox = t;
-                }
-            }
-
-            assert boundingBox != null;
-
-            //TODO: Compute Confidence Intervals
-
-            if (boundingBox.x <= MIDDLE_LEFT_X) {
-                return Optional.of(Pair.create(PipelineResult.LEFT, 0.8));
-            }
-            else if (boundingBox.x <= MIDDLE_RIGHT_X){
-                return Optional.of(Pair.create(PipelineResult.MIDDLE, 0.8));
-            }
-            else {
-                return Optional.of(Pair.create(PipelineResult.RIGHT, 0.8));
-            }
-
-        }
-
-        private void extractRectBounds(ArrayList<MatOfPoint> contours) {
-            bounds.clear();
-            for (MatOfPoint contour : contours) {
-                // if polydp fails, switch to a local new MatOfPoint2f();
-                Imgproc.approxPolyDP(new MatOfPoint2f(contour.toArray()), polyDpResult, 3, true);
-                Rect r = Imgproc.boundingRect(new MatOfPoint(polyDpResult.toArray()));
-                if (r.y > MIN_Y && r.area() > TEAM_SHIPPING_ELEMENT_AREA)
-                    addCombineRectangle(bounds, r, bounds.size() - 1);
-            }
-        }
-
-        private boolean overlaps(Rect a, Rect b) {
-            return a.tl().inside(b) || a.br().inside(b) || b.tl().inside(a) || b.br().inside(a);
-        }
-
-        private Rect combineRect(Rect a, Rect b) {
-            int topY = (int) Math.min(a.tl().y, b.tl().y);
-            int leftX = (int) Math.min(a.tl().x, b.tl().x);
-            int bottomY = (int) Math.max(a.br().y, b.br().y);
-            int rightX = (int) Math.max(a.br().x, b.br().x);
-            return new Rect(leftX, topY, rightX - leftX, bottomY - topY);
-        }
-
-        private void addCombineRectangle(List<Rect> list, Rect newRect, int ptr) {
-            for (int i = ptr; i >= 0; i--) {
-                Rect existing = list.get(i);
-                if (overlaps(newRect, existing)) {
-                    list.remove(i);
-                    addCombineRectangle(list, combineRect(existing, newRect), i - 1);
-                    return;
-                }
-            }
-            list.add(newRect);
-        }
-    }
+}
 }

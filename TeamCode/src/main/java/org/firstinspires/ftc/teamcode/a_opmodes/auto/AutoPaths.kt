@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto
 
+import com.acmerobotics.roadrunner.followers.PathFollower
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.MarkerCallback
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.GlobalConfig
-import org.firstinspires.ftc.teamcode.GlobalConfig.carousel
-import org.firstinspires.ftc.teamcode.GlobalConfig.outtakeCube
+import org.firstinspires.ftc.teamcode.GlobalConfig.*
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
@@ -59,10 +59,13 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         if (redAlliance) bot.intake.runRight() else bot.intake.runLeft()
     }
     private val intakeStop = AutoPathElement.Action("stop intake") {
-        while (! bot.outtake.isFreightIn()) {}
+        bot.roadRunner.mode = RRMecanumDrive.Mode.IDLE
+        while (! bot.outtake.isFreightIn()) {bot.roadRunner.setWeightedDrivePower(Pose2d(-0.2, 0.0, 0.0))}
+        bot.roadRunner.setWeightedDrivePower(Pose2d(0.01, 0.0, 0.0))
+        bot.roadRunner.mode = RRMecanumDrive.Mode.FOLLOW_TRAJECTORY
         if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
-        if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
         Thread.sleep(reverseDelay.toLong())
+        if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
         bot.intake.stop()
     }
 
@@ -119,12 +122,12 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun initialOuttakePosition(): Pose2d {
-        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 0.0, (5 * (PI / 4)) - if (redAlliance) 3 * PI / 2 else PI)
+        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 0.0, (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) PI / 2 else 0.0))
     }
 
     private fun intakePosition(n: Int): Pose2d {
-        var offset = 3.0
-        return Pose2d( multiplier * 72.0, 60.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        var offset = 9.0
+        return Pose2d( multiplier * 72.0, 41.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun intermediateWaypoint(): Pose2d {
@@ -132,17 +135,17 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun outtakePosition(): Pose2d {
-        return Pose2d(multiplier * 46.0,- 3.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 50.0,- 6.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingPosition(): Pose2d {
-        return if (depotSide) Pose2d( multiplier * 36.0, -60.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(72.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return if (depotSide) Pose2d( multiplier * 36.0, -66.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(72.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakeTangents(): List<Double> {
         val startTangent = PI / 2
         val endTangent = PI
-        return listOf( startTangent - if (redAlliance) 0.0 else PI, endTangent - if (redAlliance) 0.0 else PI);
+        return listOf(startTangent - if (redAlliance) 0.0 else PI, endTangent - if (redAlliance) 0.0 else PI);
     }
 
     private fun intakeTangents(initialIntake: Boolean): List<Double> {
@@ -171,19 +174,20 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
         return AutoPathElement.Path("Intake $n", bot.roadRunner.trajectoryBuilder(startingPose, intakeTangents(initialIntake)[0])
             .splineToLinearHeading(intermediateWaypoint(), intakeTangents(initialIntake)[1])
+            .addTemporalMarker(0.01, intakeStart.runner)
             .lineToConstantHeading(asVector2D(intakePosition(n)))
             .build())
     }
 
     private fun outtakeTrajectory(n: Int): AutoPathElement.Path {
-        return AutoPathElement.Path("Outtake $n", bot.roadRunner.trajectoryBuilder(/*intakePosition(n)*/ bot.roadRunner.poseEstimate)
+        return AutoPathElement.Path("Outtake $n", bot.roadRunner.trajectoryBuilder(bot.roadRunner.poseEstimate)
             .lineToConstantHeading(asVector2D(intermediateWaypoint()))
             .splineToLinearHeading(outtakePosition(), outtakeTangents()[1])
             .build())
     }
 
     private fun parkingTrajectory(): AutoPathElement.Path {
-        val parkingTrajectory = bot.roadRunner.trajectoryBuilder(outtakePosition(), parkingTangents()[0])
+        val parkingTrajectory = bot.roadRunner.trajectoryBuilder(if (cycles < 1 && !carousel) initialOuttakePosition() else if (carousel) carouselPosition() else outtakePosition(), parkingTangents()[0])
                 .splineToLinearHeading(parkingPosition(), parkingTangents()[1])
                 .build()
 
@@ -226,10 +230,11 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     val carouselTrajectory = makePath("Carousel Trajectory",
         bot.roadRunner.trajectoryBuilder(initialOuttakePosition())
             .lineToSplineHeading(carouselPosition())
+            .addTemporalMarker(0.01, runCarousel.runner)
             .build())
 
-    val turnTrajectory = AutoPathElement.Action("Turn Trajectory"){ bot.roadRunner.turn(- turnRadians) }
-    val unTurnTrajectory = AutoPathElement.Action("Turn Trajectory"){ bot.roadRunner.turn( turnRadians) }
+    val turnTrajectory = AutoPathElement.Action("Turn Trajectory"){ bot.roadRunner.turn(- turnRadians)}
+    val unTurnTrajectory = AutoPathElement.Action("Turn Trajectory"){ bot.roadRunner.turn(turnRadians)}
 
     /*
 
@@ -339,7 +344,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         }
 
         if (parking) {
-            paths.add(parkingTrajectory)
+            paths.add(parkingTrajectory())
         }
 
         return paths
