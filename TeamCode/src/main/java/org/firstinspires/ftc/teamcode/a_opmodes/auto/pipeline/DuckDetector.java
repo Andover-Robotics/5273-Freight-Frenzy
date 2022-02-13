@@ -11,14 +11,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -27,7 +25,6 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
@@ -89,14 +86,30 @@ public class DuckDetector {
 
   class RingDetectionPipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(10, 90, 140);
-    final Scalar upperRange = new Scalar(30, 200, 255);
+    final Scalar lowerRange = new Scalar(0, 200, 60);
+    final Scalar upperRange = new Scalar(180, 255, 255);
 
-    static final double DUCK_AREA = 2000;
+    /*
+
+    DUCK DETETCTION CONSTANTS
+
+    //TODO: Test new values and see if duck detetcted instantly; if not revert to previous value(
+
+    //static final double TEAM_SHIPPING_ELEMENT_AREA = 1500;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 1250;
 
     final double MIDDLE_RIGHT_X = 720;
     final double MIDDLE_LEFT_X = 320;
     final double MIN_Y = 120;
+     */
+
+    //TEAM SHIPPING ELEMENT CONSTANTS
+
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 5000;
+
+    final double MIDDLE_RIGHT_X = 640;
+    final double MIDDLE_LEFT_X = 320;
+    final double MIN_Y = 0;
 
     final Mat test = new Mat(),
             edgeDetector = new Mat(),
@@ -125,7 +138,7 @@ public class DuckDetector {
         Imgproc.rectangle(input, t, lowerRange, 2);
       }
 
-      result = identifyStackFromBounds().orElse(null);
+      result = identifyDuckFromBounds().orElse(null);
       if (saveImageNext) {
         Mat cvt = new Mat();
         Imgproc.cvtColor(input, cvt, COLOR_RGB2HLS);
@@ -141,7 +154,7 @@ public class DuckDetector {
       return input;
     }
 
-    private Optional<Pair<PipelineResult, Double>> identifyStackFromBounds() {
+    private Optional<Pair<PipelineResult, Double>> identifyDuckFromBounds() {
       if (bounds.size() == 0) {
         return Optional.of(Pair.create(PipelineResult.NONE, 0.7));
       }
@@ -150,7 +163,7 @@ public class DuckDetector {
       Rect boundingBox = null;
 
       for (Rect t: bounds) {
-        if (Math.abs(DUCK_AREA - t.area()) <= minError){
+        if (Math.abs(TEAM_SHIPPING_ELEMENT_AREA - t.area()) <= minError){
           boundingBox = t;
         }
       }
@@ -172,11 +185,12 @@ public class DuckDetector {
     }
 
     private void extractRectBounds(ArrayList<MatOfPoint> contours) {
+      bounds.clear();
       for (MatOfPoint contour : contours) {
         // if polydp fails, switch to a local new MatOfPoint2f();
         Imgproc.approxPolyDP(new MatOfPoint2f(contour.toArray()), polyDpResult, 3, true);
         Rect r = Imgproc.boundingRect(new MatOfPoint(polyDpResult.toArray()));
-        if (r.y > MIN_Y && r.area() > DUCK_AREA)
+        if (r.y > MIN_Y && r.area() > TEAM_SHIPPING_ELEMENT_AREA)
           addCombineRectangle(bounds, r, bounds.size() - 1);
       }
     }
