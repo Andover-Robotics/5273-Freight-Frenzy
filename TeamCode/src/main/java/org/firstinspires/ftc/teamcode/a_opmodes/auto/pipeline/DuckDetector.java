@@ -86,8 +86,8 @@ public class DuckDetector {
 
   class RingDetectionPipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(0, 200, 60);
-    final Scalar upperRange = new Scalar(180, 255, 255);
+    final Scalar lowerRange = new Scalar(10, 185, 35);
+    final Scalar upperRange = new Scalar(40, 255, 90);
 
     /*
 
@@ -105,10 +105,10 @@ public class DuckDetector {
 
     //TEAM SHIPPING ELEMENT CONSTANTS
 
-    static final double TEAM_SHIPPING_ELEMENT_AREA = 5000;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 30000;
 
-    final double MIDDLE_RIGHT_X = 640;
-    final double MIDDLE_LEFT_X = 320;
+    final double MIDDLE_RIGHT_X = 600;
+    final double MIDDLE_LEFT_X = 250;
     final double MIN_Y = 0;
 
     final Mat test = new Mat(),
@@ -190,7 +190,7 @@ public class DuckDetector {
         // if polydp fails, switch to a local new MatOfPoint2f();
         Imgproc.approxPolyDP(new MatOfPoint2f(contour.toArray()), polyDpResult, 3, true);
         Rect r = Imgproc.boundingRect(new MatOfPoint(polyDpResult.toArray()));
-        if (r.y > MIN_Y && r.area() > TEAM_SHIPPING_ELEMENT_AREA)
+        if (r.y > MIN_Y && r.area() > TEAM_SHIPPING_ELEMENT_AREA / 2)
           addCombineRectangle(bounds, r, bounds.size() - 1);
       }
     }

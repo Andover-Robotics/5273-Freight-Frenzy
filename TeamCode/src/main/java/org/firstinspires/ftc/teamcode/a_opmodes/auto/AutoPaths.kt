@@ -42,10 +42,10 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     private var multiplier = if (redAlliance) 1 else -1
 
-    private var intakeDelay = 1
-    private var carouselDelay = 1250
-    private var reverseDelay = 500
-    private var bucketDelay = 1000
+    private val intakeDelay = 1
+    private val carouselDelay = 1250
+    private val reverseDelay = 500
+    private val bucketDelay = 1000
 
     val turnRadians =  - 3 * PI / 4
 
@@ -62,13 +62,13 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     private val intaking = AutoPathElement.Action("stop intake") {
         bot.roadRunner.mode = RRMecanumDrive.Mode.IDLE
-        bot.roadRunner.setWeightedDrivePower(Pose2d((if (redAlliance) - 1 else 1) * 0.2, 0.0, 0.0))
+        bot.roadRunner.setWeightedDrivePower(Pose2d((if (redAlliance) - 1 else 1) * 0.4, 0.0, 0.0))
         while (if (redAlliance) ! bot.intake.wasIntakedRight() else ! bot.intake.wasIntakedLeft()) {}
         bot.roadRunner.setWeightedDrivePower(Pose2d(0.0, 0.0, 0.0))
         bot.roadRunner.mode = RRMecanumDrive.Mode.FOLLOW_TRAJECTORY
         while (! bot.outtake.isFreightIn()) {}
-        if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
         if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
+        if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
         //Thread.sleep(500)
         if (redAlliance) if (Math.abs(bot.outtake.rightFlap.position - Outtake.FLAP_CLOSED) < 0.07) else bot.outtake.openRightFlap()
         else (if (Math.abs(bot.outtake.leftFlap.position - Outtake.FLAP_CLOSED) < 0.05) else bot.outtake.openLeftFlap())
@@ -78,14 +78,22 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         bot.intake.stop()
     }
 
-    private val outtakeHigh = AutoPathElement.Action("Outtake High") {bot.outtake.goToTopGoal()}
+    private val outtakeHigh = AutoPathElement.Action("Outtake High") {
+        bot.outtake.goToTopGoal()
+        bot.outtake.autoRun()
+    }
 
-    private val outtakeMid = AutoPathElement.Action("Outtake Mid") {bot.outtake.goToMidGoal()}
+    private val outtakeMid = AutoPathElement.Action("Outtake Mid") {
+        bot.outtake.goToMidGoal()
+        bot.outtake.autoRun()
+    }
 
-    private val outtakeLow = AutoPathElement.Action("Outtake Low") {bot.outtake.goToLowGoal() }
+    private val outtakeLow = AutoPathElement.Action("Outtake Low") {
+        bot.outtake.goToLowGoal()
+        bot.outtake.autoRun()
+    }
 
     private val outtakeEnd = AutoPathElement.Action("Outtake End") {
-        bot.outtake.autoRun()
         bot.outtake.flipBucket()
         Thread.sleep(bucketDelay.toLong())
         bot.outtake.unFlipBucket()
@@ -137,15 +145,15 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //X: 72.0
     private fun intakePosition(n: Int): Pose2d {
         var offset = 3.0
-        return Pose2d( multiplier * 72.0, 41.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d( multiplier * 62.0, 41.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun intermediateWaypoint(): Pose2d {
-        return Pose2d(multiplier * 72.0, 12.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 62.0, 12.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakePosition(): Pose2d {
-        return Pose2d(multiplier * 50.0,- 6.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 50.0,- 15.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingPosition(): Pose2d {
@@ -191,14 +199,22 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     private fun outtakeTrajectory(n: Int): AutoPathElement.Path {
         return AutoPathElement.Path("Outtake $n", bot.roadRunner.trajectoryBuilder(bot.roadRunner.poseEstimate)
+            .addTemporalMarker(0.5, outtakeHigh.runner)
             .lineToConstantHeading(asVector2D(intermediateWaypoint()))
             .splineToLinearHeading(outtakePosition(), outtakeTangents()[1])
             .build())
     }
 
     private fun parkingTrajectory(): AutoPathElement.Path {
-        val parkingTrajectory = bot.roadRunner.trajectoryBuilder(if (cycles < 1 && !carousel) initialOuttakePosition() else if (carousel) carouselPosition() else outtakePosition(), parkingTangents()[0])
+        var parkingTrajectory = bot.roadRunner.trajectoryBuilder(if (cycles < 1 && !carousel) initialOuttakePosition() else if (carousel) carouselPosition() else outtakePosition(), parkingTangents()[0])
                 .splineToLinearHeading(parkingPosition(), parkingTangents()[1])
+                .build()
+
+        if (cycles < 1 && !carousel and !outtakeCube)
+            parkingTrajectory = bot.roadRunner.trajectoryBuilder(initialPosition(), intakeTangents(false)[0])
+                .splineToLinearHeading(intermediateWaypoint(), intakeTangents(false)[1])
+                .lineToConstantHeading(asVector2D(intakePosition(0)))
+                .strafeRight(30.0)
                 .build()
 
         return if (depotSide) AutoPathElement.Path("Parking", parkingTrajectory) else intakeTrajectory(2, false)
@@ -233,6 +249,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     val initialOuttakeTrajectory = makePath("Outtake Preloaded Cube Trajectory",
         bot.roadRunner.trajectoryBuilder(initialPosition())
+            .addTemporalMarker(0.1, outtakeHigh.runner)
             .lineToSplineHeading(initialOuttakePosition())
             .build()
     )
@@ -323,17 +340,11 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
         if (outtakeCube) {
             paths.add(initialOuttakeTrajectory)
-            if (pipelineResult == DuckDetector.PipelineResult.LEFT)
-                paths.add(outtakeHigh)
-            else if (pipelineResult == DuckDetector.PipelineResult.MIDDLE)
-                paths.add(outtakeMid)
-            else
-                paths.add(outtakeLow)
             paths.add(outtakeEnd)
         }
         //TODO: change initial position
         if (carousel) {
-            paths.add(runCarousel)
+            //paths.add(runCarousel)
             paths.add(carouselTrajectory)
             if (!redAlliance)
                 paths.add(turnTrajectory)
@@ -343,12 +354,12 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         }
 
         for (n in IntRange(1, cycles)) {
-            paths.add(intakeStart)
+            //paths.add(intakeStart)
             paths.add(if ( n == 1) intakeTrajectory(n, true) else intakeTrajectory(n, false))
             paths.add(intaking)
             paths.add(outtakeTrajectory(n))
             paths.add(intakeStop)
-            paths.add(outtakeHigh)
+            //paths.add(outtakeHigh)
             paths.add(outtakeEnd)
         }
 
