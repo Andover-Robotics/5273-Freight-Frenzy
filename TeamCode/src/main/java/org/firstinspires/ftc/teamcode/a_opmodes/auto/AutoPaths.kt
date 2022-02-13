@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.GlobalConfig.*
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
+import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake
 import java.lang.Math.toRadians
 import kotlin.math.PI
 
@@ -44,9 +45,9 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     private var intakeDelay = 1
     private var carouselDelay = 1250
     private var reverseDelay = 500
-    private var bucketDelay = 750
+    private var bucketDelay = 1000
 
-    val turnRadians =  - PI / 2
+    val turnRadians =  - 3 * PI / 4
 
 
     fun makePath(name: String, trajectory: Trajectory): AutoPathElement.Path {
@@ -58,14 +59,22 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     private val intakeStart = AutoPathElement.Action("start intake") {
         if (redAlliance) bot.intake.runRight() else bot.intake.runLeft()
     }
-    private val intakeStop = AutoPathElement.Action("stop intake") {
+
+    private val intaking = AutoPathElement.Action("stop intake") {
         bot.roadRunner.mode = RRMecanumDrive.Mode.IDLE
-        while (! bot.outtake.isFreightIn()) {bot.roadRunner.setWeightedDrivePower(Pose2d(-0.2, 0.0, 0.0))}
-        bot.roadRunner.setWeightedDrivePower(Pose2d(0.01, 0.0, 0.0))
+        bot.roadRunner.setWeightedDrivePower(Pose2d((if (redAlliance) - 1 else 1) * 0.2, 0.0, 0.0))
+        while (if (redAlliance) ! bot.intake.wasIntakedRight() else ! bot.intake.wasIntakedLeft()) {}
+        bot.roadRunner.setWeightedDrivePower(Pose2d(0.0, 0.0, 0.0))
         bot.roadRunner.mode = RRMecanumDrive.Mode.FOLLOW_TRAJECTORY
+        while (! bot.outtake.isFreightIn()) {}
         if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
-        Thread.sleep(reverseDelay.toLong())
         if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
+        //Thread.sleep(500)
+        if (redAlliance) if (Math.abs(bot.outtake.rightFlap.position - Outtake.FLAP_CLOSED) < 0.07) else bot.outtake.openRightFlap()
+        else (if (Math.abs(bot.outtake.leftFlap.position - Outtake.FLAP_CLOSED) < 0.05) else bot.outtake.openLeftFlap())
+    }
+
+    private val intakeStop = AutoPathElement.Action("stop intake") {
         bot.intake.stop()
     }
 
@@ -122,11 +131,12 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun initialOuttakePosition(): Pose2d {
-        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 0.0, (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) PI / 2 else 0.0))
+        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 0.0, (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) (if (redAlliance) PI / 2 else 3 * PI / 2) else 0.0))
     }
 
+    //X: 72.0
     private fun intakePosition(n: Int): Pose2d {
-        var offset = 9.0
+        var offset = 3.0
         return Pose2d( multiplier * 72.0, 41.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
@@ -151,7 +161,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     private fun intakeTangents(initialIntake: Boolean): List<Double> {
         val startTangent = 2 * PI
         val endTangent =  PI / 2
-        return listOf(startTangent - if (redAlliance) 0.0 else PI, endTangent /*- if (redAlliance) 0.0 else PI*/)
+        return listOf(startTangent - if (redAlliance) 0.0 else (if (depotSide) 12 * PI / 8 else PI), endTangent /*- if (redAlliance) 0.0 else PI*/)
     }
 
     private fun parkingTangents(): List<Double> {
@@ -335,10 +345,9 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
         for (n in IntRange(1, cycles)) {
             paths.add(intakeStart)
             paths.add(if ( n == 1) intakeTrajectory(n, true) else intakeTrajectory(n, false))
-            if (n == 1)
-                paths.add(AutoPathElement.Action("Turn", { bot.roadRunner.turn(PI / 4) }))
-            paths.add(intakeStop)
+            paths.add(intaking)
             paths.add(outtakeTrajectory(n))
+            paths.add(intakeStop)
             paths.add(outtakeHigh)
             paths.add(outtakeEnd)
         }
