@@ -67,8 +67,9 @@ public class Outtake extends SubsystemBase {
     public final Command cmdCloseLeftFlap = new InstantCommand(this::closeLeftFlap, this);
 
     // Servo positions for the arms and the bucket
-    private static final double FLAP_OPEN = 0.26;
-    private static final double FLAP_CLOSED = 0.02;
+    //TODO: Make in GlobalConfig
+    public static final double FLAP_OPEN = 0.26;
+    public static final double FLAP_CLOSED = 0.02;
     private static final double FLAP_DEPOSIT = 0.5;
     private static final double FLAP_HOOK = 0.85;
 
@@ -127,8 +128,8 @@ public class Outtake extends SubsystemBase {
 
     // TODO: more optimized way to do color sense stuff, because this is really jank
 
-    private final Servo leftFlap;
-    private final Servo rightFlap;
+    public final Servo leftFlap;
+    public final Servo rightFlap;
     private final Servo bucket;
     private final MotorEx slideMotor;
     private final ColorSensor bucketSensor;
@@ -296,9 +297,9 @@ public class Outtake extends SubsystemBase {
     }
 
     public void flipBucket() {
-        bucket.setPosition(FLIPPED);
         rightFlap.setPosition(FLAP_DEPOSIT);
         leftFlap.setPosition(FLAP_DEPOSIT);
+        bucket.setPosition(FLIPPED);
         bucketState = BucketState.FLIPPED;
     }
 

@@ -23,8 +23,8 @@ public class Intake extends SubsystemBase {
     private static ExpansionHubEx controlHub;
     private static ExpansionHubEx expansionHub;
 
-    public static final double INTAKE_SPEED = 1.0;
-    private static final double OUTTAKE_SPEED = 1.0;
+    public static final double INTAKE_SPEED = 0.7;
+    private static final double OUTTAKE_SPEED = 0.9;
 
     public MotorEx leftIntake;
     public MotorEx rightIntake;
@@ -97,7 +97,7 @@ public class Intake extends SubsystemBase {
         curLeftVelo = 0;
 
         //                    ____   <-  that is the constant ration level where intaking gets detected
-        INTAKE_DETECT_CONST_RPM = 1100; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
+        INTAKE_DETECT_CONST_RPM = 1000; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
     }
 
     @Override
@@ -262,12 +262,12 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean wasIntakedLeft() {
-        return curLeftAmps > LEFT_INTAKE_DETECT_CONST_AMPS && !isReversingLeft;
+        return leftIntakeCurrentDraw() > LEFT_INTAKE_DETECT_CONST_AMPS && !isReversingLeft;
                 //(curLeftVelo < INTAKE_DETECT_CONST_RPM && isLeftIntaking())
     }
 
     public boolean wasIntakedRight() {
-        return curRightAmps > RIGHT_INTAKE_DETECT_CONST_AMPS && !isReversingRight;
+        return rightIntakeCurrentDraw() > RIGHT_INTAKE_DETECT_CONST_AMPS && !isReversingRight;
                 //(curRightVelo < INTAKE_DETECT_CONST_RPM && isRightIntaking()) || rightIntakeCurrentDraw() > INTAKE_DETECT_CONST_AMPS;
     }
 
