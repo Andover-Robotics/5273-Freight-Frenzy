@@ -51,16 +51,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT){
       bot.intake.runLeft();
-      if(!bot.outtake.isFreightIn() || !bot.outtake.isAutoFlap()) {
-        bot.outtake.openLeftFlap();
-        bot.outtake.closeRightFlap();
-      }
+      bot.outtake.closeRightFlap();
+      bot.outtake.openLeftFlap();
     }
     else {
       bot.intake.stopLeft();
-      if(!bot.outtake.isAutoFlap()) {
-        bot.outtake.closeLeftFlap();
-      }
     }
 
     if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
@@ -68,16 +63,20 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.intake.runRight();
-      if(!bot.outtake.isFreightIn() || !bot.outtake.isAutoFlap()) {
-        bot.outtake.openRightFlap();
-        bot.outtake.closeLeftFlap();
-      }
+      bot.outtake.openRightFlap();
+      bot.outtake.closeLeftFlap();
     }
     else {
       bot.intake.stopRight();
-      if(!bot.outtake.isAutoFlap()) {
-        bot.outtake.closeRightFlap();
-      }
+    }
+
+    if(gamepadEx1.wasJustPressed(Button.A)) {
+      bot.outtake.setAutoFlap(false);
+      bot.outtake.openRightFlap();
+    }
+    if(gamepadEx1.wasJustPressed(Button.X)) {
+      bot.outtake.setAutoFlap(false);
+      bot.outtake.openLeftFlap();
     }
 
     if(gamepadEx1.wasJustPressed(Button.DPAD_LEFT)) {
@@ -87,7 +86,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.closeRightFlap();
     }
     else if(gamepadEx1.wasJustPressed(Button.DPAD_UP)) {
-      bot.outtake.toggleAutoFlap();
+      bot.outtake.setAutoFlap(true);
+    }
+    else if(gamepadEx1.wasJustPressed(Button.DPAD_DOWN)) {
+       bot.outtake.setAutoFlap(false);
     }
 
 
@@ -173,6 +175,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
     telemetry.addData("driver left stick", "left X" + gamepadEx1.getLeftX() + ": " + gamepadEx1.getLeftY());
     telemetry.addLine("isFreightIn : " + bot.outtake.isFreightIn());
+    telemetry.addLine("autoFlap: " + bot.outtake.isAutoFlap());
   }
 
 

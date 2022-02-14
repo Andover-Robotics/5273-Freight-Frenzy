@@ -11,15 +11,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.GlobalConfig;
-import org.openftc.revextensions2.ExpansionHubMotor;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 
 public class Outtake extends SubsystemBase {
@@ -348,6 +340,10 @@ public class Outtake extends SubsystemBase {
 
     public void toggleAutoFlap() {
         autoFlap = !autoFlap;
+    }
+
+    public void setAutoFlap(boolean on) {
+        autoFlap = on;
     }
 
     public boolean isAutoFlap() {
