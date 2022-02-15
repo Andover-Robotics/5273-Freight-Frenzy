@@ -43,9 +43,9 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     private var multiplier = if (redAlliance) 1 else -1
 
     private val intakeDelay = 1
-    private val carouselDelay = 1250
+    private val carouselDelay = 1750
     private val reverseDelay = 500
-    private val bucketDelay = 1000
+    private val bucketDelay = 600
 
     val turnRadians =  - 3 * PI / 4
 
@@ -62,7 +62,7 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
 
     private val intaking = AutoPathElement.Action("stop intake") {
         bot.roadRunner.mode = RRMecanumDrive.Mode.IDLE
-        bot.roadRunner.setWeightedDrivePower(Pose2d((if (redAlliance) - 1 else 1) * 0.4, 0.0, 0.0))
+        bot.roadRunner.setWeightedDrivePower(Pose2d((if (redAlliance) - 1 else 1) * 0.5, 0.0, 0.0))
         while (if (redAlliance) ! bot.intake.wasIntakedRight() else ! bot.intake.wasIntakedLeft()) {}
         bot.roadRunner.setWeightedDrivePower(Pose2d(0.0, 0.0, 0.0))
         bot.roadRunner.mode = RRMecanumDrive.Mode.FOLLOW_TRAJECTORY
@@ -135,29 +135,29 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     }
 
     private fun carouselPosition(): Pose2d {
-        return Pose2d( multiplier * (if (redAlliance) 61.0 else 59.0), (if (redAlliance) -65.0 else -63.0), 3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d( multiplier * (if (redAlliance) 61.0 else 59.0), (if (redAlliance) -65.0 else -67.0), 3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun initialOuttakePosition(): Pose2d {
-        return Pose2d(multiplier * 44.0, if (depotSide) -25.0 else 0.0, (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) (if (redAlliance) PI / 2 else 3 * PI / 2) else 0.0))
+        return Pose2d(multiplier * 42.0, if (depotSide) -22.0 else 0.0, (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) (if (redAlliance) PI / 2 else 3 * PI / 2) else 0.0))
     }
 
     //X: 72.0
     private fun intakePosition(n: Int): Pose2d {
         var offset = 3.0
-        return Pose2d( multiplier * 62.0, 41.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d( multiplier * 72.0, 41.0 + offset * ( n - 1),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun intermediateWaypoint(): Pose2d {
-        return Pose2d(multiplier * 62.0, 12.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 72.0, 12.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakePosition(): Pose2d {
-        return Pose2d(multiplier * 50.0,- 15.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 50.0,- 18.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun parkingPosition(): Pose2d {
-        return if (depotSide) Pose2d( multiplier * 36.0, -66.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(72.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
+        return if (depotSide) Pose2d( multiplier * 30.0, -66.0, 3 * PI / 2 - if (redAlliance) 0.0 else PI) else Pose2d(72.0,56.0, 3 * PI / 2  - if (redAlliance) 0.0 else PI)
     }
 
     private fun outtakeTangents(): List<Double> {

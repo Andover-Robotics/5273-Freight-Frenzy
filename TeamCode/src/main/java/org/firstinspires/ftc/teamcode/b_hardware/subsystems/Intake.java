@@ -92,7 +92,7 @@ public class Intake extends SubsystemBase {
         curLeftVelo = 0;
 
         //                    ____   <-  that is the constant ration level where intaking gets detected
-        CONST_AMPS= 1000; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
+        CONST_AMPS= 1300; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
     }
 
     @Override
