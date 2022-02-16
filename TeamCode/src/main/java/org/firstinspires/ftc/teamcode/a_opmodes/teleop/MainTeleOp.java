@@ -98,7 +98,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.openLeftFlap();
     }
 
-    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+    if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
       bot.outtake.openRightFlap();
     }
 
