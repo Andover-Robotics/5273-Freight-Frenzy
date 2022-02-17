@@ -166,6 +166,13 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.carousel.stop();
     }
 
+    if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
+      bot.outtake.toggleRightFlap();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
+      bot.outtake.toggleLeftFlap();
+    }
+
     CommandScheduler.getInstance().run();
 
     telemetry.addData("Centricity", centricity);
