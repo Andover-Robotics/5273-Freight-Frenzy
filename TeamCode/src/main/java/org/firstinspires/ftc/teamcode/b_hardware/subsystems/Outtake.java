@@ -166,16 +166,17 @@ public class Outtake extends SubsystemBase {
                 slideMotor.set(SLIDE_SPEED);
                 switch (slideState) {
                     case AT_TOP_GOAL:
-                        slideMotor.setPositionCoefficient(0.015);
+                        slideMotor.setPositionCoefficient(0.01);
                         break;
                     case AT_MID_GOAL:
-                        slideMotor.setPositionCoefficient(0.017);
+                        slideMotor.setPositionCoefficient(0.009);
                         break;
                     case AT_CAPSTONE:
                         slideMotor.setPositionCoefficient(0.15);
                         break;
                     case AT_LOW_GOAL:
-                        slideMotor.setPositionCoefficient(0.35);
+                        slideMotor.setPositionCoefficient(0.008);
+                        slideMotor.set(0.5);
                 }
             }
         } else {
