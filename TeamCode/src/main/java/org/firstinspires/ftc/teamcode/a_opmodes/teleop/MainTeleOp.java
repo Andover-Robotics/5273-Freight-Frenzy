@@ -70,36 +70,25 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.intake.stopRight();
     }
 
-    if(gamepadEx1.wasJustPressed(Button.A)) {
-      bot.outtake.setAutoFlap(false);
-      bot.outtake.openRightFlap();
-    }
-    if(gamepadEx1.wasJustPressed(Button.X)) {
-      bot.outtake.setAutoFlap(false);
-      bot.outtake.openLeftFlap();
-    }
-
-    if(gamepadEx1.wasJustPressed(Button.DPAD_LEFT)) {
-      bot.outtake.closeLeftFlap();
-    }
-    else if(gamepadEx1.wasJustPressed(Button.DPAD_RIGHT)) {
-      bot.outtake.closeRightFlap();
-    }
-    else if(gamepadEx1.wasJustPressed(Button.DPAD_UP)) {
+    if(gamepadEx1.wasJustPressed(Button.DPAD_RIGHT) || gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)) {
       bot.outtake.setAutoFlap(true);
     }
-    else if(gamepadEx1.wasJustPressed(Button.DPAD_DOWN)) {
-       bot.outtake.setAutoFlap(false);
-    }
 
 
-
-    if (gamepadEx2.isDown(Button.LEFT_BUMPER)) {
+    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)) {
+      bot.outtake.setAutoFlap(false);
       bot.outtake.openLeftFlap();
     }
+    else if(gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT) {
+      bot.outtake.closeLeftFlap();
+    }
 
-    else if (gamepadEx2.isDown(Button.RIGHT_BUMPER)) {
+    if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)) {
+      bot.outtake.setAutoFlap(false);
       bot.outtake.openRightFlap();
+    }
+    else if(gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > TRIGGER_CONSTANT) {
+      bot.outtake.closeRightFlap();
     }
 
     // all slides controls
@@ -108,62 +97,32 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
-      timingScheduler.defer(0.26,
-              () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5,
-                        () -> {
-                          bot.outtake.unFlipBucket();
-                          bot.outtake.fullyRetract();
-                        }
-                );
-              }
-      );
-    }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
-      bot.outtake.goToLowGoal();
-      timingScheduler.defer(0.06,
-              () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5,
-                                () -> {
-                                  bot.outtake.unFlipBucket();
-                                  bot.outtake.fullyRetract();
-                                }
-
-                );
-              }
-      );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
+      bot.outtake.goToLowGoal();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
       bot.outtake.goToMidGoal();
-      timingScheduler.defer(0.16,
-              () -> { bot.outtake.flipBucket();
-                timingScheduler.defer(0.5,
-                                () -> {
-                                  bot.outtake.unFlipBucket();
-                                  bot.outtake.fullyRetract();
-                                }
-
-                );
-              }
-      );
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
       bot.outtake.fullyRetract();
     }
 
-    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
-      timingScheduler.clearAll();
+    if(gamepadEx2.wasJustPressed(Button.X)) {
+      bot.outtake.flipBucket();
+      timingScheduler.defer(0.6,
+      () -> {
+        bot.outtake.unFlipBucket();
+        bot.outtake.fullyRetract();
+      });
     }
 
     // carousel controls
-    if (gamepadEx2.wasJustPressed(Button.A)){
+    if (gamepadEx2.wasJustPressed(Button.Y)){
       bot.carousel.toggleBlue();
     }
     else if (gamepadEx2.wasJustPressed(Button.B)) {
       bot.carousel.toggleRed();
-    }
-    else if (gamepadEx2.wasJustPressed(Button.X)) {
-      bot.carousel.stop();
     }
 
     if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
@@ -188,8 +147,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
   private void drive(){//Driving ===================================================================================
 
-    if(inSlowMode) driveSpeed = SLOW_MODE_PERCENT;
-    else driveSpeed = 1;
+    driveSpeed = inSlowMode ? SLOW_MODE_PERCENT : 1;
 
     final double gyroTolerance = 0.05;
 
@@ -207,10 +165,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                     gamepadEx1.getRightX() * Math.abs(gamepadEx1.getRightX()),
                     0);
     if (bot.roadRunner.mode == RRMecanumDrive.Mode.IDLE) {
-
-      boolean dpadPressed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
-              || gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT));
-      boolean buttonPressed = (gamepadEx1.getButton(GamepadKeys.Button.X) || gamepadEx1.getButton(GamepadKeys.Button.B));
 
       double forwardSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT) ? 1 : -1) : 0;
       double strafeSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : -1) : 0;
@@ -239,6 +193,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       }
 
     }
+
     if (gamepadEx1.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       fieldCentricOffset0 = bot.imu0.getAngularOrientation()
               .toAngleUnit(AngleUnit.DEGREES).firstAngle;
@@ -247,6 +202,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     if (gamepadEx1.wasJustPressed(Button.RIGHT_STICK_BUTTON)){
       centricity = !centricity;
+      if(centricity) {
+        fieldCentricOffset0 = bot.imu0.getAngularOrientation()
+                .toAngleUnit(AngleUnit.DEGREES).firstAngle;
+        fieldCentricOffset1 = bot.imu1.getAngularOrientation()
+                .toAngleUnit(AngleUnit.DEGREES).firstAngle;
+      }
     }
 
     if(gamepadEx1.wasJustPressed(Button.BACK)) {
