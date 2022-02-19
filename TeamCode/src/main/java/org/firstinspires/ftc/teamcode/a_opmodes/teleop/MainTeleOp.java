@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
+import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
 @TeleOp(name = "Main TeleOp", group = "Competition")
 public class MainTeleOp extends BaseOpMode {//required vars here
@@ -19,7 +20,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private final double SLOW_MODE_PERCENT = 0.4;
   private double fieldCentricOffset0 = 0.0;
   private double fieldCentricOffset1 = 0.0;
-  private boolean inSlowMode = false;
 
   //config? stuff here =========================================================================
 
@@ -37,10 +37,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     prevRead = time;
     timingScheduler.run();
 
-    //Movement ==================================================================================================
+    //Movement =================================================================================================
     drive();
-
-    //Sensors ===================================================================================================
 
 
     //Subsystem control =========================================================================================
@@ -78,10 +76,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)) {
       bot.outtake.setAutoFlap(false);
       bot.outtake.openLeftFlap();
+
     }
     else if(gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.outtake.closeLeftFlap();
     }
+
 
     if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)) {
       bot.outtake.setAutoFlap(false);
@@ -105,7 +105,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.goToMidGoal();
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
+      timingScheduler.clearAll();
       bot.outtake.fullyRetract();
+
     }
 
     if(gamepadEx2.wasJustPressed(Button.X)) {
@@ -132,6 +134,35 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.toggleLeftFlap();
     }
 
+
+    /*
+    Controller 1
+    A:      B:      X:      Y:
+    DPAD
+    L: Unflip BucketD:     U: Flip Bucket R:
+    Joystick
+    L:Field centric movement
+    R:Set orientation / Rotation (Determine through practice)
+    Trigger L/R: left intake -- right intake
+    Bumper:
+    L:none/switch to previous path      R:none/switch to next path
+    Other
+    Start:  Back:switch between automation and driving
+
+    Controller 2
+    A:      B:      X:      Y:
+    DPAD
+    L:      D: Unflip Bucket    U: Flip Bucket     R:
+    Joystick
+    L:movement/reset field centric or progress automation
+    R:movement/switch robotfield centric or none
+    Trigger L/R: slow driving
+    Bumper
+    L: Open Left Flap, Close Right Flap      R: Open Right Flap, Close Left Flap
+    Other
+    Start:  Back:switch between automation and driving
+     */
+
     CommandScheduler.getInstance().run();
 
     telemetry.addData("Centricity", centricity);
@@ -146,6 +177,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
 
   private void drive(){//Driving ===================================================================================
+
 
     driveSpeed = inSlowMode ? SLOW_MODE_PERCENT : 1;
 
@@ -170,8 +202,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       double strafeSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : -1) : 0;
       double turnSpeed = (gamepadEx1.getButton(GamepadKeys.Button.X) || gamepadEx1.getButton(GamepadKeys.Button.B)) ? (gamepadEx1.getButton(GamepadKeys.Button.B) ? 1 : -1) : 0;
 
-
-
       if (centricity) {//epic java syntax
         bot.drive.driveFieldCentric(
                 driveVector.getY() * driveSpeed,
@@ -182,8 +212,25 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                                 Math.abs(gyroAngle0 - avgGyroAngle) <
                                         Math.abs(gyroAngle1 - avgGyroAngle) ?
                                         gyroAngle0 : gyroAngle1 : avgGyroAngle
+                // Epic Java Syntax here
+                /*
+                 * In theory, this check ensures that when the avgGyroAngle is VERY off
+                 * due to one IMU giving ~0.01, and the second giving ~1.99 which SHOULD be considered an angle of 2 or 0
+                 * This problem was encountered while first testing the dual IMU dependant field centric drive
+                 * the robot would run two motors on the corners of the robot in opposite directions, causing negligible movement
+                 * Because I believe the rarer incorrect averages, these ternary statements, should correct this.
+                 */
         );
       }
+      else if (dpadPressed || buttonPressed) {
+        double tempDriveSpeed = driveSpeed *= SLOW_MODE_PERCENT;
+        bot.drive.driveRobotCentric(
+                strafeSpeed * tempDriveSpeed,
+                forwardSpeed * -tempDriveSpeed,
+                turnSpeed * tempDriveSpeed
+        );
+      }
+
       else {
         bot.drive.driveRobotCentric(
                 driveVector.getY() * driveSpeed,
@@ -200,7 +247,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       fieldCentricOffset1 = bot.imu1.getAngularOrientation()
               .toAngleUnit(AngleUnit.DEGREES).firstAngle;
     }
-    if (gamepadEx1.wasJustPressed(Button.RIGHT_STICK_BUTTON)){
+    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)){
       centricity = !centricity;
       if(centricity) {
         fieldCentricOffset0 = bot.imu0.getAngularOrientation()
@@ -208,10 +255,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
         fieldCentricOffset1 = bot.imu1.getAngularOrientation()
                 .toAngleUnit(AngleUnit.DEGREES).firstAngle;
       }
-    }
-
-    if(gamepadEx1.wasJustPressed(Button.BACK)) {
-      inSlowMode = !inSlowMode;
     }
 
   }

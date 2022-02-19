@@ -10,13 +10,9 @@ import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 public class SwapAlliance extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-
-        waitForStart();
-
         GlobalConfig.alliance = GlobalConfig.alliance == GlobalConfig.Alliance.RED ? GlobalConfig.Alliance.BLUE : GlobalConfig.Alliance.RED;
         Bot.instance = null;
-
-        telemetry.addLine(GlobalConfig.alliance.toString() + " is the current Alliance!");
+        telemetry.addLine(GlobalConfig.alliance.toString() + " is now sus");
         telemetry.update();
     }
 }
