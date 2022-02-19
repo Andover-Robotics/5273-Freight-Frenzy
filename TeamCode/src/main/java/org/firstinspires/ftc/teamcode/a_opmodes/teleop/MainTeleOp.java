@@ -49,11 +49,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if (gamepadEx1.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT){
       bot.intake.runLeft();
+      bot.outtake.closeRightFlap();
       bot.outtake.openLeftFlap();
     }
     else {
       bot.intake.stopLeft();
-      bot.outtake.closeLeftFlap();
     }
 
     if (gamepadEx1.isDown(Button.RIGHT_BUMPER)) {
@@ -62,54 +62,47 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     else if (gamepadEx1.getTrigger(Trigger.RIGHT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.intake.runRight();
       bot.outtake.openRightFlap();
+      bot.outtake.closeLeftFlap();
     }
     else {
       bot.intake.stopRight();
+    }
+
+    if(gamepadEx1.wasJustPressed(Button.DPAD_RIGHT) || gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)) {
+      bot.outtake.setAutoFlap(true);
+    }
+
+
+    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)) {
+      bot.outtake.setAutoFlap(false);
+      bot.outtake.openLeftFlap();
+
+    }
+    else if(gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT) {
+      bot.outtake.closeLeftFlap();
+    }
+
+
+    if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)) {
+      bot.outtake.setAutoFlap(false);
+      bot.outtake.openRightFlap();
+    }
+    else if(gamepadEx2.getTrigger(Trigger.RIGHT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.outtake.closeRightFlap();
-    }
-
-
-      // driver 2
-
-    // toggling flaps to hold freight in bucket
-    if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)){
-      bot.outtake.toggleLeftFlap();
-    }
-
-    else if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)){
-      bot.outtake.toggleRightFlap();
     }
 
     // all slides controls
     if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.goToCapstone();
     }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
-      bot.outtake.goToLowGoal();
-      timingScheduler.defer(0.05, () -> { bot.outtake.flipBucket();
-        timingScheduler.defer(0.5, () -> {
-          bot.outtake.unFlipBucket();
-          bot.outtake.fullyRetract();
-        });
-      });
-    }
-    else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
-      bot.outtake.goToMidGoal();
-      timingScheduler.defer(0.15, () -> { bot.outtake.flipBucket();
-        timingScheduler.defer(0.5, () -> {
-          bot.outtake.unFlipBucket();
-          bot.outtake.fullyRetract();
-        });
-      });
-    }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
-      timingScheduler.defer(0.25, () -> { bot.outtake.flipBucket();
-        timingScheduler.defer(0.5, () -> {
-          bot.outtake.unFlipBucket();
-          bot.outtake.fullyRetract();
-        });
-      });
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
+      bot.outtake.goToLowGoal();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
+      bot.outtake.goToMidGoal();
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
       timingScheduler.clearAll();
@@ -117,19 +110,28 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     }
 
-    if (gamepadEx2.wasJustPressed(Button.Y)){
-      timingScheduler.clearAll();
+    if(gamepadEx2.wasJustPressed(Button.X)) {
+      bot.outtake.flipBucket();
+      timingScheduler.defer(0.6,
+      () -> {
+        bot.outtake.unFlipBucket();
+        bot.outtake.fullyRetract();
+      });
     }
 
     // carousel controls
-    if (gamepadEx2.wasJustPressed(Button.A)){
+    if (gamepadEx2.wasJustPressed(Button.Y)){
       bot.carousel.toggleBlue();
     }
     else if (gamepadEx2.wasJustPressed(Button.B)) {
       bot.carousel.toggleRed();
     }
-    else if (gamepadEx2.wasJustPressed(Button.X)) {
-      bot.carousel.stop();
+
+    if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
+      bot.outtake.toggleRightFlap();
+    }
+    else if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
+      bot.outtake.toggleLeftFlap();
     }
 
 
@@ -169,11 +171,15 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("y", bot.roadRunner.getPoseEstimate().getY());
     telemetry.addData("heading", bot.roadRunner.getPoseEstimate().getHeading());
     telemetry.addData("driver left stick", "left X" + gamepadEx1.getLeftX() + ": " + gamepadEx1.getLeftY());
-
+    telemetry.addLine("isFreightIn : " + bot.outtake.isFreightIn());
+    telemetry.addLine("autoFlap: " + bot.outtake.isAutoFlap());
   }
 
 
   private void drive(){//Driving ===================================================================================
+
+
+    driveSpeed = inSlowMode ? SLOW_MODE_PERCENT : 1;
 
     final double gyroTolerance = 0.05;
 
@@ -191,10 +197,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                     gamepadEx1.getRightX() * Math.abs(gamepadEx1.getRightX()),
                     0);
     if (bot.roadRunner.mode == RRMecanumDrive.Mode.IDLE) {
-
-      boolean dpadPressed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
-              || gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT));
-      boolean buttonPressed = (gamepadEx1.getButton(GamepadKeys.Button.X) || gamepadEx1.getButton(GamepadKeys.Button.B));
 
       double forwardSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT) ? 1 : -1) : 0;
       double strafeSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : -1) : 0;
@@ -238,7 +240,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       }
 
     }
-    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+
+    if (gamepadEx1.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       fieldCentricOffset0 = bot.imu0.getAngularOrientation()
               .toAngleUnit(AngleUnit.DEGREES).firstAngle;
       fieldCentricOffset1 = bot.imu1.getAngularOrientation()
@@ -246,6 +249,12 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     if (gamepadEx1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)){
       centricity = !centricity;
+      if(centricity) {
+        fieldCentricOffset0 = bot.imu0.getAngularOrientation()
+                .toAngleUnit(AngleUnit.DEGREES).firstAngle;
+        fieldCentricOffset1 = bot.imu1.getAngularOrientation()
+                .toAngleUnit(AngleUnit.DEGREES).firstAngle;
+      }
     }
 
   }
