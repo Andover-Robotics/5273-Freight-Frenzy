@@ -334,7 +334,7 @@ class AutoPaths(val opMode: LinearOpMode) {
         return paths
 
     }
-        //todo make it use periodic instead of sliderun
+    //todo make it use periodic instead of sliderun
     // features as functions, that return command groups
     fun getTrajectories(a: DuckDetector.PipelineResult): List<AutoPathElement> {
         return calcTrajectories(
