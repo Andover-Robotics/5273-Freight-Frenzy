@@ -131,11 +131,11 @@ class AutoPaths(val opMode: LinearOpMode) {//TODO: possibly add the TeleOpPaths 
     //TODO: Edit
     fun initialPosition(): Pose2d {
         val initialY = (if (redAlliance)  -31.0 else -41.0)
-        return Pose2d(  multiplier * 65.0, initialY + (if (depotSide) 0.0 else 48.0),3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d(multiplier * 65.0, initialY + (if (depotSide) 0.0 else 48.0),3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun carouselPosition(): Pose2d {
-        return Pose2d( multiplier * (if (redAlliance) 61.0 else 59.0), (if (redAlliance) -65.0 else -67.0), 3 * PI / 2 - if (redAlliance) 0.0 else PI)
+        return Pose2d( multiplier * (if (redAlliance) 61.0 else 59.0), (if (redAlliance) -62.5 else -67.0), 3 * PI / 2 - if (redAlliance) 0.0 else PI)
     }
 
     private fun initialOuttakePosition(): Pose2d {
