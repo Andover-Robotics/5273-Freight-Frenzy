@@ -7,28 +7,30 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 
+@TeleOp(name = "IntakeDetectionTesting", group = "ZTesting")
+public class IntakeDetectionTestingOpMode extends BaseOpMode {
 
-@TeleOp(name = "IntakeTuningGraphing", group = "ZDashBoard graphing tool")
-public class IntakeGraphingOpMode extends BaseOpMode {
 
     TelemetryPacket packet = new TelemetryPacket();
+    double prevLeftVelo, prevRightVelo;
 
-    private static final double TRIGGER_TOLERANCE = 0.05;
+    private static final double TRIGGER_TOLERANCE = 0.1;
+    private static final double INTAKE_DETECT_CONST = 1150;
 
-    private static double lastLeftRPM, lastRightRPM;
-
+    @Override
     public void subInit() {
-
-
-
+        prevLeftVelo = bot.intake.getPrevLeftVelo();
+        prevRightVelo = bot.intake.getPrevRightVelo();
         packet.addLine("Init done");
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 
+
+    @Override
     public void subLoop() {
 
         double leftIntakeVelo = bot.intake.leftIntake.getVelocity(),
-               rightIntakeVelo = bot.intake.rightIntake.getVelocity();
+                rightIntakeVelo = bot.intake.rightIntake.getVelocity();
 
         if(gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= TRIGGER_TOLERANCE) {
             bot.intake.runRight();
@@ -40,11 +42,16 @@ public class IntakeGraphingOpMode extends BaseOpMode {
             bot.intake.stop();
         }
 
-        packet.put("Left Intake Accel", leftIntakeVelo - lastLeftRPM);
-        packet.put("Right Intake Accel", lastRightRPM - rightIntakeVelo);
+        if(leftIntakeVelo < INTAKE_DETECT_CONST && !bot.intake.isLeftIntaking()) packet.put("Left Intaked", 300);
+        else packet.put("Left Intaked", 0);
+        if(rightIntakeVelo < INTAKE_DETECT_CONST && !bot.intake.isRightIntaking()) packet.put("Right Intaked", 300);
+        else packet.put("Right Intaked", 0);
 
-        lastLeftRPM = leftIntakeVelo;
-        lastRightRPM = rightIntakeVelo;
+        packet.put("Left Intake Accel", leftIntakeVelo - prevLeftVelo);
+        packet.put("Right Intake Accel", prevRightVelo - rightIntakeVelo);
+
+        prevLeftVelo = leftIntakeVelo;
+        prevRightVelo = rightIntakeVelo;
 
         packet.put("Left Intake RPM", leftIntakeVelo);
         packet.put("Right Intake RPM", rightIntakeVelo);
@@ -52,6 +59,4 @@ public class IntakeGraphingOpMode extends BaseOpMode {
 
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
-
-
 }
