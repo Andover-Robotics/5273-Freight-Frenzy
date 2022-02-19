@@ -272,7 +272,7 @@ public class Outtake extends SubsystemBase {
     }
 
     public void autoRun() {
-        while (true ) {
+        while (true) {
             if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
                 slideMotor.set(SLIDE_STOPPED);
                 slideRun = SlideRun.HOLDING;

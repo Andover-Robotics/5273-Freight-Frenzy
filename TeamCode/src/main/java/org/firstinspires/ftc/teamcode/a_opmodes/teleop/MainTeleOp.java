@@ -28,9 +28,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   //opmode vars here ==============================================================================================
   public void subInit() {
     driveSpeed = 1.0;
-    bot.outtake.closeRightFlap();
-    bot.outtake.closeLeftFlap();
-    bot.outtake.unFlipBucket();
   }
 
   @Override

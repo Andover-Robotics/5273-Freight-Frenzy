@@ -86,8 +86,8 @@ public class DuckDetector {
 
   class RingDetectionPipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(50, 50, 0);
-    final Scalar upperRange = new Scalar(80, 255, 255);
+    final Scalar lowerRange = new Scalar(40, 0, 30);
+    final Scalar upperRange = new Scalar(80, 110, 255);
 
     /*
 
