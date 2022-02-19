@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
     private static ExpansionHubEx controlHub;
     private static ExpansionHubEx expansionHub;
 
-    public static final double INTAKE_SPEED = 0.8;
+    public static final double INTAKE_SPEED = 0.7;
     private static final double OUTTAKE_SPEED = 0.9;
 
     public MotorEx leftIntake;
@@ -47,8 +47,13 @@ public class Intake extends SubsystemBase {
 
     private double curLeftVelo, curRightVelo;
     private double curRightAmps, curLeftAmps;
-    private final double CONST_AMPS;
+    private final double INTAKE_DETECT_CONST_RPM;
+    private final double LEFT_INTAKE_DETECT_CONST_AMPS = 1500;
+    private final double RIGHT_INTAKE_DETECT_CONST_AMPS = 2500;
+    private final double REVERSE_INTAKE_DELAY = 1250;
+    private static final double STOP_DELAY = 500;
     private final double IS_RUNNING_CONST_RPM = 15;
+    private final double IS_RUNNING_CONST_AMPS = 30;
     // private boolean leftRunning = false, rightRunning= false;
     private double timeWhenIntake = -1; //timeWhenReverse;
     public boolean elementIntook = false;
@@ -92,7 +97,7 @@ public class Intake extends SubsystemBase {
         curLeftVelo = 0;
 
         //                    ____   <-  that is the constant ration level where intaking gets detected
-        CONST_AMPS= 1300; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
+        INTAKE_DETECT_CONST_RPM = 1000; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
     }
 
     @Override
@@ -257,12 +262,12 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean wasIntakedLeft() {
-        return leftIntakeCurrentDraw() > CONST_AMPS && !isReversingLeft;
+        return leftIntakeCurrentDraw() > LEFT_INTAKE_DETECT_CONST_AMPS && !isReversingLeft;
                 //(curLeftVelo < INTAKE_DETECT_CONST_RPM && isLeftIntaking())
     }
 
     public boolean wasIntakedRight() {
-        return rightIntakeCurrentDraw() > CONST_AMPS && !isReversingRight;
+        return rightIntakeCurrentDraw() > RIGHT_INTAKE_DETECT_CONST_AMPS && !isReversingRight;
                 //(curRightVelo < INTAKE_DETECT_CONST_RPM && isRightIntaking()) || rightIntakeCurrentDraw() > INTAKE_DETECT_CONST_AMPS;
     }
 
