@@ -27,6 +27,7 @@ public abstract class BaseOpMode extends OpMode {
   @Override
   public void init() {
     bot = Bot.getInstance(this);
+    bot.init();
     gamepadEx2 = new GamepadEx(gamepad2);
     gamepadEx1 = new GamepadEx(gamepad1);
     timingScheduler = new TimingScheduler(this);
