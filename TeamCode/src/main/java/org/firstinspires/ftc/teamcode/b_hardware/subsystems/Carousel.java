@@ -23,10 +23,10 @@ public class Carousel extends SubsystemBase {
     public final Command cmdRunBlue = new InstantCommand(this::runBlue, this);
     public final Command cmdStopCarousel = new InstantCommand(this::stop, this);
 
-    public static double OPTIMAL_RPM = 135;
-    public static final double MOTOR_SPEED = 6000;
+    public static double OPTIMAL_RPM = 60;
+    public static final double MOTOR_SPEED = 1150;
     public static final double TICKS_PER_REVOLUTION = 145.1;
-    public static final double VELOCITY = OPTIMAL_RPM / 60 * TICKS_PER_REVOLUTION; //531 rpm
+    public static final double VELOCITY = OPTIMAL_RPM * TICKS_PER_REVOLUTION / 60.0; //531 rpm
 
     private final MotorEx motor;
     private enum State {
@@ -38,19 +38,20 @@ public class Carousel extends SubsystemBase {
 
 
     public Carousel(@NonNull OpMode opMode){
-        motor = new MotorEx(opMode.hardwareMap, "carousel");
+        motor = new MotorEx(opMode.hardwareMap, "carousel", Motor.GoBILDA.RPM_1150);
         motor.setRunMode(Motor.RunMode.VelocityControl);
-        motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         motor.setInverted(GlobalConfig.alliance == GlobalConfig.Alliance.RED);
     }
 
     public void runRed() {
-        motor.setVelocity(- VELOCITY);
+        motor.set(-.2);
         runState = State.RED_ON;
     }
 
     public void runBlue() {
-        motor.setVelocity(VELOCITY);
+       motor.set(.2);
+        // motor.setVelocity(VELOCITY);
         runState = State.BLUE_ON;
     }
 
@@ -68,11 +69,7 @@ public class Carousel extends SubsystemBase {
         if(runState == State.BLUE_ON) {
             stop();
         }
-        else if(runState == State.RED_ON) {
-            stop();
-            runBlue();
-        }
-        else if(runState == State.OFF) {
+        else {
             runBlue();
         }
     }
@@ -81,18 +78,14 @@ public class Carousel extends SubsystemBase {
         if(runState == State.RED_ON) {
             stop();
         }
-        else if(runState == State.BLUE_ON) {
-            stop();
-            runRed();
-        }
-        else if(runState == State.OFF) {
+        else  {
             runRed();
         }
     }
 
     public void stop() {
         //motor.stopMotor();
-        motor.setVelocity(0.0);
+        motor.set(0.0);
         runState = State.OFF;
     }
 

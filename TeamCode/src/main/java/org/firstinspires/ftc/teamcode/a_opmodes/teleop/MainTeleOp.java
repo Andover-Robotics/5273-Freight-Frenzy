@@ -134,6 +134,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
     // carousel controls
     if (gamepadEx2.wasJustPressed(Button.Y)) {
+      //bot.carousel.toggleBlue();
       bot.carousel.runBlue();
       /*
       for (int i = 0; i < 10; i++) {
@@ -153,7 +154,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
        */
     }
     else if (gamepadEx2.wasJustPressed(Button.B)) {
-      bot.carousel.toggleRed();
+      //bot.carousel.toggleRed();
+      bot.carousel.runRed();
       /*
       for (int i = 0; i < 10; i++) {
         timingScheduler.defer(
@@ -171,6 +173,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
        */
     }
+    else bot.carousel.stop();
 
 
 
