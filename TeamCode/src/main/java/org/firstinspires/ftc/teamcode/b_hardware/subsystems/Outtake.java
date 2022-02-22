@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -12,7 +13,6 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-
 
 public class Outtake extends SubsystemBase {
 
@@ -88,13 +88,16 @@ public class Outtake extends SubsystemBase {
     private static final double SLIDE_STOPPED = 0.15;
     private static final double RETRACT_SPEED = 0.015;
     private static final double ZERO_SPEED = 0.0;
-    private static final double TOLERANCE = 44;
+    private static final double TOLERANCE = 5;
     public static final int RETRACTED = 0;
     public static final int LOW_GOAL_POS = 226; // ticks
     public static final int MID_GOAL_POS = 377;
     public static final int TOP_GOAL_POS = 690;
     private static final int CAPSTONE_POS = 650; //TODO: tune these values
     public static final int HOOK_CAPSTONE_POS = 176;
+
+    private int offset = 0;
+    private int kOffset = 0;
 
     private static int targetPosition;
 
@@ -146,7 +149,7 @@ public class Outtake extends SubsystemBase {
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.setInverted(true);
-        slideMotor.setPositionTolerance(30);
+        slideMotor.setPositionTolerance(40);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         unFlipBucket();
@@ -156,23 +159,22 @@ public class Outtake extends SubsystemBase {
 
     @Override
     public void periodic() {
+        slideMotor.setTargetPosition(targetPosition + kOffset);
+
         if (!slideMotor.atTargetPosition()) {
             slideRun = SlideRun.RUNNING;
-            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+            if (Math.abs(targetPosition + kOffset) < Math.abs(slideMotor.getCurrentPosition())) {
                 slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(RETRACT_SPEED);
             } else {
-
                 slideMotor.set(SLIDE_SPEED);
                 switch (slideState) {
                     case AT_TOP_GOAL:
+                    case AT_CAPSTONE:
                         slideMotor.setPositionCoefficient(0.01);
                         break;
                     case AT_MID_GOAL:
                         slideMotor.setPositionCoefficient(0.009);
-                        break;
-                    case AT_CAPSTONE:
-                        slideMotor.setPositionCoefficient(0.15);
                         break;
                     case AT_LOW_GOAL:
                         slideMotor.setPositionCoefficient(0.008);
@@ -211,6 +213,7 @@ public class Outtake extends SubsystemBase {
 
     public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
         unFlipBucket();
+        resetOffset();
         targetPosition = RETRACTED;
         slideMotor.setTargetPosition(RETRACTED);
         slideRun = SlideRun.RUNNING;
@@ -253,6 +256,20 @@ public class Outtake extends SubsystemBase {
         slideRun = SlideRun.RUNNING;
     }
 
+    public void addOffset(double offset) {
+        this.offset += (int) (offset * 15);
+        if(targetPosition == RETRACTED) kOffset = 0;
+        else if(targetPosition == CAPSTONE_POS && this.offset > 10) kOffset = 10;
+        else if(this.offset >= 90) kOffset = 90;
+        else if(this.offset <= -90) kOffset = -90;
+        else this.kOffset = this.offset;
+    }
+
+    public void resetOffset() {
+        offset = 0;
+        kOffset = 0;
+    }
+
     public void hookCapstone() {
         slideState = SlideState.INTAKING_CAPSTONE;
         slideMotor.setTargetPosition(HOOK_CAPSTONE_POS);
@@ -272,7 +289,8 @@ public class Outtake extends SubsystemBase {
     }
 
     public void autoRun() {
-        while (true ) {
+        System.out.println("autoRun Doing stuff");
+        while (true) {
             if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
                 slideMotor.set(SLIDE_STOPPED);
                 slideRun = SlideRun.HOLDING;

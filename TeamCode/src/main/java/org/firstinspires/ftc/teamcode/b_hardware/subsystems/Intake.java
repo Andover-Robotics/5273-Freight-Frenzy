@@ -23,8 +23,8 @@ public class Intake extends SubsystemBase {
     private static ExpansionHubEx controlHub;
     private static ExpansionHubEx expansionHub;
 
-    public static final double INTAKE_SPEED = 0.8;
-    private static final double OUTTAKE_SPEED = 0.9;
+    public static final double INTAKE_SPEED = 1.0;
+    private static final double OUTTAKE_SPEED = 1.0;
 
     public MotorEx leftIntake;
     public MotorEx rightIntake;

@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
@@ -75,6 +76,9 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.setAutoFlap(true);
     }
 
+    if(Math.abs(gamepadEx2.getRightY()) > TRIGGER_CONSTANT) {
+      bot.outtake.addOffset(-gamepadEx2.getRightY());
+    }
 
     if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)) {
       bot.outtake.setAutoFlap(false);
@@ -108,19 +112,25 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.goToMidGoal();
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
-      timingScheduler.clearAll();
       bot.outtake.fullyRetract();
 
     }
 
-    if(gamepadEx2.wasJustPressed(Button.X)) {
+    if(gamepadEx2.isDown(Button.X)) {
       bot.outtake.flipBucket();
-      timingScheduler.defer(0.6,
-      () -> {
-        bot.outtake.unFlipBucket();
-        bot.outtake.fullyRetract();
-      });
     }
+    else if(gamepadEx2.wasJustReleased(Button.X)) {
+      bot.outtake.fullyRetract();
+    }
+
+//    if(gamepadEx2.wasJustPressed(Button.X)) {
+//      bot.outtake.flipBucket();
+//      timingScheduler.defer(0.6,
+//      () -> {
+//        bot.outtake.unFlipBucket();
+//        bot.outtake.fullyRetract();
+//      });
+//    }
 
     // carousel controls
     if (gamepadEx2.wasJustPressed(Button.Y)){
@@ -130,12 +140,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.carousel.toggleRed();
     }
 
-    if (gamepadEx2.wasJustReleased(Button.RIGHT_BUMPER)){
-      bot.outtake.toggleRightFlap();
-    }
-    else if (gamepadEx2.wasJustReleased(Button.LEFT_BUMPER)){
-      bot.outtake.toggleLeftFlap();
-    }
 
 
     /*
@@ -166,8 +170,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     Start:  Back:switch between automation and driving
      */
 
-    CommandScheduler.getInstance().run();
-
     telemetry.addData("Centricity", centricity);
     telemetry.addData("cycle", cycle);
     telemetry.addData("x", bot.roadRunner.getPoseEstimate().getX());
@@ -181,8 +183,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
 
   private void drive(){//Driving ===================================================================================
 
-
-    driveSpeed = inSlowMode ? SLOW_MODE_PERCENT : 1;
 
     final double gyroTolerance = 0.05;
 
@@ -210,30 +210,13 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                 driveVector.getY() * driveSpeed,
                 driveVector.getX() * -driveSpeed,
                 turnVector.getX() * driveSpeed,
-                        (  Math.abs(avgGyroAngle - gyroAngle0) < gyroTolerance
+                (Math.abs(avgGyroAngle - gyroAngle0) < gyroTolerance
                         || Math.abs(avgGyroAngle - gyroAngle1) < gyroTolerance) ?
-                                Math.abs(gyroAngle0 - avgGyroAngle) <
-                                        Math.abs(gyroAngle1 - avgGyroAngle) ?
-                                        gyroAngle0 : gyroAngle1 : avgGyroAngle
-                // Epic Java Syntax here
-                /*
-                 * In theory, this check ensures that when the avgGyroAngle is VERY off
-                 * due to one IMU giving ~0.01, and the second giving ~1.99 which SHOULD be considered an angle of 2 or 0
-                 * This problem was encountered while first testing the dual IMU dependant field centric drive
-                 * the robot would run two motors on the corners of the robot in opposite directions, causing negligible movement
-                 * Because I believe the rarer incorrect averages, these ternary statements, should correct this.
-                 */
+                        Math.abs(gyroAngle0 - avgGyroAngle) <
+                                Math.abs(gyroAngle1 - avgGyroAngle) ?
+                                gyroAngle0 : gyroAngle1 : avgGyroAngle
         );
       }
-      else if (dpadPressed || buttonPressed) {
-        double tempDriveSpeed = driveSpeed *= SLOW_MODE_PERCENT;
-        bot.drive.driveRobotCentric(
-                strafeSpeed * tempDriveSpeed,
-                forwardSpeed * -tempDriveSpeed,
-                turnSpeed * tempDriveSpeed
-        );
-      }
-
       else {
         bot.drive.driveRobotCentric(
                 driveVector.getY() * driveSpeed,
