@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.b_hardware;
 import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -79,11 +80,18 @@ public class Bot {
 
 
     //required subsystems
-    this.drive = new MecanumDrive(false,
-        new MotorEx(opMode.hardwareMap, GlobalConfig.motorFL),
-        new MotorEx(opMode.hardwareMap, GlobalConfig.motorFR),
-        new MotorEx(opMode.hardwareMap, GlobalConfig.motorBL),
-        new MotorEx(opMode.hardwareMap, GlobalConfig.motorBR));
+
+    MotorEx FL = new MotorEx(opMode.hardwareMap, GlobalConfig.motorFL);
+    FL.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    MotorEx FR = new MotorEx(opMode.hardwareMap, GlobalConfig.motorFR);
+    FR.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    MotorEx BL = new MotorEx(opMode.hardwareMap, GlobalConfig.motorBL);
+    BL.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    MotorEx BR = new MotorEx(opMode.hardwareMap, GlobalConfig.motorBR);
+    BR.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
+    this.drive = new MecanumDrive(false, FL, FR, BL, BR);
+
     this.roadRunner = new RRMecanumDrive(opMode.hardwareMap);
 //    this.cosmetics = new Cosmetics(opMode);
     imu0 = roadRunner.imu;
