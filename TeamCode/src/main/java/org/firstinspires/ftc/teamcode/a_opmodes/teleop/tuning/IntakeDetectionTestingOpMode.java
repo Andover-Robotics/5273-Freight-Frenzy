@@ -19,8 +19,6 @@ public class IntakeDetectionTestingOpMode extends BaseOpMode {
 
     @Override
     public void subInit() {
-        prevLeftVelo = bot.intake.getPrevLeftVelo();
-        prevRightVelo = bot.intake.getPrevRightVelo();
         packet.addLine("Init done");
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
