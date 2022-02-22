@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -37,6 +38,7 @@ public abstract class BaseOpMode extends OpMode {
   @Override
   public void loop() {
     updateButtons();
+    CommandScheduler.getInstance().run();
     subLoop();
   }
 
