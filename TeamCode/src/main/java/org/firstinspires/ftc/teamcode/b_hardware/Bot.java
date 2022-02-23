@@ -98,6 +98,21 @@ public class Bot {
     imu1 = (roadRunner.imu2 != null) ? roadRunner.imu2 : null;
   }
 
+  public void init() {
+    initDrive();
+  }
+
+  private void initDrive() {
+    MotorEx FL = new MotorEx(opMode.hardwareMap, GlobalConfig.motorFL);
+    FL.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    MotorEx FR = new MotorEx(opMode.hardwareMap, GlobalConfig.motorFR);
+    FR.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    MotorEx BL = new MotorEx(opMode.hardwareMap, GlobalConfig.motorBL);
+    BL.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    MotorEx BR = new MotorEx(opMode.hardwareMap, GlobalConfig.motorBR);
+    BR.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+  }
+
 //  private void initializeImu() {
 //    final Parameters params = new Parameters();
 //    params.angleUnit = AngleUnit.RADIANS;
