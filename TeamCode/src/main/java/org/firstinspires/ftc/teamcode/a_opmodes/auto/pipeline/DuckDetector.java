@@ -86,14 +86,17 @@ public class DuckDetector {
 
   class RingDetectionPipeline extends OpenCvPipeline {
 
-    final Scalar lowerRange = new Scalar(50, 50, 0);
-    final Scalar upperRange = new Scalar(80, 255, 255);
+    /*
+    final Scalar lowerRange = new Scalar(40, 0, 30);
+    final Scalar upperRange = new Scalar(80, 90, 255);
+    */
+
+    final Scalar lowerRange = new Scalar(40, 0, 50);
+    final Scalar upperRange = new Scalar(120, 255, 255);
 
     /*
 
     DUCK DETETCTION CONSTANTS
-
-    //TODO: Test new values and see if duck detetcted instantly; if not revert to previous value(
 
     //static final double TEAM_SHIPPING_ELEMENT_AREA = 1500;
     static final double TEAM_SHIPPING_ELEMENT_AREA = 1250;
@@ -105,7 +108,7 @@ public class DuckDetector {
 
     //TEAM SHIPPING ELEMENT CONSTANTS
 
-    static final double TEAM_SHIPPING_ELEMENT_AREA = 10000;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 40000;
 
     final double MIDDLE_RIGHT_X = 600;
     final double MIDDLE_LEFT_X = 320;
@@ -119,12 +122,14 @@ public class DuckDetector {
     final List<Rect> bounds = new ArrayList<>();
     final Size gaussianKernelSize = new Size(9, 9);
 
+    double green;
+
     @SuppressLint("SdCardPath")
     @Override
     public Mat processFrame(Mat input) {
       Rect potentialDuckArea = new Rect(0, 0, input.width(), input.height());
       Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
-      Imgproc.cvtColor(input, test, Imgproc.COLOR_RGB2HLS);
+      Imgproc.cvtColor(input, test, COLOR_RGB2HLS);
       Core.inRange(test, lowerRange, upperRange, edgeDetector);
       Imgproc.GaussianBlur(edgeDetector, smoothEdges, gaussianKernelSize, 0, 0);
 
@@ -156,7 +161,7 @@ public class DuckDetector {
 
     private Optional<Pair<PipelineResult, Double>> identifyDuckFromBounds() {
       if (bounds.size() == 0) {
-        return Optional.of(Pair.create(PipelineResult.NONE, 0.7));
+        return Optional.of(Pair.create(PipelineResult.NONE, 0.9));
       }
 
       double minError = bounds.stream().map(Rect::area).max(Comparator.naturalOrder()).get();
@@ -170,16 +175,15 @@ public class DuckDetector {
 
       assert boundingBox != null;
 
-      //TODO: Compute Confidence Intervals
 
       if (boundingBox.x <= MIDDLE_LEFT_X) {
-        return Optional.of(Pair.create(PipelineResult.LEFT, 0.8));
+        return Optional.of(Pair.create(PipelineResult.LEFT, green));
       }
       else if (boundingBox.x <= MIDDLE_RIGHT_X){
-        return Optional.of(Pair.create(PipelineResult.MIDDLE, 0.8));
+        return Optional.of(Pair.create(PipelineResult.MIDDLE, green));
       }
       else {
-        return Optional.of(Pair.create(PipelineResult.RIGHT, 0.8));
+        return Optional.of(Pair.create(PipelineResult.RIGHT, green));
       }
 
     }

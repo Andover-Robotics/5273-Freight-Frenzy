@@ -28,9 +28,8 @@ public class TestOpMode extends OpMode {
 
     @Override
     public void loop() {
-//        testPath.followPath(bot.drive, bot.roadRunner.localizer);//TODO: make ftclib odometry
-
-        //testing music
+//        testPath.followPath(bot.drive, bot.roadRunner.localizer);
+// testing music
 //        MediaPlayer.create(hardwareMap.appContext, R.raw.rickroll).start();
     }
 }

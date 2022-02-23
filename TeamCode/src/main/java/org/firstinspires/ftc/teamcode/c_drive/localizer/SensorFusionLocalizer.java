@@ -31,7 +31,7 @@ public class SensorFusionLocalizer implements Localizer {
     centerPose = GlobalConfig.EncoderValues.centerEncoder;
     
     data = new SensorFusionData(hardwareMap, imu1, imu2);
-    //TODO: switch encoders around if this doesnt work
+    //switch encoders around if this doesnt work
     localizers[0] = new RROdometryLocalizerIMU(leftPose, centerPose, 2, 1, data);
     localizers[1] = new RROdometryLocalizerIMU(leftPose, centerPose, 2, 2, data);
     localizers[2] = new RROdometryLocalizerIMU(rightPose, centerPose, 0, 1, data);
@@ -55,7 +55,6 @@ public class SensorFusionLocalizer implements Localizer {
     Pose2d mean = new Pose2d(
         sum.vec().div(positionSum),
         sum.getHeading() / headingSum);
-    //TODO find a way to get this to work
 //    for(Localizer l: localizers){
 //        l.setPoseEstimate(mean);
 //      }

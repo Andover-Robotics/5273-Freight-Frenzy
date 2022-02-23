@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 import java.util.List;
 
 @Autonomous(name = "Main Autonomous", group = "Competition")
-public class MainAutonomous extends LinearOpMode {//TODO: add reversing for competition
+public class MainAutonomous extends LinearOpMode {
 
   private Bot bot;
 
@@ -43,9 +43,7 @@ public class MainAutonomous extends LinearOpMode {//TODO: add reversing for comp
 
 
     pipeline = new DuckDetector(this, telemetry);
-
-    //TODO: add initialization here
-
+    //initialize here
     bot.outtake.fullyRetract();
     bot.outtake.closeRightFlap();
     bot.outtake.closeLeftFlap();

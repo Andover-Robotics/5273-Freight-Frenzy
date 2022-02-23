@@ -22,7 +22,7 @@ public class Bot {
   public static Bot instance;
 
 
-  //TODO: Declare subsystems here
+  //Declare subsystems here
   //example
   public final Carousel carousel;
   public final Intake intake;
@@ -56,21 +56,21 @@ public class Bot {
   }
 
   public void reset(){
-    //TODO: add reset code here
+    // add reset code here
   }
 
   private Bot(OpMode opMode){
     this.opMode = opMode;
     enableAutoBulkRead();
     try {
-//      this.hubs = Pair.create(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"), // TODO: check if revextensions2 works with sdk7.0 and control hubs
+//      this.hubs = Pair.create(opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1"),
 //          opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2"));
     } catch (Exception e) {
       // Avoid catastrophic errors if RevExtensions don't behave as expected. Limited trust of stability
       e.printStackTrace();
     }
 
-    //TODO: initialize subsystems
+    //initialize subsystems
     //example
 //    this.templateSubsystem = new TemplateSubsystem(opMode);
     this.carousel = new Carousel(opMode);

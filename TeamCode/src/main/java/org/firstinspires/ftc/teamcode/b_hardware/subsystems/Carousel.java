@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
-
+//todo implement with motor instead of CR servo
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -23,13 +23,12 @@ public class Carousel extends SubsystemBase {
     public final Command cmdRunBlue = new InstantCommand(this::runBlue, this);
     public final Command cmdStopCarousel = new InstantCommand(this::stop, this);
 
-    public static double OPTIMAL_RPM = 531;
-    public static final double MOTOR_SPEED = 1150;
-    public static final double SPEED_PERCENT = OPTIMAL_RPM / MOTOR_SPEED; //531 rpm
-
+    public static double OPTIMAL_RPM = 135;
+    public static final double MOTOR_SPEED = 6000;
+    public static final double TICKS_PER_REVOLUTION = 145.1;
+    public static final double VELOCITY = OPTIMAL_RPM / 60 * TICKS_PER_REVOLUTION; //531 rpm
 
     private final MotorEx motor;
-    private final CRServo servo;
     private enum State {
         RED_ON,
         BLUE_ON,
@@ -39,22 +38,30 @@ public class Carousel extends SubsystemBase {
 
 
     public Carousel(@NonNull OpMode opMode){
-        motor = new MotorEx(opMode.hardwareMap, "carousel", Motor.GoBILDA.RPM_1150);
-        motor.setRunMode(Motor.RunMode.RawPower);
+        motor = new MotorEx(opMode.hardwareMap, "carousel");
+        motor.setRunMode(Motor.RunMode.VelocityControl);
         motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
         motor.setInverted(GlobalConfig.alliance == GlobalConfig.Alliance.RED);
-        servo = opMode.hardwareMap.crservo.get("carouselLeft");
-        servo.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void runRed() {
-        servo.setPower(-1);
+        motor.setVelocity(- VELOCITY);
         runState = State.RED_ON;
     }
 
     public void runBlue() {
-        motor.set(SPEED_PERCENT);
+        motor.setVelocity(VELOCITY);
         runState = State.BLUE_ON;
+    }
+
+    public void runAtRPM(boolean red, int rpm) {
+        motor.setVelocity(((red) ? -1 : 1) * rpm / 60 * TICKS_PER_REVOLUTION);
+        if (red) {
+            runState = State.BLUE_ON;
+        }
+        else {
+            runState = State.RED_ON;
+        }
     }
 
     public void toggleBlue() {
@@ -69,6 +76,7 @@ public class Carousel extends SubsystemBase {
             runBlue();
         }
     }
+
     public void toggleRed() {
         if(runState == State.RED_ON) {
             stop();
@@ -84,12 +92,8 @@ public class Carousel extends SubsystemBase {
 
     public void stop() {
         //motor.stopMotor();
-        servo.setPower(0);
+        motor.setVelocity(0.0);
         runState = State.OFF;
-    }
-
-    public void runAtRPM(double rpmSpeed) {
-        motor.set(rpmSpeed / MOTOR_SPEED);
     }
 
     public MotorEx getMotor() {

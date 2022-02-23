@@ -6,7 +6,7 @@ public class BinarySearchHelper {
 
     public BinarySearchHelper(double min, double max) {
         this.min = min;
-        this.mid = (min + max) / 2.0;
+        this.mid = (min + max) / 2;
         this.max = max;
     }
 

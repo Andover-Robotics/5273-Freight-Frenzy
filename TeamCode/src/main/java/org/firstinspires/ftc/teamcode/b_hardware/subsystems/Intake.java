@@ -83,16 +83,11 @@ public class Intake extends SubsystemBase {
         rightIntake.setRunMode(Motor.RunMode.RawPower);
         rightIntake.motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        /*
-        prevLeftVelo = 0;
-        prevRightVelo = 0;
-         */
-
         curRightVelo = 0;
         curLeftVelo = 0;
 
         //                    ____   <-  that is the constant ration level where intaking gets detected
-        CONST_AMPS= 1300; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
+        CONST_AMPS= 2000; //0.783333 * ((leftIntake.getMaxRPM()/60) * leftIntake.getCPR());
     }
 
     @Override
@@ -101,7 +96,6 @@ public class Intake extends SubsystemBase {
         updateVeloVals();
         updateAmpVals();
 
-        //TODO: Tune Amperage Values
 
         /*
         if (!elementIntook) {

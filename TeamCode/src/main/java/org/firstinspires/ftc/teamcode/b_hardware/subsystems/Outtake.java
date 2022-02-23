@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+
 public class Outtake extends SubsystemBase {
 
     public class RunSlides extends CommandBase {
@@ -59,7 +60,7 @@ public class Outtake extends SubsystemBase {
     public final Command cmdCloseLeftFlap = new InstantCommand(this::closeLeftFlap, this);
 
     // Servo positions for the arms and the bucket
-    //TODO: Make in GlobalConfig
+    //Make in GlobalConfig
     public static final double FLAP_OPEN = 0.26;
     public static final double FLAP_CLOSED = 0.02;
     private static final double FLAP_DEPOSIT = 0.5;
@@ -93,7 +94,7 @@ public class Outtake extends SubsystemBase {
     public static final int LOW_GOAL_POS = 226; // ticks
     public static final int MID_GOAL_POS = 377;
     public static final int TOP_GOAL_POS = 690;
-    private static final int CAPSTONE_POS = 650; //TODO: tune these values
+    private static final int CAPSTONE_POS = 650;
     public static final int HOOK_CAPSTONE_POS = 176;
 
     private int offset = 0;
@@ -120,8 +121,6 @@ public class Outtake extends SubsystemBase {
     private boolean leftFlapOpen = true;
     private boolean rightFlapOpen = true;
     private boolean autoFlap = true;
-
-    // TODO: more optimized way to do color sense stuff, because this is really jank
 
     public final Servo leftFlap;
     public final Servo rightFlap;
@@ -166,19 +165,23 @@ public class Outtake extends SubsystemBase {
             if (Math.abs(targetPosition + kOffset) < Math.abs(slideMotor.getCurrentPosition())) {
                 slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(RETRACT_SPEED);
-            } else {
+            }
+            else {
                 slideMotor.set(SLIDE_SPEED);
                 switch (slideState) {
                     case AT_TOP_GOAL:
-                    case AT_CAPSTONE:
                         slideMotor.setPositionCoefficient(0.01);
                         break;
                     case AT_MID_GOAL:
                         slideMotor.setPositionCoefficient(0.009);
                         break;
+                    case AT_CAPSTONE:
+                        slideMotor.setPositionCoefficient(0.15);
+                        break;
                     case AT_LOW_GOAL:
                         slideMotor.setPositionCoefficient(0.008);
                         slideMotor.set(0.5);
+                        break;
                 }
             }
         } else {
@@ -223,7 +226,6 @@ public class Outtake extends SubsystemBase {
     public void goToLowGoal() {
         closeRightFlap();
         closeLeftFlap();
-        leftFlap.close();
         targetPosition = LOW_GOAL_POS;
         slideState = SlideState.AT_LOW_GOAL;
         slideMotor.setTargetPosition(LOW_GOAL_POS);
@@ -233,7 +235,6 @@ public class Outtake extends SubsystemBase {
     public void goToMidGoal() {
         closeRightFlap();
         closeLeftFlap();
-        leftFlap.close();
         targetPosition = MID_GOAL_POS;
         slideState = SlideState.AT_MID_GOAL;
         slideMotor.setTargetPosition(MID_GOAL_POS);
@@ -243,7 +244,6 @@ public class Outtake extends SubsystemBase {
     public void goToTopGoal() {
         closeRightFlap();
         closeLeftFlap();
-        leftFlap.close();
         targetPosition = TOP_GOAL_POS;
         slideState = SlideState.AT_TOP_GOAL;
         slideMotor.setTargetPosition(TOP_GOAL_POS);
@@ -289,13 +289,21 @@ public class Outtake extends SubsystemBase {
     }
 
     public void autoRun() {
-        System.out.println("autoRun Doing stuff");
+        System.out.println("autoRun");
         while (true) {
             if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
-                slideMotor.set(SLIDE_STOPPED);
+                if (slideState == SlideState.RETRACTED) {
+                    slideMotor.stopMotor();
+                }
+                else {
+                    slideMotor.set(SLIDE_STOPPED);
+                }
                 slideRun = SlideRun.HOLDING;
                 return;
-            } else {
+
+            }
+
+            else {
                 if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
                     slideMotor.set(RETRACT_SPEED);
                 } else {

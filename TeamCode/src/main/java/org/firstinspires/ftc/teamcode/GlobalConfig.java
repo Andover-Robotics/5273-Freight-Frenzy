@@ -31,7 +31,6 @@ public class GlobalConfig {//make all fields final
     public String toString() { return super.toString(); }
   }
 
-  //TODO add more config stuff
   public static final String motorFL = "motorFL", motorFR = "motorFR", motorBL = "motorBL", motorBR = "motorBR";
   public static Alliance alliance = Alliance.RED;
   public static Side side = Side.DEPOT;
