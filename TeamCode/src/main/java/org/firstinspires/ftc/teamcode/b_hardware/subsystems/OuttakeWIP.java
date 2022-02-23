@@ -73,9 +73,6 @@ public class OuttakeWIP extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        //TODO: make this method better to make it smoothly go to the next slide position and better tolerances
-
         while(!slideMotor.atTargetPosition()) {
             slideMotor.set((targetPosition - slideMotor.getCurrentPosition()) < 50 ? SLIDE_SPEED/3 : SLIDE_SPEED);
             slideMotor.setTargetPosition(targetPosition);
@@ -88,8 +85,7 @@ public class OuttakeWIP extends SubsystemBase {
         // end of slide code -- beginning of freight detection
     }
 
-    // TODO: add the code in main teleOP to make this outtake method work +
-    //       add the current sensing for cube weight detection
+
     private void checkNewPos() {
         if(slideState == SlideState.RETRACTED) {
             slideMotor.setTargetPosition(RETRACTED);

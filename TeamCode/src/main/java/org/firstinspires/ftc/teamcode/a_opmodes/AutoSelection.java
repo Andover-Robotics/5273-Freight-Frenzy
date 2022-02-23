@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 @Autonomous(name="Autonomous Selection", group = "Competition")
 
 public class AutoSelection extends BaseOpMode {
-
+    //todo combine this opmode with alliance selection and side selection
     @Override
     protected void subInit() {
         telemetry.addData("Controls", "X: carousel, Y:outtakeCube, B:parking, D-Pad: cycles");

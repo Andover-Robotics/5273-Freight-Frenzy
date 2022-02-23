@@ -8,7 +8,6 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.checkerframework.checker.units.qual.A;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
@@ -25,7 +24,6 @@ class Hubs extends SubsystemBase {
     // variables for current draw logic
     private static double leftAvgMilliamps;
     private static double rightAvgMilliamps;
-    // TODO: tune milliamp draw for different weight cubes --> put in constants RELATIVE to the avg amps
     private static double LIGHT_WEIGHT_CUBE_MILLIAMP_DRAW = 0.0, MEDIUM_WEIGHT_CUBE_MILLIAMP_DRAW = 0.0, HEAVY_WEIGHT_CUBE_MILLIAMP_DRAW;
 
 
@@ -87,7 +85,7 @@ class Hubs extends SubsystemBase {
         return controlHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS, 2);
     }
 
-// TODO: possible calibration thing durinig init to run the motor and get the current it currently draws and average
+//  possible calibration thing durinig init to run the motor and get the current it currently draws and average
 //    for more accurate measurements during auto & teleOp also find a way to display it on the driver hub or something
 //    BUT -- in the future use the data from the lsat 5 seconds to keep a floating average for better accuracy in cube weight detection
 

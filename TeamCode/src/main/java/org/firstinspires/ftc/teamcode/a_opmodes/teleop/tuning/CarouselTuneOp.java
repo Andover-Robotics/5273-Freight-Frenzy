@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 
-//TODO: make a opmode able to change the speed of the carousel wheel to tune what speed exactly we can do
+//make a opmode able to change the speed of the carousel wheel to tune what speed exactly we can do
 // maybe increment in 1 percent increments, and remember that you can use any buttons
 // maybe teach luke the FTClib stuff with this
 
@@ -33,7 +33,7 @@ public class CarouselTuneOp extends BaseOpMode {
 
     @Override
     public void subLoop() {
-        bot.carousel.runAtRPM(curIter.getMid());
+        //bot.carousel.runAtRPM(curIter.getMid());
         if(gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
             BinarySearchHelper nextIter = curIter.iterateLeft();
             iters.push(nextIter);
