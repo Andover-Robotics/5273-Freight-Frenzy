@@ -63,15 +63,17 @@ public class Outtake extends SubsystemBase {
     public static final double FLAP_OPEN = 0.26;
     public static final double FLAP_CLOSED = 0.02;
     private static final double FLAP_DEPOSIT = 0.5;
-    private static final double FLAP_HOOK = 0.85;
 
     private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0.0;
+    private static final double HOOK_BUCKET = 0.70;
+    private static final double TSE_DELIVERY = 0.35;
 
     private enum BucketState {
         FLIPPED,
         UNFLIPPED,
-        HOOKING
+        HOOKING,
+        CAPSTONE
     }
 
     private BucketState bucketState = BucketState.UNFLIPPED;
@@ -92,8 +94,8 @@ public class Outtake extends SubsystemBase {
     public static final int LOW_GOAL_POS = 226; // ticks
     public static final int MID_GOAL_POS = 377;
     public static final int TOP_GOAL_POS = 690;
-    private static final int CAPSTONE_POS = 650;
-    public static final int HOOK_CAPSTONE_POS = 176;
+    public static final int CAPSTONE_POS = 650;
+    public static final int HOOK_CAPSTONE_POS = 280;
 
     private int offset = 0;
     private int kOffset = 0;
@@ -122,7 +124,7 @@ public class Outtake extends SubsystemBase {
 
     public final Servo leftFlap;
     public final Servo rightFlap;
-    private final Servo bucket;
+    public final Servo bucket;
     private final MotorEx slideMotor;
     private final ColorSensor bucketSensor;
 
@@ -178,6 +180,10 @@ public class Outtake extends SubsystemBase {
                         break;
                     case AT_LOW_GOAL:
                         slideMotor.setPositionCoefficient(0.008);
+                        slideMotor.set(0.5);
+                        break;
+                    case INTAKING_CAPSTONE:
+                        slideMotor.setPositionCoefficient(0.009);
                         slideMotor.set(0.5);
                         break;
                 }
@@ -249,6 +255,7 @@ public class Outtake extends SubsystemBase {
     }
 
     public void goToCapstone() {
+        targetPosition = CAPSTONE_POS;
         slideState = SlideState.AT_CAPSTONE;
         slideMotor.setTargetPosition(CAPSTONE_POS);
         slideRun = SlideRun.RUNNING;
@@ -269,25 +276,30 @@ public class Outtake extends SubsystemBase {
     }
 
     public void hookCapstone() {
+        targetPosition = HOOK_CAPSTONE_POS;
         slideState = SlideState.INTAKING_CAPSTONE;
         slideMotor.setTargetPosition(HOOK_CAPSTONE_POS);
         slideRun = SlideRun.RUNNING;
     }
 
-    public void extendRightHook() {
-        rightFlap.setPosition(FLAP_HOOK);
+    public void hookTSE() {
+        bucket.setPosition(HOOK_BUCKET);
         bucketState = BucketState.HOOKING;
-        rightFlapOpen = true;
     }
 
-    public void extendLeftHook() {
-        leftFlap.setPosition(FLAP_HOOK);
-        bucketState = BucketState.HOOKING;
-        leftFlapOpen = true;
+    public void capstone() {
+        bucket.setPosition(TSE_DELIVERY);
+        bucketState = BucketState.CAPSTONE;
+    }
+
+    public void incrementBucket(double position) {
+        bucket.setPosition(position);
     }
 
     public void autoRun() {
         System.out.println("autoRun");
+
+        /*
         while (true) {
             if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
                 if (slideState == SlideState.RETRACTED) {
@@ -310,6 +322,46 @@ public class Outtake extends SubsystemBase {
                 }
                 slideRun = SlideRun.RUNNING;
             }
+        }
+         */
+
+        if (!slideMotor.atTargetPosition()) {
+            slideRun = SlideRun.RUNNING;
+            if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+                slideMotor.setPositionCoefficient(0.05);
+                slideMotor.set(RETRACT_SPEED);
+            }
+            else {
+                slideMotor.set(SLIDE_SPEED);
+                switch (slideState) {
+                    case AT_TOP_GOAL:
+                        slideMotor.setPositionCoefficient(0.01);
+                        break;
+                    case AT_MID_GOAL:
+                        slideMotor.setPositionCoefficient(0.009);
+                        break;
+                    case AT_CAPSTONE:
+                        slideMotor.setPositionCoefficient(0.15);
+                        break;
+                    case AT_LOW_GOAL:
+                        slideMotor.setPositionCoefficient(0.008);
+                        slideMotor.set(0.5);
+                        break;
+                    case INTAKING_CAPSTONE:
+                        slideMotor.setPositionCoefficient(0.009);
+                        slideMotor.set(0.5);
+                        break;
+                }
+            }
+        } else {
+            if (slideState == SlideState.RETRACTED) {
+                slideMotor.stopMotor();
+            }
+            else {
+                slideMotor.set(SLIDE_STOPPED);
+            }
+            slideRun = SlideRun.HOLDING;
+            return;
         }
     }
 

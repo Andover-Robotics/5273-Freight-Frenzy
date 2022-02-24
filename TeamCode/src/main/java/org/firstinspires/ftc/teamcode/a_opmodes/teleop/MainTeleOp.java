@@ -82,7 +82,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
 
     if(Math.abs(gamepadEx2.getLeftY()) > TRIGGER_CONSTANT) {
-      bot.outtake.addOffset(-gamepadEx2.getLeftY());
+      bot.outtake.addOffset(gamepadEx2.getLeftY());
     }
 
     if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)) {
@@ -93,7 +93,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     else if(gamepadEx2.getTrigger(Trigger.LEFT_TRIGGER) > TRIGGER_CONSTANT) {
       bot.outtake.closeLeftFlap();
     }
-
 
     if (gamepadEx2.wasJustPressed(Button.RIGHT_BUMPER)) {
       bot.outtake.setAutoFlap(false);
@@ -107,6 +106,18 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
       bot.outtake.goToCapstone();
     }
+    else if(gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)){
+      bot.outtake.hookCapstone();
+      timingScheduler.defer(1.0, () -> {
+        bot.outtake.hookTSE();
+      });
+      timingScheduler.defer(2.0, () -> {
+        bot.outtake.capstone();
+      });
+    }
+    else if (Math.abs(gamepadEx2.getRightY()) > TRIGGER_CONSTANT) {
+      bot.outtake.incrementBucket(bot.outtake.bucket.getPosition() + gamepadEx2.getRightY() * 0.07);
+    }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();
     }
@@ -118,7 +129,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
       bot.outtake.fullyRetract();
-
     }
 
     if(gamepadEx2.isDown(Button.X)) {
@@ -134,6 +144,10 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     if(gamepadEx2.wasJustPressed(Button.B) && Math.abs(carouselStartTime - this.time) > 1.5) {
       carouselStartTime = this.time;
     }
+    else if(gamepadEx2.wasJustPressed(Button.Y)){
+      carouselStartTime -= 1.2;
+    }
+
     runCarousel();
 
 
@@ -213,10 +227,6 @@ public class MainTeleOp extends BaseOpMode {//required vars here
                     gamepadEx1.getRightX() * Math.abs(gamepadEx1.getRightX()),
                     0);
     if (bot.roadRunner.mode == RRMecanumDrive.Mode.IDLE) {
-
-      double forwardSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT) ? 1 : -1) : 0;
-      double strafeSpeed = (gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN) || gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)) ? (gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : -1) : 0;
-      double turnSpeed = (gamepadEx1.getButton(GamepadKeys.Button.X) || gamepadEx1.getButton(GamepadKeys.Button.B)) ? (gamepadEx1.getButton(GamepadKeys.Button.B) ? 1 : -1) : 0;
 
       if (centricity) {//epic java syntax
         bot.drive.driveFieldCentric(
