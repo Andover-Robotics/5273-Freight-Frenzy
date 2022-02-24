@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-
 public class Outtake extends SubsystemBase {
 
     public class RunSlides extends CommandBase {
@@ -88,7 +87,6 @@ public class Outtake extends SubsystemBase {
 
     private static final double SLIDE_STOPPED = 0.15;
     private static final double RETRACT_SPEED = 0.015;
-    private static final double ZERO_SPEED = 0.0;
     private static final double TOLERANCE = 5;
     public static final int RETRACTED = 0;
     public static final int LOW_GOAL_POS = 226; // ticks

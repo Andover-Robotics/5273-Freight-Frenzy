@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
@@ -8,6 +10,7 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
 import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
@@ -22,9 +25,11 @@ public class MainTeleOp extends BaseOpMode {//required vars here
   private double fieldCentricOffset0 = 0.0;
   private double fieldCentricOffset1 = 0.0;
 
-  //config? stuff here =========================================================================
+  private double carouselStartTime = 0.0;
 
-  private double fieldCentricOffset = 0.0;
+
+
+  //config? stuff here =========================================================================
 
   //opmode vars here ==============================================================================================
   public void subInit() {
@@ -76,8 +81,8 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.setAutoFlap(true);
     }
 
-    if(Math.abs(gamepadEx2.getRightY()) > TRIGGER_CONSTANT) {
-      bot.outtake.addOffset(-gamepadEx2.getRightY());
+    if(Math.abs(gamepadEx2.getLeftY()) > TRIGGER_CONSTANT) {
+      bot.outtake.addOffset(-gamepadEx2.getLeftY());
     }
 
     if (gamepadEx2.wasJustPressed(Button.LEFT_BUMPER)) {
@@ -123,57 +128,13 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       bot.outtake.fullyRetract();
     }
 
-//    if(gamepadEx2.wasJustPressed(Button.X)) {
-//      bot.outtake.flipBucket();
-//      timingScheduler.defer(0.6,
-//      () -> {
-//        bot.outtake.unFlipBucket();
-//        bot.outtake.fullyRetract();
-//      });
-//    }
 
     // carousel controls
-    if (gamepadEx2.wasJustPressed(Button.Y)) {
-      //bot.carousel.toggleBlue();
-      bot.carousel.runBlue();
-      /*
-      for (int i = 0; i < 10; i++) {
-        timingScheduler.defer(
-                i * 3.0 + 2.5, () -> {
-                  bot.carousel.toggleBlue();
-                }
-        );
 
-        timingScheduler.defer(
-                (i + 1) * 3.0, () -> {
-                  bot.carousel.toggleBlue();
-                }
-        );
-      }
-
-       */
+    if(gamepadEx2.wasJustPressed(Button.B) && Math.abs(carouselStartTime - this.time) > 1.5) {
+      carouselStartTime = this.time;
     }
-    else if (gamepadEx2.wasJustPressed(Button.B)) {
-      //bot.carousel.toggleRed();
-      bot.carousel.runRed();
-      /*
-      for (int i = 0; i < 10; i++) {
-        timingScheduler.defer(
-                i * 3.0 + 2.5, () -> {
-                  bot.carousel.toggleRed();
-                }
-        );
-
-        timingScheduler.defer(
-                (i + 1) * 3.0, () -> {
-                  bot.carousel.toggleRed();
-                }
-        );
-      }
-
-       */
-    }
-    else bot.carousel.stop();
+    runCarousel();
 
 
 
@@ -213,8 +174,25 @@ public class MainTeleOp extends BaseOpMode {//required vars here
     telemetry.addData("driver left stick", "left X" + gamepadEx1.getLeftX() + ": " + gamepadEx1.getLeftY());
     telemetry.addLine("isFreightIn : " + bot.outtake.isFreightIn());
     telemetry.addLine("autoFlap: " + bot.outtake.isAutoFlap());
+    telemetry.addLine("System time: " + this.time);
+    telemetry.addLine("startCarouselTime: " + carouselStartTime);
+    telemetry.addData("Carousel Speed", bot.carousel.getMotor().getVelocity());
   }
 
+  private void runCarousel() {
+    double curTime = Math.abs(carouselStartTime - this.time);
+    if(curTime < 0.7) {
+      bot.carousel.runAtTPS(GlobalConfig.alliance == GlobalConfig.Alliance.RED,
+              (Math.pow(1.5, curTime * 0.3) - 0.8) * bot.carousel.getMotor().ACHIEVABLE_MAX_TICKS_PER_SECOND);
+    }
+    else if (curTime < 1.2) {
+      bot.carousel.runAtTPS(GlobalConfig.alliance == GlobalConfig.Alliance.RED,
+              (Math.pow(4, curTime * 0.25) - 0.99) * bot.carousel.getMotor().ACHIEVABLE_MAX_TICKS_PER_SECOND);
+    }
+    else {
+      bot.carousel.stop();
+    }
+  }
 
   private void drive(){//Driving ===================================================================================
 
