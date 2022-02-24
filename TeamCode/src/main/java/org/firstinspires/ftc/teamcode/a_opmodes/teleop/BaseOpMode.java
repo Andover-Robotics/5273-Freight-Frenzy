@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
@@ -21,6 +24,10 @@ public abstract class BaseOpMode extends OpMode {
   protected GamepadEx gamepadEx1, gamepadEx2;
   TimingScheduler timingScheduler;
 
+  protected FtcDashboard dashboard = FtcDashboard.getInstance();
+  protected TelemetryPacket packet = new TelemetryPacket();
+
+
   //button reader syntax
   // (g1 or g2)  (a, b, lt, lb, etc)
 
@@ -31,6 +38,7 @@ public abstract class BaseOpMode extends OpMode {
     gamepadEx2 = new GamepadEx(gamepad2);
     gamepadEx1 = new GamepadEx(gamepad1);
     timingScheduler = new TimingScheduler(this);
+    telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
     subInit();
     telemetry.addLine("Init done");
     telemetry.update();
@@ -41,6 +49,7 @@ public abstract class BaseOpMode extends OpMode {
     updateButtons();
     CommandScheduler.getInstance().run();
     subLoop();
+    telemetry.update();
   }
 
   protected abstract void subInit();
