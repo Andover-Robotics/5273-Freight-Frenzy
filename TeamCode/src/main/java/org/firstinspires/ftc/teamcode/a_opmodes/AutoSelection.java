@@ -17,7 +17,7 @@ public class AutoSelection extends BaseOpMode {
     //todo clean up opmodes, so the selection screen is not cluttered
     @Override
     protected void subInit() {
-        telemetry.addData("Controls", "X: carousel, Y:outtakeCube, B:parking, D-Pad: cycles");
+        telemetry.addData("Controls", "B: carousel, Y: outtakeCube, X: parking, A: alliance, Bumpers: side, D-Pad: cycles");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class AutoSelection extends BaseOpMode {
         telemetry.addData("OuttakeCube", GlobalConfig.outtakeCube);
         telemetry.addData("Cycles", GlobalConfig.cycles);
         telemetry.addData("Parking", GlobalConfig.parking);
-        telemetry.addData("Allaince", GlobalConfig.alliance);
+        telemetry.addData("Alliance", GlobalConfig.alliance);
         telemetry.addData("Side", GlobalConfig.side);
         telemetry.update();
 

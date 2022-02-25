@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -148,7 +150,7 @@ public class Outtake extends SubsystemBase {
         slideMotor = new MotorEx(opMode.hardwareMap, "slideMotor", Motor.GoBILDA.RPM_312);
         slideMotor.setRunMode(Motor.RunMode.PositionControl);
         slideMotor.setInverted(true);
-        slideMotor.setPositionTolerance(40);
+        slideMotor.setPositionTolerance(TOLERANCE);
         slideMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         unFlipBucket();
@@ -215,7 +217,7 @@ public class Outtake extends SubsystemBase {
     }
 
     public boolean isFreightIn() {
-        return bucketSensor.alpha() > 2500;
+        return bucketSensor.alpha() > 2000;
     }
 
     public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
@@ -297,33 +299,28 @@ public class Outtake extends SubsystemBase {
     }
 
     public void autoRun() {
-        System.out.println("autoRun");
 
         /*
+
         while (true) {
-            if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
-                if (slideState == SlideState.RETRACTED) {
-                    slideMotor.stopMotor();
-                }
-                else {
-                    slideMotor.set(SLIDE_STOPPED);
-                }
-                slideRun = SlideRun.HOLDING;
-                return;
-
-            }
-
-            else {
-                if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
-                    slideMotor.set(RETRACT_SPEED);
+                if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
+                    slideMotor.set(SLIDE_STOPPED + 0.02  );
+                    slideRun = SlideRun.HOLDING;
+                    return;
                 } else {
-                    slideMotor.setPositionCoefficient(0.05);
-                    slideMotor.set(SLIDE_SPEED);
+                    if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
+                        slideMotor.set(RETRACT_SPEED);
+                    } else {
+                        slideMotor.setPositionCoefficient(0.05);
+                        slideMotor.set(SLIDE_SPEED);
+                    }
+                    slideRun = SlideRun.RUNNING;
                 }
-                slideRun = SlideRun.RUNNING;
             }
-        }
+
          */
+
+        slideMotor.setTargetPosition(targetPosition);
 
         if (!slideMotor.atTargetPosition()) {
             slideRun = SlideRun.RUNNING;

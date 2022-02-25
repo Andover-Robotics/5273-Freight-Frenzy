@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
+import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Hubs;
 
 
 @TeleOp(name = "IntakeTuningGraphing", group = "ZDashBoard graphing tool")
@@ -13,42 +14,21 @@ public class IntakeGraphingOpMode extends BaseOpMode {
 
     TelemetryPacket packet = new TelemetryPacket();
 
-    private static final double TRIGGER_TOLERANCE = 0.05;
-
-    private static double lastLeftRPM, lastRightRPM;
+    private Hubs hubs;
 
     public void subInit() {
+        hubs = new Hubs(this);
 
-
+        bot.intake.runRight();
+        bot.intake.runLeft();
 
         packet.addLine("Init done");
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 
     public void subLoop() {
-
-        double leftIntakeVelo = bot.intake.leftIntake.getVelocity(),
-               rightIntakeVelo = bot.intake.rightIntake.getVelocity();
-
-        if(gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= TRIGGER_TOLERANCE) {
-            bot.intake.runRight();
-        }
-        else if(gamepadEx1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) >= TRIGGER_TOLERANCE) {
-            bot.intake.runLeft();
-        }
-        else {
-            bot.intake.stop();
-        }
-
-        packet.put("Left Intake Accel", leftIntakeVelo - lastLeftRPM);
-        packet.put("Right Intake Accel", lastRightRPM - rightIntakeVelo);
-
-        lastLeftRPM = leftIntakeVelo;
-        lastRightRPM = rightIntakeVelo;
-
-        packet.put("Left Intake RPM", leftIntakeVelo);
-        packet.put("Right Intake RPM", rightIntakeVelo);
-
+        packet.put("Left Intake Amperage", hubs.leftIntakeCurrentDraw());
+        packet.put("Right Intake Amperage", hubs.rightIntakeCurrentDraw());
 
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }

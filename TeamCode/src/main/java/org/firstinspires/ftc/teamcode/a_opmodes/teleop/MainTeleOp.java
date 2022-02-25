@@ -116,7 +116,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
       });
     }
     else if (Math.abs(gamepadEx2.getRightY()) > TRIGGER_CONSTANT) {
-      bot.outtake.incrementBucket(bot.outtake.bucket.getPosition() + gamepadEx2.getRightY() * 0.07);
+      bot.outtake.incrementBucket(Math.max(0.0, bot.outtake.bucket.getPosition() + gamepadEx2.getRightY() * 0.07));
     }
     else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
       bot.outtake.goToTopGoal();

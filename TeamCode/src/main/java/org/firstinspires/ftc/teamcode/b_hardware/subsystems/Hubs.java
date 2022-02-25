@@ -13,7 +13,7 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
 
-class Hubs extends SubsystemBase {
+public class Hubs extends SubsystemBase {
 
     private static ExpansionHubEx controlHub;
     private static ExpansionHubEx expansionHub;
