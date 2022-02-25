@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto
 
-import com.acmerobotics.roadrunner.followers.PathFollower
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.MarkerCallback
@@ -8,7 +7,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.GlobalConfig
 import org.firstinspires.ftc.teamcode.GlobalConfig.*
-import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.TSEDetector
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
 import org.firstinspires.ftc.teamcode.b_hardware.subsystems.Outtake
@@ -228,7 +227,7 @@ class AutoPaths(val opMode: LinearOpMode) {
 
     private fun outtakeTrajectory(
         n: Int,
-        element: DuckDetector.PipelineResult
+        element: TSEDetector.PipelineResult
     ): AutoPathElement.Path {
         return AutoPathElement.Path(
             "Outtake $n", bot.roadRunner.trajectoryBuilder(bot.roadRunner.poseEstimate)
@@ -261,13 +260,13 @@ class AutoPaths(val opMode: LinearOpMode) {
         ) else intakeTrajectory(5, false)
     }
 
-    private fun initialOuttakeTrajectory(element: DuckDetector.PipelineResult): AutoPathElement.Path {
+    private fun initialOuttakeTrajectory(element: TSEDetector.PipelineResult): AutoPathElement.Path {
         return makePath(
             "Outtake Preloaded Cube Trajectory",
             bot.roadRunner.trajectoryBuilder(initialPosition())
                 .addTemporalMarker(
                     0.1,
-                    if (element == DuckDetector.PipelineResult.LEFT) outtakeHigh.runner else if (element == DuckDetector.PipelineResult.MIDDLE) outtakeMid.runner else outtakeLow.runner
+                    if (element == TSEDetector.PipelineResult.LEFT) outtakeHigh.runner else if (element == TSEDetector.PipelineResult.MIDDLE) outtakeMid.runner else outtakeLow.runner
                 )
                 .lineToSplineHeading(initialOuttakePosition())
                 .build()
@@ -295,7 +294,7 @@ class AutoPaths(val opMode: LinearOpMode) {
     )
 
     private fun calcTrajectories(
-        pipelineResult: DuckDetector.PipelineResult,
+        pipelineResult: TSEDetector.PipelineResult,
         outtakeCube: Boolean,
         carousel: Boolean,
         cycles: Int,
@@ -336,7 +335,7 @@ class AutoPaths(val opMode: LinearOpMode) {
     }
     //todo make it use periodic instead of sliderun
     // features as functions, that return command groups
-    fun getTrajectories(a: DuckDetector.PipelineResult): List<AutoPathElement> {
+    fun getTrajectories(a: TSEDetector.PipelineResult): List<AutoPathElement> {
         return calcTrajectories(
             a,
             GlobalConfig.outtakeCube,

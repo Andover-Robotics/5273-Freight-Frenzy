@@ -5,16 +5,16 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 @Autonomous(name = "Barcode Tester", group = "Competition")
 public class TestBarcodePosition extends OpMode {
-    private DuckDetector duckDetector;
+    private TSEDetector TSEDetector;
 
     @Override
     public void init() {
-        duckDetector = new DuckDetector(this, telemetry);
+        TSEDetector = new TSEDetector(this, telemetry);
     }
 
     @Override
     public void loop() {
-        duckDetector.currentlyDetected()
+        TSEDetector.currentlyDetected()
                 .ifPresent((pipelineResultDoublePair -> {
                     telemetry.addData("Status", "Looking for a duck");
                     telemetry.addData("Detected", pipelineResultDoublePair.first);

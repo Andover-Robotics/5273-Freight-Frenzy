@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement.Action;
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoPaths.AutoPathElement.Path;
-import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector;
-import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.DuckDetector.PipelineResult;
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.TSEDetector;
+import org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline.TSEDetector.PipelineResult;
 import org.firstinspires.ftc.teamcode.b_hardware.Bot;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class MainAutonomous extends LinearOpMode {
 
   PipelineResult detected;
   double confidence;
-  DuckDetector pipeline;
+  TSEDetector pipeline;
   boolean performActions = true;
   GamepadEx gamepad;
 
@@ -42,7 +42,7 @@ public class MainAutonomous extends LinearOpMode {
     telemetry.update();
 
 
-    pipeline = new DuckDetector(this, telemetry);
+    pipeline = new TSEDetector(this, telemetry);
     //initialize here
     bot.outtake.fullyRetract();
     bot.outtake.closeRightFlap();

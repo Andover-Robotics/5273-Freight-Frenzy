@@ -29,7 +29,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
 
-public class DuckDetector {
+public class TSEDetector {
 
   public enum PipelineResult {
     LEFT(0),
@@ -48,7 +48,7 @@ public class DuckDetector {
   private volatile boolean saveImageNext = true;
   private Telemetry telemetry;
 
-  public DuckDetector(OpMode opMode, Telemetry telemetry) {
+  public TSEDetector(OpMode opMode, Telemetry telemetry) {
     this.telemetry = telemetry;
     WebcamName camName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
     camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
@@ -108,7 +108,7 @@ public class DuckDetector {
 
     //TEAM SHIPPING ELEMENT CONSTANTS
 
-    static final double TEAM_SHIPPING_ELEMENT_AREA = 40000;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 30000;
 
     final double MIDDLE_RIGHT_X = 600;
     final double MIDDLE_LEFT_X = 320;
