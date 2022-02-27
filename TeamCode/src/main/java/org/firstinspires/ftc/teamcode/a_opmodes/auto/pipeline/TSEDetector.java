@@ -136,7 +136,7 @@ public class TSEDetector {
       Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
       Imgproc.GaussianBlur(input, smoothEdges, gaussianKernelSize, 0, 0);
 
-      Mat bitmaskImage = Imgcodecs.imread("bitmask.jpeg");
+      Mat bitmaskImage = Imgcodecs.imread("src/main/java/org/firstinspires/ftc/teamcode/a_opmodes/auto/pipeline/bitmask.jpeg");
       Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
       Core.bitwise_and(bitmask, smoothEdges, bitmaskedImage);
 
