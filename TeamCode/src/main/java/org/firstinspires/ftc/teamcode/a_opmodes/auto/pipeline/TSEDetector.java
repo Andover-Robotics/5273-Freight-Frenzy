@@ -27,6 +27,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2HLS;
 import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
 
 public class TSEDetector {
@@ -136,11 +137,11 @@ public class TSEDetector {
       Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
       Imgproc.GaussianBlur(input, smoothEdges, gaussianKernelSize, 0, 0);
 
-      Mat bitmaskImage = Imgcodecs.imread("src/main/java/org/firstinspires/ftc/teamcode/a_opmodes/auto/pipeline/bitmask.jpeg");
+      Mat bitmaskImage = Imgcodecs.imread("TeamCode/src/main/java/org/firstinspires/ftc/teamcode/a_opmodes/auto/pipeline/bitmask.jpeg", Imgcodecs.IMREAD_COLOR);
       Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
       Core.bitwise_and(bitmask, smoothEdges, bitmaskedImage);
 
-      Imgproc.cvtColor(bitmaskedImage, test, COLOR_RGB2HLS);
+      Imgproc.cvtColor(bitmaskedImage, test, COLOR_BGR2HLS);
       Core.inRange(test, lowerRangeHLS, upperRangeHLS, edgeDetector);
 
       ArrayList<MatOfPoint> contours = new ArrayList<>();
