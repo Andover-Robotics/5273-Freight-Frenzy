@@ -9,21 +9,22 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.GlobalConfig;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
+import org.firstinspires.ftc.teamcode.d_util.utilclasses.TimingScheduler;
 
 @TeleOp(name = "Main TeleOp", group = "Competition")
 public class MainTeleOp extends BaseOpMode {//required vars here
-    private double cycle = 0;
-    private double prevRead = 0;
-    private boolean centricity = false;
-    private final double TRIGGER_CONSTANT = 0.15;
-    private final double SLOW_MODE_PERCENT = 0.4;
-    private double fieldCentricOffset0 = 0.0;
-    private double fieldCentricOffset1 = 0.0;
+  private double cycle = 0;
+  private double prevRead = 0;
+  private boolean centricity = false;
+  private final double TRIGGER_CONSTANT = 0.15;
+  private final double SLOW_MODE_PERCENT = 0.4;
+  private double fieldCentricOffset0 = 0.0;
+  private double fieldCentricOffset1 = 0.0;
+  private double turnSpeed;
+  private double carouselStartTime = 0.0;
 
-    private double carouselStartTime = 0.0;
 
-
-    //config? stuff here =========================================================================
+  //config? stuff here =========================================================================
 
     //opmode vars here ==============================================================================================
     public void subInit() {
@@ -95,18 +96,34 @@ public class MainTeleOp extends BaseOpMode {//required vars here
             bot.outtake.closeLeftFlap();
         }
 
-        // all slides controls
-        if (Math.abs(gamepadEx2.getRightY()) > TRIGGER_CONSTANT) {
-            bot.outtake.incrementBucket(Math.max(0.0, bot.outtake.bucket.getPosition() + gamepadEx2.getRightY() * 0.07));
-        } else if (gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
-            bot.outtake.goToTopGoal();
-        } else if (gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
-            bot.outtake.goToLowGoal();
-        } else if (gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
-            bot.outtake.goToMidGoal();
-        } else if (gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
-            bot.outtake.fullyRetract();
-        }
+    // all slides controls
+    if(gamepadEx2.wasJustPressed(Button.LEFT_STICK_BUTTON)) {
+      bot.outtake.goToCapstone();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.RIGHT_STICK_BUTTON)){
+      bot.outtake.hookCapstone();
+      timingScheduler.defer(1.0, () -> {
+        bot.outtake.hookTSE();
+      });
+      timingScheduler.defer(2.0, () -> {
+        bot.outtake.capstone();
+      });
+    }
+    else if (Math.abs(gamepadEx2.getRightY()) > TRIGGER_CONSTANT) {
+      bot.outtake.incrementBucket(bot.outtake.bucket.getPosition() + (gamepadEx2.getRightY() > 0.0 ? -1.0 : 1.0) * 0.03);
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_UP)) {
+      bot.outtake.goToTopGoal();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_LEFT)) {
+      bot.outtake.goToLowGoal();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_RIGHT)) {
+      bot.outtake.goToMidGoal();
+    }
+    else if(gamepadEx2.wasJustPressed(Button.DPAD_DOWN)) {
+      bot.outtake.fullyRetract();
+    }
 
         if (gamepadEx2.isDown(Button.X)) {
             bot.outtake.flipBucket();

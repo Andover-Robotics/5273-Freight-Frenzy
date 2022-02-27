@@ -87,6 +87,7 @@ public class Outtake extends SubsystemBase {
     private static final double SLIDE_SPEED = 0.3;
 
     private static final double SLIDE_STOPPED = 0.15;
+    private static final double AUTO_SLIDE_STOPPED = 0.05;
     private static final double RETRACT_SPEED = 0.015;
     private static final double TOLERANCE = 5;
     public static final int RETRACTED = 0;
@@ -350,7 +351,7 @@ public class Outtake extends SubsystemBase {
                 slideMotor.set(0.0);
             }
             else {
-                slideMotor.set(SLIDE_STOPPED);
+                slideMotor.set(AUTO_SLIDE_STOPPED);
             }
             slideRun = SlideRun.HOLDING;
             return;

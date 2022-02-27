@@ -91,8 +91,11 @@ public class TSEDetector {
     final Scalar upperRange = new Scalar(80, 90, 255);
     */
 
-    final Scalar lowerRange = new Scalar(40, 0, 50);
-    final Scalar upperRange = new Scalar(120, 255, 255);
+    final Scalar lowerRangeHLS = new Scalar(100, 0, 40);
+    final Scalar upperRangeHLS = new Scalar(180, 255, 255);
+
+    final Scalar lowerRangeRGB = new Scalar(0, 0, 0);
+    final Scalar upperRangeRGB = new Scalar(5, 5, 5);
 
     /*
 
@@ -110,13 +113,15 @@ public class TSEDetector {
 
     static final double TEAM_SHIPPING_ELEMENT_AREA = 30000;
 
-    final double MIDDLE_RIGHT_X = 600;
-    final double MIDDLE_LEFT_X = 320;
+    final double MIDDLE_RIGHT_X = 640;
+    final double MIDDLE_LEFT_X = 280;
     final double MIN_Y = 0;
 
     final Mat test = new Mat(),
+            bitmask = new Mat(),
             edgeDetector = new Mat(),
             smoothEdges = new Mat(),
+            bitmaskedImage = new Mat(),
             contourDetector = new Mat();
     final MatOfPoint2f polyDpResult = new MatOfPoint2f();
     final List<Rect> bounds = new ArrayList<>();
@@ -129,21 +134,26 @@ public class TSEDetector {
     public Mat processFrame(Mat input) {
       Rect potentialDuckArea = new Rect(0, 0, input.width(), input.height());
       Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
-      Imgproc.cvtColor(input, test, COLOR_RGB2HLS);
-      Core.inRange(test, lowerRange, upperRange, edgeDetector);
-      Imgproc.GaussianBlur(edgeDetector, smoothEdges, gaussianKernelSize, 0, 0);
+      Imgproc.GaussianBlur(input, smoothEdges, gaussianKernelSize, 0, 0);
+
+      Mat bitmaskImage = Imgcodecs.imread("bitmask.jpeg");
+      Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
+      Core.bitwise_and(bitmask, smoothEdges, bitmaskedImage);
+
+      Imgproc.cvtColor(bitmaskedImage, test, COLOR_RGB2HLS);
+      Core.inRange(test, lowerRangeHLS, upperRangeHLS, edgeDetector);
 
       ArrayList<MatOfPoint> contours = new ArrayList<>();
-      Imgproc.findContours(smoothEdges, contours, contourDetector,
+      Imgproc.findContours(edgeDetector, contours, contourDetector,
               Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
       extractRectBounds(contours);
 
       for (Rect t : bounds) {
-        Imgproc.rectangle(input, t, lowerRange, 2);
+        Imgproc.rectangle(input, t, lowerRangeHLS, 2);
       }
 
-      result = identifyDuckFromBounds().orElse(null);
+      result = identifyTSEFromBounds().orElse(null);
       if (saveImageNext) {
         Mat cvt = new Mat();
         Imgproc.cvtColor(input, cvt, COLOR_RGB2HLS);
@@ -159,7 +169,7 @@ public class TSEDetector {
       return input;
     }
 
-    private Optional<Pair<PipelineResult, Double>> identifyDuckFromBounds() {
+    private Optional<Pair<PipelineResult, Double>> identifyTSEFromBounds() {
       if (bounds.size() == 0) {
         return Optional.of(Pair.create(PipelineResult.NONE, 0.9));
       }

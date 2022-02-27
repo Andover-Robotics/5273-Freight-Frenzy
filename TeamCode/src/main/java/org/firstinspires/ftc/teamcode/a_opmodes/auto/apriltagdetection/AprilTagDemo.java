@@ -72,7 +72,7 @@ public class AprilTagDemo extends LinearOpMode
             @Override
             public void onOpened()
             {
-                camera.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
