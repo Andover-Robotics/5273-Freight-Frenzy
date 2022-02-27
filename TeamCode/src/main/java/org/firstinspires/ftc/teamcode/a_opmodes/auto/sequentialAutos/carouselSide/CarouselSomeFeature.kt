@@ -5,11 +5,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoCommands
 import org.firstinspires.ftc.teamcode.a_opmodes.auto.AutoCommands.offset
 import org.firstinspires.ftc.teamcode.b_hardware.Bot
-
+@Disabled
 @Autonomous(name = "Carousel Half(Feature-based)", group = "Experimental")
 class CarouselSomeFeature : OpMode() {
     lateinit var bot: Bot

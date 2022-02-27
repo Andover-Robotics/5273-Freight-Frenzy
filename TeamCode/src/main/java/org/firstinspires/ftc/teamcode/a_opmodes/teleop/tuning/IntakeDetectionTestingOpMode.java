@@ -3,10 +3,11 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
-
+@Disabled
 @TeleOp(name = "IntakeDetectionTesting", group = "ZTesting")
 public class IntakeDetectionTestingOpMode extends BaseOpMode {
 

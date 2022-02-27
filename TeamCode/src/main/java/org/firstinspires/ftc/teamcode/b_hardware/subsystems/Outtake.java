@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
 
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -299,7 +296,6 @@ public class Outtake extends SubsystemBase {
     }
 
     public void autoRun() {
-
         /*
 
         while (true) {
@@ -319,7 +315,6 @@ public class Outtake extends SubsystemBase {
             }
 
          */
-
         slideMotor.setTargetPosition(targetPosition);
 
         if (!slideMotor.atTargetPosition()) {
@@ -352,7 +347,7 @@ public class Outtake extends SubsystemBase {
             }
         } else {
             if (slideState == SlideState.RETRACTED) {
-                slideMotor.stopMotor();
+                slideMotor.set(0.0);
             }
             else {
                 slideMotor.set(SLIDE_STOPPED);
@@ -363,9 +358,9 @@ public class Outtake extends SubsystemBase {
     }
 
     public void flipBucket() {
+        bucket.setPosition(FLIPPED);
         rightFlap.setPosition(FLAP_DEPOSIT);
         leftFlap.setPosition(FLAP_DEPOSIT);
-        bucket.setPosition(FLIPPED);
         bucketState = BucketState.FLIPPED;
     }
 

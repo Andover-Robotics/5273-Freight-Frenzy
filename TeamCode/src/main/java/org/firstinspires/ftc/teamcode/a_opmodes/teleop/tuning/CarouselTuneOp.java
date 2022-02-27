@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 // maybe teach luke the FTClib stuff with this
 
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.teamcode.d_util.utilclasses.BinarySearchHelper;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-
+@Disabled
 @TeleOp(name = "CarouselTuningOp", group = "Tuning")
 public class CarouselTuneOp extends BaseOpMode {
 

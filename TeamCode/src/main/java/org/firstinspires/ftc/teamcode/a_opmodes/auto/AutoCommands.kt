@@ -73,7 +73,7 @@ object AutoCommands {
         )
     }
 
-    fun generateOuttakeFeature(drift: Vector2d = Vector2d()): CommandBase {
+    fun generateOuttakeFeature(drift:   Vector2d = Vector2d()): CommandBase {
         val bot = Bot.getInstance()
         val pos = bot.roadRunner.poseEstimate
         val endPos = if(isRed)

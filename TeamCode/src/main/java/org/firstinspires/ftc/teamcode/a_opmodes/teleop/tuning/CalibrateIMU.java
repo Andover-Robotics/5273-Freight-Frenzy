@@ -3,12 +3,13 @@ package org.firstinspires.ftc.teamcode.a_opmodes.teleop.tuning;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.a_opmodes.teleop.BaseOpMode;
 import org.firstinspires.ftc.teamcode.c_drive.RRMecanumDrive;
-
+@Disabled
 @TeleOp(name = "IMU calibration Opmode", group = "Utility" )
 public class CalibrateIMU extends BaseOpMode {
 

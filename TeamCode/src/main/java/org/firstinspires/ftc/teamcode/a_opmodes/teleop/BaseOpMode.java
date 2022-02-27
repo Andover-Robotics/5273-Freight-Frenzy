@@ -20,7 +20,7 @@ import java.util.function.Function;
 public abstract class BaseOpMode extends OpMode {
 
   protected Bot bot;
-  protected double driveSpeed;
+  protected double driveSpeed, turnSpeed;
   protected GamepadEx gamepadEx1, gamepadEx2;
   TimingScheduler timingScheduler;
 
