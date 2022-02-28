@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2HLS;
+import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
+
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.util.Pair;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -27,8 +25,10 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import static org.opencv.imgproc.Imgproc.COLOR_BGR2HLS;
-import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 public class TSEDetector {
 
@@ -137,7 +137,7 @@ public class TSEDetector {
       Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
       Imgproc.GaussianBlur(input, smoothEdges, gaussianKernelSize, 0, 0);
 
-      Mat bitmaskImage = Imgcodecs.imread("TeamCode/src/main/java/org/firstinspires/ftc/teamcode/a_opmodes/auto/pipeline/bitmask.jpeg", Imgcodecs.IMREAD_COLOR);
+      Mat bitmaskImage = Imgcodecs.imread("/FIRST/vision/bitmask.jpg");
       Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
       Core.bitwise_and(bitmask, smoothEdges, bitmaskedImage);
 
