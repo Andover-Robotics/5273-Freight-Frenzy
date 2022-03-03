@@ -61,7 +61,7 @@ public class Outtake extends SubsystemBase {
     //Make in GlobalConfig
     public static final double FLAP_OPEN = 0.26;
     public static final double FLAP_CLOSED = 0.02;
-    private static final double FLAP_DEPOSIT = 0.5;
+    private static final double FLAP_DEPOSIT = 0.43;
 
     private static final double FLIPPED = 0.45;
     private static final double UNFLIPPED = 0.0;
@@ -87,12 +87,12 @@ public class Outtake extends SubsystemBase {
     private static final double SLIDE_SPEED = 0.3;
 
     private static final double SLIDE_STOPPED = 0.15;
-    private static final double AUTO_SLIDE_STOPPED = 0.05;
+    private static final double AUTO_SLIDE_STOPPED = 0.02;
     private static final double RETRACT_SPEED = 0.015;
     private static final double TOLERANCE = 5;
     public static final int RETRACTED = 0;
     public static final int LOW_GOAL_POS = 226; // ticks
-    public static final int MID_GOAL_POS = 377;
+    public static final int MID_GOAL_POS = 420;
     public static final int TOP_GOAL_POS = 690;
     public static final int CAPSTONE_POS = 650;
     public static final int HOOK_CAPSTONE_POS = 280;
@@ -297,11 +297,9 @@ public class Outtake extends SubsystemBase {
     }
 
     public void autoRun() {
-        /*
-
         while (true) {
-                if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE) {
-                    slideMotor.set(SLIDE_STOPPED + 0.02  );
+                if (Math.abs(slideMotor.getCurrentPosition() - targetPosition) < TOLERANCE + 35) {
+                    slideMotor.set(SLIDE_STOPPED);
                     slideRun = SlideRun.HOLDING;
                     return;
                 } else {
@@ -315,17 +313,17 @@ public class Outtake extends SubsystemBase {
                 }
             }
 
-         */
+        /*
         slideMotor.setTargetPosition(targetPosition);
 
-        if (!slideMotor.atTargetPosition()) {
+        if (!slideMotor.atTargetPosition() && slideRun != SlideRun.HOLDING) {
             slideRun = SlideRun.RUNNING;
             if (Math.abs(targetPosition) < Math.abs(slideMotor.getCurrentPosition())) {
                 slideMotor.setPositionCoefficient(0.05);
                 slideMotor.set(RETRACT_SPEED);
             }
             else {
-                slideMotor.set(SLIDE_SPEED);
+                slideMotor.set(SLIDE_SPEED - 0.1);
                 switch (slideState) {
                     case AT_TOP_GOAL:
                         slideMotor.setPositionCoefficient(0.01);
@@ -338,24 +336,30 @@ public class Outtake extends SubsystemBase {
                         break;
                     case AT_LOW_GOAL:
                         slideMotor.setPositionCoefficient(0.008);
-                        slideMotor.set(0.5);
                         break;
                     case INTAKING_CAPSTONE:
                         slideMotor.setPositionCoefficient(0.009);
-                        slideMotor.set(0.5);
                         break;
                 }
             }
         } else {
+            if (slideRun == SlideRun.HOLDING) {
+                return;
+            }
+
+            /*
             if (slideState == SlideState.RETRACTED) {
                 slideMotor.set(0.0);
             }
             else {
                 slideMotor.set(AUTO_SLIDE_STOPPED);
             }
+
+
+            slideMotor.set(0.0);
             slideRun = SlideRun.HOLDING;
-            return;
         }
+        */
     }
 
     public void flipBucket() {

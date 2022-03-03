@@ -65,7 +65,6 @@ class AutoPaths(val opMode: LinearOpMode) {
         bot.roadRunner.setWeightedDrivePower(Pose2d(0.0, 0.0, 0.0))
         while (!bot.outtake.isFreightIn()) {
         }
-        //bot.roadRunner.setWeightedDrivePower(Pose2d(0.0, 0.0, 0.0));
         bot.roadRunner.mode = RRMecanumDrive.Mode.FOLLOW_TRAJECTORY
         if (redAlliance) bot.outtake.closeRightFlap() else bot.outtake.closeLeftFlap()
         if (redAlliance) bot.intake.reverseRight() else bot.intake.reverseLeft()
@@ -128,7 +127,7 @@ class AutoPaths(val opMode: LinearOpMode) {
     }
 
     fun initialPosition(): Pose2d {
-        val initialY = (if (redAlliance) -36.0 else -39.0)
+        val initialY = (if (redAlliance) -31.0 else -41.0)
         return Pose2d(
                 multiplier * 65.0,
                 initialY + (if (depotSide) 0.0 else 48.0),
@@ -147,8 +146,8 @@ class AutoPaths(val opMode: LinearOpMode) {
     private fun initialOuttakePosition(): Pose2d {
         val blueOffset = 4.0;
         return Pose2d(
-                multiplier * 45.0,
-                if (depotSide) -28.0 else (-2.0 +if (!redAlliance) blueOffset else 0.0),
+                multiplier * 39.0,
+                if (depotSide) -25.0 else (-2.0 + if (!redAlliance) blueOffset else 0.0),
                 (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) (if (redAlliance) PI / 2 else 3 * PI / 2) else 0.0)
         )
     }
@@ -208,24 +207,28 @@ class AutoPaths(val opMode: LinearOpMode) {
         )
     }
 
-    private fun intakeTrajectory(n: Int, initialIntake: Boolean): AutoPathElement.Path {
+    private fun intakeTrajectory(n: Int, initialIntake: Boolean): List<AutoPathElement.Path> {
 
         var startingPose = if (carousel && n == 1)
             carouselPosition()
         else if (outtakeCube && n == 1)
-            initialOuttakePosition().plus(Pose2d(0.0, 0.0, (if (redAlliance) -1 else 1) * PI / 4))
-        else if (n == 1)
+            initialOuttakePosition()
+        else if (n == 1 && !outtakeCube && !carousel)
             initialPosition()
         else
             outtakePosition(n)
 
-        return AutoPathElement.Path(
+        return return listOf(AutoPathElement.Path(
                 "Intake $n",
                 bot.roadRunner.trajectoryBuilder(startingPose, intakeTangents(initialIntake)[0])
-                        .splineToLinearHeading(intermediateWaypoint(), intakeTangents(initialIntake)[1])
-                        .addTemporalMarker(0.01, intakeStart.runner)
-                        .lineToConstantHeading(asVector2D(intakePosition(n)))
-                        .build()
+                    .addTemporalMarker(0.1, intakeStart.runner)
+                    .splineToLinearHeading(intermediateWaypoint(), intakeTangents(initialIntake)[1])
+                    .build()),
+                AutoPathElement.Path(
+                    "Intake $n",
+                bot.roadRunner.trajectoryBuilder(intermediateWaypoint(), intakeTangents(false)[1])
+                    .splineToConstantHeading(asVector2D(intakePosition(1)), intakeTangents(false)[1])
+                    .build())
         )
     }
 
@@ -240,24 +243,27 @@ class AutoPaths(val opMode: LinearOpMode) {
         )
     }
 
-    private fun parkingTrajectory(): AutoPathElement.Path {
+    private fun depotParkingTrajectory(): AutoPathElement.Path {
         var parkingTrajectory = bot.roadRunner.trajectoryBuilder(
                 if (cycles < 1 && !carousel && !outtakeCube) initialPosition() else if (!carousel && outtakeCube) initialOuttakePosition() else if (carousel) carouselPosition() else outtakePosition(cycles),
                 parkingTangents()[0])
                 .splineToLinearHeading(parkingPosition(), parkingTangents()[1])
                 .build()
 
-        return if (depotSide) AutoPathElement.Path(
+        return AutoPathElement.Path(
                 "Parking",
-                parkingTrajectory
-        ) else intakeTrajectory(7, false)
+                parkingTrajectory)
+    }
+
+    private fun warehouseParkingTrajectory(): List<AutoPathElement.Path> {
+        return intakeTrajectory(7, false)
     }
 
     private fun initialOuttakeTrajectory(element: TSEDetector.PipelineResult): AutoPathElement.Path {
         return makePath(
                 "Outtake Preloaded Cube Trajectory",
                 bot.roadRunner.trajectoryBuilder(initialPosition())
-                        //.addTemporalMarker(0.1,if (element == TSEDetector.PipelineResult.LEFT) outtakeHigh.runner else if (element == TSEDetector.PipelineResult.MIDDLE) outtakeMid.runner else outtakeLow.runner)
+                        .addTemporalMarker(0.1, if (element == TSEDetector.PipelineResult.LEFT) outtakeHigh.runner else if (element == TSEDetector.PipelineResult.MIDDLE) outtakeMid.runner else outtakeLow.runner)
                         .lineToSplineHeading(initialOuttakePosition())
                         .build()
         )
@@ -293,12 +299,10 @@ class AutoPaths(val opMode: LinearOpMode) {
 
         if (outtakeCube) {
             paths.add(initialOuttakeTrajectory(pipelineResult))
-            paths.add(outtakeHigh)
             paths.add(outtakeEnd)
         }
 
         if (carousel) {
-            //paths.add(runCarousel)
             paths.add(carouselTrajectory)
             if (!redAlliance)
                 paths.add(turnTrajectory)
@@ -309,7 +313,8 @@ class AutoPaths(val opMode: LinearOpMode) {
 
         for (n in IntRange(1, cycles)) {
             //paths.add(intakeStart)
-            paths.add(if (n == 1) intakeTrajectory(n, true) else intakeTrajectory(n, false))
+            paths.add((if (n == 1) intakeTrajectory(n, true) else intakeTrajectory(n, false))[0])
+            paths.add((if (n == 1) intakeTrajectory(n, true) else intakeTrajectory(n, false))[1])
             paths.add(intaking)
             paths.add(outtakeTrajectory(n))
             paths.add(intakeStop)
@@ -318,7 +323,9 @@ class AutoPaths(val opMode: LinearOpMode) {
         }
 
         if (parking) {
-            paths.add(parkingTrajectory())
+            paths.add(if (depotSide) depotParkingTrajectory() else warehouseParkingTrajectory()[0])
+            if (!depotSide)
+                paths.add(warehouseParkingTrajectory()[1])
         }
 
         return paths
@@ -330,10 +337,10 @@ class AutoPaths(val opMode: LinearOpMode) {
     fun getTrajectories(a: TSEDetector.PipelineResult): List<AutoPathElement> {
         return calcTrajectories(
                 a,
-                GlobalConfig.outtakeCube,
-                GlobalConfig.carousel,
-                GlobalConfig.cycles,
-                GlobalConfig.parking
+                outtakeCube,
+                carousel,
+                cycles,
+                parking
         )
     }
 }

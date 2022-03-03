@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.b_hardware.subsystems;
-//todo implement with motor instead of CR servo
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -18,7 +18,7 @@ public class Carousel extends SubsystemBase {
     public final Command cmdRunBlue = new InstantCommand(this::runBlue, this);
     public final Command cmdStopCarousel = new InstantCommand(this::stop, this);
 
-    public static double OPTIMAL_RPM = 135;
+    public static double OPTIMAL_RPM = 200;
     public static final double MOTOR_SPEED = 6000;
     public static final double TICKS_PER_REVOLUTION = 145.1;
     public static final double VELOCITY = OPTIMAL_RPM / 60 * TICKS_PER_REVOLUTION; //531 rpm

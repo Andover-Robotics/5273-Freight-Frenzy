@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.a_opmodes.auto.pipeline;
 
-import static org.opencv.imgproc.Imgproc.COLOR_BGR2HLS;
-import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
-
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.util.Pair;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -25,10 +27,9 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import static org.opencv.imgcodecs.Imgcodecs.IMREAD_UNCHANGED;
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2HLS;
+import static org.opencv.imgproc.Imgproc.COLOR_RGB2HLS;
 
 public class TSEDetector {
 
@@ -57,7 +58,7 @@ public class TSEDetector {
       @Override
       public void onOpened() {
         camera.setPipeline(pipeline);
-        camera.startStreaming(320 * 3, 240 * 3, OpenCvCameraRotation.UPRIGHT);
+        camera.startStreaming(960, 720, OpenCvCameraRotation.UPRIGHT);
         telemetry.addData("Camera Status", "Opened");
       }
 
@@ -92,11 +93,11 @@ public class TSEDetector {
     final Scalar upperRange = new Scalar(80, 90, 255);
     */
 
-    final Scalar lowerRangeHLS = new Scalar(100, 0, 40);
+    final Scalar lowerRangeHLS = new Scalar(0, 0, 90);
     final Scalar upperRangeHLS = new Scalar(180, 255, 255);
 
-    final Scalar lowerRangeRGB = new Scalar(0, 0, 0);
-    final Scalar upperRangeRGB = new Scalar(5, 5, 5);
+    final Scalar lowerRangeRGB = new Scalar(250, 250, 250);
+    final Scalar upperRangeRGB = new Scalar(255, 255, 255);
 
     /*
 
@@ -112,17 +113,17 @@ public class TSEDetector {
 
     //TEAM SHIPPING ELEMENT CONSTANTS
 
-    static final double TEAM_SHIPPING_ELEMENT_AREA = 30000;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 20000;
 
-    final double MIDDLE_RIGHT_X = 640;
-    final double MIDDLE_LEFT_X = 280;
+    final double MIDDLE_RIGHT_X = 600;
+    final double MIDDLE_LEFT_X = 250;
     final double MIN_Y = 0;
 
     final Mat test = new Mat(),
             bitmask = new Mat(),
             edgeDetector = new Mat(),
             smoothEdges = new Mat(),
-            bitmaskedImage = new Mat(),
+            rotatedEdgeDetector = new Mat(),
             contourDetector = new Mat();
     final MatOfPoint2f polyDpResult = new MatOfPoint2f();
     final List<Rect> bounds = new ArrayList<>();
@@ -137,12 +138,17 @@ public class TSEDetector {
       Imgproc.rectangle(input, potentialDuckArea, new Scalar(255, 255, 255));
       Imgproc.GaussianBlur(input, smoothEdges, gaussianKernelSize, 0, 0);
 
-      Mat bitmaskImage = Imgcodecs.imread("/FIRST/vision/bitmask.jpg");
-      Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
-      Core.bitwise_and(bitmask, smoothEdges, bitmaskedImage);
-
-      Imgproc.cvtColor(bitmaskedImage, test, COLOR_BGR2HLS);
+      Imgproc.cvtColor(smoothEdges, test, COLOR_RGB2HLS);
       Core.inRange(test, lowerRangeHLS, upperRangeHLS, edgeDetector);
+
+      Mat bitmaskImage = Imgcodecs.imread("/sdcard/FIRST/bitmask.jpg", IMREAD_UNCHANGED);
+      Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
+
+      Log.d("Bitmask Size", bitmask.toString());
+      Log.d("Input Size", input.toString());
+
+      Core.bitwise_and(bitmask, edgeDetector, edgeDetector);
+      Core.rotate(edgeDetector, rotatedEdgeDetector, Core.ROTATE_180);
 
       ArrayList<MatOfPoint> contours = new ArrayList<>();
       Imgproc.findContours(edgeDetector, contours, contourDetector,
