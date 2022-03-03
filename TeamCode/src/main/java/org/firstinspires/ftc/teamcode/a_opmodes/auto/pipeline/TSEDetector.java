@@ -151,7 +151,7 @@ public class TSEDetector {
       Core.rotate(edgeDetector, rotatedEdgeDetector, Core.ROTATE_180);
 
       ArrayList<MatOfPoint> contours = new ArrayList<>();
-      Imgproc.findContours(edgeDetector, contours, contourDetector,
+      Imgproc.findContours(rotatedEdgeDetector, contours, contourDetector,
               Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
       extractRectBounds(contours);
