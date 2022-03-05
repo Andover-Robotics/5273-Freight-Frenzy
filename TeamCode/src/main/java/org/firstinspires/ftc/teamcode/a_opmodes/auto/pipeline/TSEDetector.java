@@ -93,7 +93,7 @@ public class TSEDetector {
     final Scalar upperRange = new Scalar(80, 90, 255);
     */
 
-    final Scalar lowerRangeHLS = new Scalar(0, 0, 90);
+    final Scalar lowerRangeHLS = new Scalar(40, 40, 70);
     final Scalar upperRangeHLS = new Scalar(180, 255, 255);
 
     final Scalar lowerRangeRGB = new Scalar(250, 250, 250);
@@ -113,11 +113,15 @@ public class TSEDetector {
 
     //TEAM SHIPPING ELEMENT CONSTANTS
 
-    static final double TEAM_SHIPPING_ELEMENT_AREA = 20000;
+    static final double TEAM_SHIPPING_ELEMENT_AREA = 10000;
 
-    final double MIDDLE_RIGHT_X = 600;
-    final double MIDDLE_LEFT_X = 250;
-    final double MIN_Y = 0;
+    final double MIDDLE_RIGHT_X = 120;
+    final double MIDDLE_LEFT_X = 400;
+
+    final double MIN_WIDTH = 50;
+    final double MAX_WIDTH = 225;
+    final double MIN_HEIGHT = 100;
+    final double MAX_HEIGHT = 300;
 
     final Mat test = new Mat(),
             bitmask = new Mat(),
@@ -141,7 +145,7 @@ public class TSEDetector {
       Imgproc.cvtColor(smoothEdges, test, COLOR_RGB2HLS);
       Core.inRange(test, lowerRangeHLS, upperRangeHLS, edgeDetector);
 
-      Mat bitmaskImage = Imgcodecs.imread("/sdcard/FIRST/bitmask.jpg", IMREAD_UNCHANGED);
+      Mat bitmaskImage = Imgcodecs.imread("/sdcard/Download/compbitmask.jpg", IMREAD_UNCHANGED);
       Core.inRange(bitmaskImage, lowerRangeRGB, upperRangeRGB, bitmask);
 
       Log.d("Bitmask Size", bitmask.toString());
@@ -211,7 +215,8 @@ public class TSEDetector {
         // if polydp fails, switch to a local new MatOfPoint2f();
         Imgproc.approxPolyDP(new MatOfPoint2f(contour.toArray()), polyDpResult, 3, true);
         Rect r = Imgproc.boundingRect(new MatOfPoint(polyDpResult.toArray()));
-        if (r.y > MIN_Y && r.area() > TEAM_SHIPPING_ELEMENT_AREA)
+        if (r.area() > TEAM_SHIPPING_ELEMENT_AREA && r.width > MIN_WIDTH
+          && r.width < MAX_WIDTH && r.height > MIN_HEIGHT && r.height < MAX_HEIGHT)
           addCombineRectangle(bounds, r, bounds.size() - 1);
       }
     }

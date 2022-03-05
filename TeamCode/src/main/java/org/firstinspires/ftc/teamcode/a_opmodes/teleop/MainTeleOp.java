@@ -183,6 +183,7 @@ public class MainTeleOp extends BaseOpMode {//required vars here
         telemetry.addLine("System time: " + this.time);
         telemetry.addLine("startCarouselTime: " + carouselStartTime);
         telemetry.addData("Carousel Speed", bot.carousel.getMotor().getVelocity());
+        telemetry.addData("Alpha", bot.outtake.bucketSensor.alpha());
     }
 
     private void runCarousel() {

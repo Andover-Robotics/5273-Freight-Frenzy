@@ -127,11 +127,11 @@ class AutoPaths(val opMode: LinearOpMode) {
     }
 
     fun initialPosition(): Pose2d {
-        val initialY = (if (redAlliance) -31.0 else -41.0)
+        val initialY = (if (redAlliance) -37.0 else -37.0)
         return Pose2d(
-                multiplier * 65.0,
-                initialY + (if (depotSide) 0.0 else 48.0),
-                3 * PI / 2 - if (redAlliance) 0.0 else PI
+            multiplier * 65.0,
+            initialY + (if (depotSide) 0.0 else 48.0),
+            3 * PI / 2 - if (redAlliance) 0.0 else PI
         )
     }
 
@@ -146,7 +146,7 @@ class AutoPaths(val opMode: LinearOpMode) {
     private fun initialOuttakePosition(): Pose2d {
         val blueOffset = 4.0;
         return Pose2d(
-                multiplier * 39.0,
+                multiplier * 42.0,
                 if (depotSide) -25.0 else (-2.0 + if (!redAlliance) blueOffset else 0.0),
                 (5 * (PI / 4)) - (if (redAlliance) 3 * PI / 2 else PI) - (if (depotSide) (if (redAlliance) PI / 2 else 3 * PI / 2) else 0.0)
         )
@@ -227,7 +227,7 @@ class AutoPaths(val opMode: LinearOpMode) {
                 AutoPathElement.Path(
                     "Intake $n",
                 bot.roadRunner.trajectoryBuilder(intermediateWaypoint(), intakeTangents(false)[1])
-                    .splineToConstantHeading(asVector2D(intakePosition(1)), intakeTangents(false)[1])
+                    .splineToConstantHeading(asVector2D(intakePosition(n)), intakeTangents(false)[1])
                     .build())
         )
     }
@@ -256,7 +256,7 @@ class AutoPaths(val opMode: LinearOpMode) {
     }
 
     private fun warehouseParkingTrajectory(): List<AutoPathElement.Path> {
-        return intakeTrajectory(7, false)
+        return intakeTrajectory(cycles, false)
     }
 
     private fun initialOuttakeTrajectory(element: TSEDetector.PipelineResult): AutoPathElement.Path {
@@ -281,13 +281,6 @@ class AutoPaths(val opMode: LinearOpMode) {
             AutoPathElement.Action("Turn Trajectory") { bot.roadRunner.turn(-turnRadians) }
     val unTurnTrajectory =
             AutoPathElement.Action("Turn Trajectory") { bot.roadRunner.turn(turnRadians) }
-
-    val parkingTrajectory = makePath(
-            "Parking Trajectory",
-            bot.roadRunner.trajectoryBuilder(outtakePosition(cycles), parkingTangents()[0])
-                    .splineToSplineHeading(parkingPosition(), parkingTangents()[1])
-                    .build()
-    )
 
     private fun calcTrajectories(
             pipelineResult: TSEDetector.PipelineResult,

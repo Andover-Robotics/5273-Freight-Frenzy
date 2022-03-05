@@ -126,7 +126,7 @@ public class Outtake extends SubsystemBase {
     public final Servo rightFlap;
     public final Servo bucket;
     private final MotorEx slideMotor;
-    private final ColorSensor bucketSensor;
+    public final ColorSensor bucketSensor;
 
 
     public Outtake(@NonNull OpMode opMode) {
@@ -215,7 +215,7 @@ public class Outtake extends SubsystemBase {
     }
 
     public boolean isFreightIn() {
-        return bucketSensor.alpha() > 2000;
+        return bucketSensor.alpha() > 1000;
     }
 
     public void fullyRetract() { // depending on alliance set the flaps to the correct position as well
